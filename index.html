@@ -232,7 +232,47 @@ button{font:inherit;color:inherit}
 .cine-end{opacity:0;animation:cine 1s ease forwards}
 @keyframes cine{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .ending{background:#1b120b;color:#f3e3c3;border-radius:12px;padding:16px}
-@media (prefers-reduced-motion:reduce){.tgt,.ready,#coachArrow{animation:none!important}}
+/* การกระทำของฝ่ายอื่นบนแผนที่ */
+#fx{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+#fx text,#map .ghost text,#map .tag-g text{text-anchor:middle;dominant-baseline:central;pointer-events:none}
+#map .ghost,#map .rp,#map .rp-arrow,#map .rp-atk{pointer-events:none}
+.gh-ico,.fx-ico{font-size:24px}
+.tag-g text{font-family:'Kanit','Leelawadee UI',sans-serif;font-weight:600}
+.rp-ring{fill:none;stroke-width:9}
+.rp-ring.on{stroke-width:14}
+.fx-boom{font-size:86px;transform-box:fill-box;transform-origin:center;animation:fxBoom .9s ease-out forwards}
+@keyframes fxBoom{0%{transform:scale(.2);opacity:0}25%{transform:scale(1.25);opacity:1}70%{transform:scale(1);opacity:1}100%{transform:scale(.9);opacity:0}}
+.fx-float{font-family:'Kanit',sans-serif;font-size:36px;font-weight:600;paint-order:stroke;stroke:#fffaf0;stroke-width:8px;animation:fxFloat 1.3s ease-out forwards}
+@keyframes fxFloat{0%{transform:translateY(10px);opacity:0}15%{opacity:1}75%{opacity:1}100%{transform:translateY(-75px);opacity:0}}
+.fx-flash{fill:none;stroke-width:15;animation:fxFlash .16s ease-in-out 6 alternate}
+@keyframes fxFlash{from{opacity:1}to{opacity:.12}}
+.fx-pop{transform-box:fill-box;transform-origin:center;animation:fxPop 1.2s ease-out forwards}
+@keyframes fxPop{0%{transform:scale(.3);opacity:0}20%{transform:scale(1.15);opacity:1}80%{transform:scale(1);opacity:1}100%{transform:translateY(-24px);opacity:0}}
+.btn.fx-btn{padding:8px 10px;font-size:14px;background:#efe2c4}
+.btn.fx-btn small{font-size:13px}
+.sb-gap{display:none}
+.ghost-key{font-size:13px;background:#f1e7d2;border-radius:8px;padding:6px 8px;margin-bottom:6px;line-height:1.6}
+.gk{display:inline-block;border-radius:99px;padding:0 4px;color:#fff}
+.gk-win{background:#2f7d4f} .gk-lose{background:#b03a2e}
+/* เลือกปลายทางถอนทัพบนแผนที่: หน้าต่างรบย่อเป็นแถบเล็กด้านล่าง */
+#battle.mini{background:transparent;pointer-events:none;align-items:flex-end;padding:8px}
+#battle.mini .modal{pointer-events:auto;max-height:36vh;padding:10px 12px;border:3px solid #e8862a;box-shadow:0 4px 22px #0006}
+.rp-head{font-size:14px;line-height:1.5}
+.rp-key i{display:inline-block;width:11px;height:11px;border-radius:50%;margin:0 3px 0 8px;vertical-align:-1px}
+.rp-chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.rp-chip{border:2px solid #2f9d5a;background:#e2f1e6;border-radius:99px;padding:3px 10px;font-size:14px;cursor:pointer}
+.rp-chip.break{border-color:#e8862a;background:#fbe6dc}
+.rp-chip.on{box-shadow:0 0 0 3px #2b2118;font-weight:600}
+.rp-info{font-size:14px;background:#f6efe0;border-radius:8px;padding:6px 8px;line-height:1.45}
+.rp-btns{display:flex;gap:8px;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
+@media (max-width:600px){
+  .gh-ico,.fx-ico{font-size:28px}
+  #chips{flex-basis:100%}
+  .sb-gap{display:block;flex:1}
+  .fx-btn .lbl{display:none}
+  #scorebar .btn{padding:8px 10px}
+}
+@media (prefers-reduced-motion:reduce){.tgt,.ready,#coachArrow,.fx-flash{animation:none!important}}
 </style>
 </head>
 <body>
@@ -286,12 +326,16 @@ button{font:inherit;color:inherit}
   </header>
   <div id="scorebar">
     <div id="chips"></div>
+    <button class="btn fx-btn" id="btnReplay" title="ดูตาศัตรูอีกครั้ง" aria-label="ดูตาศัตรูอีกครั้ง" disabled>🔁<span class="lbl"> ดูตาศัตรู</span></button>
+    <button class="btn fx-btn" id="btnSpeed" title="ความเร็วตอนศัตรูเดิน: ปกติ / เร็ว / ข้าม (แตะเพื่อเปลี่ยน)" aria-label="ความเร็วตอนศัตรูเดิน"></button>
+    <span class="sb-gap"></span>
     <button class="btn" id="btnUndo" title="ย้อนการสั่งการ">↩️ ย้อน</button>
     <button class="btn primary" id="btnEnd">จบเทิร์น ▶</button>
   </div>
   <div id="main">
     <div id="board">
       <svg id="map" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" aria-label="แผนที่"></svg>
+      <svg id="fx" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
       <div id="phaseBanner" class="hidden"></div>
       <div class="map-btns"><button class="map-btn" id="btnZoomIn" title="ซูมเข้า" aria-label="ซูมเข้า">＋</button><button class="map-btn" id="btnZoomOut" title="ซูมออก" aria-label="ซูมออก">－</button><button class="map-btn" id="btnView" title="รีเซ็ตมุมมอง" aria-label="รีเซ็ตมุมมอง">⟲</button></div>
     </div>
@@ -346,7 +390,7 @@ const LEVELS = [
   { id: 1, name: 'แม่ทัพ', icon: '⚔️', undo: 5, atkThr: 1.2,
     desc: 'AI มาตรฐาน: เกณฑ์ทหารแก้ทาง ป้องกันเมืองหลวง ถอนทัพเมื่อเสียเปรียบหนัก แย่งตำนานพเนจร · ย้อนได้ 5 ครั้งต่อเกม' },
   { id: 2, name: 'จอมพล', icon: '🎖️', undo: 2, atkThr: 1.15,
-    desc: 'AI เลือกทหารแก้ทางแม่นขึ้น ประสานหลายทัพบุกเป้าเดียว ฉวยโอกาสบุกเมืองหลวงเราเมื่อป้องกันอ่อน เน้นบุกดินแดนเรามากขึ้น ล่าทัพจอมทัพเราตอนไร้แผ่นดิน ถอนทัพเป็นจังหวะ เลือกตำนานที่คุ้มและใช้จุดอ่อนของตำนานฝ่ายตรงข้าม · ย้อนได้ 2 ครั้งต่อเกม' },
+    desc: 'AI เลือกทหารแก้ทางแม่นขึ้น ประสานหลายทัพบุกเป้าเดียว ฉวยโอกาสบุกเมืองหลวงเราเมื่อป้องกันอ่อน ถ่วงดุลอำนาจ (รุมฝ่ายที่ครองดินแดนนำห่าง ไม่ว่าจะเป็นเราหรือ AI) ล่าทัพจอมทัพเราตอนไร้แผ่นดิน ถอนทัพเป็นจังหวะ เลือกตำนานที่คุ้มและใช้จุดอ่อนของตำนานฝ่ายตรงข้าม · ย้อนได้ 2 ครั้งต่อเกม' },
   { id: 3, name: 'ตำนาน', icon: '👑', undo: 0, atkThr: 1.15,
     desc: 'ทุกอย่างของจอมพล + จำกลยุทธ์ที่เราใช้บ่อยแล้วเลือกตัวแก้ทาง + ถ้าเราครองดินแดนมากที่สุด AI ทุกฝ่ายจะรุมเรา · ย้อนการสั่งการไม่ได้' },
 ];
@@ -510,7 +554,11 @@ const NAME_POOLS = {
    STATE — สถานะเกม (S บันทึกลง localStorage ได้ทั้งก้อน)
    ===================================================================== */
 let S = null;
-const UI = { selNode: null, selArmy: null, busy: false, setupLegend: null, setupAI: 2, setupLevel: 0, setupSize: 'm', tut: null, undo: [], notices: [], view: null };
+const UI = { selNode: null, selArmy: null, busy: false, setupLegend: null, setupAI: 2, setupLevel: 0, setupSize: 'm', tut: null, undo: [], notices: [], view: null,
+  aiSpeed: 'normal', ghost: false, retreatPick: null };
+// บันทึกการกระทำของฝ่ายอื่นในรอบล่าสุด (ไว้แสดงบนแผนที่และเล่นซ้ำ — ไม่บันทึกลงเซฟ)
+// steps: [{ fac, from, to, kind: 'move'|'atk', ev: [เหตุการณ์], pre: สถานะก่อนเกิด (JSON) }] — step ที่ไม่มี from = เหตุการณ์เดี่ยว เช่น เกณฑ์ทหาร
+const FX = { rec: false, steps: [], cur: null, played: 0, last: null };
 
 // RNG แบบมี seed (mulberry32) — สถานะ seed อยู่ใน S จึงเซฟ/โหลดต่อได้
 function rng() {
@@ -580,6 +628,7 @@ function newGame(legendId, numAI, seed, level = 1, size = 's', opts = {}) {
     turn: 1, phase: 'player', current: 0, factions: [], nodes: [], edges: [], armies: [],
     log: [], nextId: 1, over: null, lastMove: null, genNames: [],
     stats: { battles: 0, won: 0, captured: 0 },
+    grudge: {}, tstats: { onP: 0, onAI: 0, bP: 0, bAI: 0 },
     ...wanderFields(),
   };
   const me = LEGENDS.find(l => l.id === legendId);
@@ -862,6 +911,7 @@ function canRecruitAt(f, nodeId) {
 function recruit(f, nodeId, type) {
   const F = fac(f), cost = UNITS[type].cost;
   if (!canRecruitAt(f, nodeId) || F.gold < cost) return false;
+  emitFx({ t: 'recruit', fac: f, node: nodeId, n: PACK });
   F.gold -= cost;
   const a = armyAt(nodeId);
   if (a) a.units[type] += PACK; else S.nodes[nodeId].garrison[type] += PACK;
@@ -895,6 +945,7 @@ function hireGeneral(f) {
   }
   const a = newArmy(f, cap, { name, icon: '🎖️', leader: false }, Z());
   log(`${facName(f)} แต่งตั้ง ${name}`);
+  emitFx({ t: 'hire', fac: f, node: cap });
   return a;
 }
 function absorbGarrison(a, keep = 0) {
@@ -1028,6 +1079,34 @@ function applyLoss(u, frac) {
 function wipeIfTiny(u, lost) {
   if (sumU(u) < 3) for (const t of UNIT_TYPES) { lost[t] += u[t]; u[t] = 0; }
 }
+// ฝ่าย atk บุกดินแดนของฝ่าย def (รบ / ยึดดินแดนว่าง / ฝ่ายรับถอนทัพ): จดความแค้น และนับสถิติให้ ?sim
+// เหตุการณ์สำหรับแสดงบนแผนที่ (บันทึกเฉพาะระหว่างตาของฝ่ายอื่น)
+// t: battle / own (เปลี่ยนเจ้าของ) / retreat / recruit / hire / legend / ares / terrain
+const fxSnap = () => JSON.stringify({ ...S, log: [] });
+function emitFx(e) {
+  if (!FX.rec) return;
+  if (FX.cur) { FX.cur.ev.push(e); return; }
+  const last = FX.steps[FX.steps.length - 1];
+  if (last && last.from == null && last.fac === e.fac && FX.played < FX.steps.length) last.ev.push(e);
+  else FX.steps.push({ fac: e.fac, ev: [e], pre: fxSnap() });
+}
+function fxBegin(f, from, to, kind) {
+  if (!FX.rec) return null;
+  const st = { fac: f, from, to, kind, ev: [], pre: fxSnap() };
+  FX.steps.push(st); FX.cur = st;
+  return st;
+}
+function fxEnd(st, drop) {
+  if (!st) return;
+  FX.cur = null;
+  if (drop) { FX.steps.splice(FX.steps.indexOf(st), 1); FX.played = Math.min(FX.played, FX.steps.length); }
+}
+function noteAttack(atk, def) {
+  if (atk < 0 || def < 0 || atk === def) return;
+  if (!isBoss()) { const G = S.grudge || (S.grudge = {}); (G[def] = G[def] || {})[atk] = S.turn; }
+  const T = S.tstats;
+  if (T && !isHumanFac(atk)) { if (isHumanFac(def)) T.onP++; else T.onAI++; }
+}
 
 async function moveArmy(a, to) {
   const res = await moveArmyCore(a, to);
@@ -1052,16 +1131,20 @@ async function moveArmyCore(a, to) {
     S.lastMove = { from, to, fac: a.fac };
     log(`${a.gen.name} ยึด ${node.name} ได้โดยไม่ต้องรบ`);
     if (isHumanFac(a.fac)) S.stats.captured++;
+    noteAttack(a.fac, prev);
     capture(a, node, prev);
     return { type: 'capture' };
   }
+  const defFac = node.owner;
   const ctx = await battle(a, node);
   if (ctx.cancelled) return { type: 'cancel' };
+  noteAttack(a.fac, defFac);
   S.lastMove = { from, to, fac: a.fac };
   return { type: 'battle', ctx };
 }
 
 function capture(a, node, prevOwner, preGarrison) {
+  emitFx({ t: 'own', node: node.id, from: prevOwner, to: a.fac });
   node.owner = a.fac;
   node.garrison = Z();
   a.node = node.id; // เข้ายึดก่อน เพื่อไม่ให้ทัพอื่น (เช่น จอมทัพที่ถูกปลดปล่อย) มาตั้งซ้อนที่เดียวกัน
@@ -1143,6 +1226,7 @@ function aresPower() {
   const B = S.boss;
   if (!fac(B.ares).alive) return;
   B.gauge = 0;
+  const aresAt = B.throne != null && S.nodes[B.throne].owner === B.ares ? B.throne : homeNode(B.ares);
   // เชิดวิญญาณ: ตำนานที่ยังไม่ภักดีของผู้เล่นก่อน แล้วค่อยตำนานพเนจรใกล้บัลลังก์ (ตำนานที่ภักดีแล้วต้านทานได้)
   const mineU = S.armies.filter(a => a.fac === 0 && a.gen.wid && !isLoyal(a.gen, 0));
   const dist = bfs(S.boss.throne != null ? S.boss.throne : homeNode(B.ares), NEUTRAL, () => true).dist;
@@ -1164,11 +1248,13 @@ function aresPower() {
     }
     text += aresTakeLegend(wid);
     log(text); UI.notices.push(text);
+    emitFx({ t: 'ares', fac: B.ares, node: aresAt, kind: 'puppet' });
   } else {
     B.power.rage++;
     B.rage = 2;
     const text = '🩸 Ares ปล่อย “โลหิตเดือด”! ทัพของ Ares และหุ่นเชิด +25% เป็นเวลา 2 เทิร์น';
     log(text); UI.notices.push(text);
+    emitFx({ t: 'ares', fac: B.ares, node: aresAt, kind: 'rage' });
   }
 }
 // ตำนานที่ถูกเชิดวิญญาณตั้งทัพให้ Ares: ดินแดนว่างของ Ares ที่ใกล้บัลลังก์ ไม่มีก็ยึดดินแดนกลางที่ใกล้ที่สุด (กองกำลังเฝ้ากลายเป็นของ Ares)
@@ -1204,6 +1290,7 @@ function bossRound() {
     for (const n of pickN) n.terrain = pick(Object.keys(TERRAINS).filter(t => t !== n.terrain));
     const text = `🌀 สนามรบนิรันดร์เปลี่ยนรูป: ${pickN.map(n => `${n.name} → ${TERRAINS[n.terrain].name}`).join(', ')}`;
     log(text); UI.notices.push(text);
+    emitFx({ t: 'terrain', fac: NEUTRAL, nodes: pickN.map(n => n.id) });
   }
 }
 
@@ -1243,6 +1330,7 @@ function rebellion(f) {
   const far = S.nodes.filter(n => n.owner === f && n.id !== cap && !armyAt(n.id))
     .sort((a, b) => (dist[b.id] == null ? 99 : dist[b.id]) - (dist[a.id] == null ? 99 : dist[a.id])).slice(0, N);
   for (const n of far) {
+    emitFx({ t: 'own', node: n.id, from: f, to: NEUTRAL });
     n.owner = NEUTRAL; n.garrison = Z();
     let g = randInt(4, 9) + (n.terrain === 'mountain' ? 2 : 0);
     while (g-- > 0) n.garrison[pick(UNIT_TYPES)]++;
@@ -1273,16 +1361,22 @@ function wanderAway(wid, fromNode) {
   log(`🌫️ ไม่มีดินแดนกลางเหลือ วิญญาณของ ${W.name} หายไปพัก ${WANDER_REST} เทิร์น`);
   return `${W.name} หายไปพัก ${WANDER_REST} เทิร์น`;
 }
-// ต้นเทิร์นใหม่: ตำนานที่พักครบโผล่ในดินแดนที่ไม่มีทัพและไม่ใช่เมืองหลวง พร้อมปลุกกองกำลังท้องถิ่น
+// ต้นเทิร์นใหม่: ตำนานที่พักครบโผล่ในดินแดนที่ไม่มีทัพ ไม่มีกองรักษาการณ์ และไม่ใช่เมืองหลวง/อดีตเมืองหลวง
+// พร้อมปลุกกองกำลังท้องถิ่น — ไม่มีที่ว่างให้โผล่ = รอเทิร์นถัดไป · 2 เทิร์นสุดท้ายไม่โผล่อีก (หายไปจนจบศึก)
+const WANDER_LATE = 2;
+const wanderClosed = () => S.turn > maxTurns() - WANDER_LATE;
+const returnSpots = () => S.nodes.filter(n => n.capitalOf === null && !armyAt(n.id) && !wildAt(n.id) && sumU(n.garrison) === 0);
 function wanderReturn() {
+  if (wanderClosed()) return;
   for (const r of S.resting.slice()) {
     if (r.back > S.turn) continue;
-    const opts = S.nodes.filter(n => n.capitalOf === null && !armyAt(n.id) && !wildAt(n.id));
+    const opts = returnSpots();
     if (!opts.length) continue;
     const n = pick(opts), prev = n.owner;
     S.resting = S.resting.filter(x => x !== r);
     n.owner = NEUTRAL;
     putWild(r.wid, n.id);
+    emitFx({ t: 'legend', fac: NEUTRAL, node: n.id, wid: r.wid });
     log(`✨ วิญญาณของ ${WMAP[r.wid].name} ปรากฏที่ ${n.name}${prev !== NEUTRAL ? ` — กองกำลังท้องถิ่นลุกขึ้นแยกตัวจาก ${facName(prev)}` : ''}`);
   }
 }
@@ -1323,6 +1417,7 @@ function legendBroken(x, info) {
       S.wflags[key] = true;
       const pre = info.pre || x.units;
       for (const t of UNIT_TYPES) x.units[t] = Math.round(pre[t] * W.skill.revive);
+      emitFx({ t: 'retreat', fac: x.fac, from: around, to: dest, kind: 'revive' });
       x.node = dest; x.used = 99;
       S.wstats.revive++;
       const text = `🌬️ ลมพัดคืนชีพ! ${W.name} ฟื้นทหาร ${sumU(x.units)} นาย ถอยไป ${S.nodes[dest].name}`;
@@ -1392,6 +1487,8 @@ async function processJoins() {
       }
     }
     log(`✨ ${text}`);
+    const at = S.armies.find(x => x.gen === gen);
+    if (at) emitFx({ t: 'legend', fac: j.fac, node: at.node, wid: j.wid });
     if (isHumanFac(j.fac)) await Ctrl.showJoin(gen, text);
   }
 }
@@ -1436,7 +1533,7 @@ function eliminate(loser, winner, why) {
   }
   S.armies = S.armies.filter(a => a.fac !== loser);
   let cnt = 0;
-  for (const n of S.nodes) if (n.owner === loser) { n.owner = winner; cnt++; }
+  for (const n of S.nodes) if (n.owner === loser) { emitFx({ t: 'own', node: n.id, from: loser, to: winner }); n.owner = winner; cnt++; }
   const rest = winner >= 0 ? `${facName(winner)} รับดินแดนที่เหลือ ${cnt} แห่ง` : `ดินแดน ${cnt} แห่งกลายเป็นดินแดนกลาง`;
   log(why === 'leader' ? `💀 ${facName(loser)} ไร้แผ่นดินและทัพจอมทัพแตก — พ่ายแพ้! ${rest}`
     : `💀 ${facName(loser)} ไร้แผ่นดินครบ ${HOMELESS_TURNS} เทิร์นโดยไม่ได้เมืองหลวงใหม่ — พ่ายแพ้! ${rest}`);
@@ -1504,6 +1601,7 @@ function retreatOptions(d, nodeId, a) {
 async function executeRetreat(ctx, a, d, node, opt) {
   const prevOwner = node.owner, dest = S.nodes[opt.to];
   ctx.retreat = { to: opt.to, kind: opt.kind, lossFrac: opt.lossFrac, gen: d.gen, fac: d.fac };
+  emitFx({ t: 'retreat', fac: d.fac, from: node.id, to: opt.to, kind: opt.kind });
   ctx.retreat.lost = applyLoss(d.units, opt.lossFrac);
   ctx.retreat.garrisonLost = { ...node.garrison };
   node.garrison = Z();
@@ -1611,7 +1709,7 @@ async function battle(a, node, opts = {}) {
     D.after = d ? { ...d.units } : Z();
     if (d) {
       const ret = sumU(d.units) > 0 ? retreatNode(d, node.id) : null;
-      if (ret != null) { payAlps(d, node.id, ret); d.node = ret; d.used = 99; ctx.outcome.push(`${d.gen.name} ถอยทัพไป ${S.nodes[ret].name}`); }
+      if (ret != null) { payAlps(d, node.id, ret); d.node = ret; d.used = 99; ctx.outcome.push(`${d.gen.name} ถอยทัพไป ${S.nodes[ret].name}`); emitFx({ t: 'retreat', fac: d.fac, from: node.id, to: ret, kind: 'fall' }); }
       else {
         ctx.outcome.push(`ทัพของ ${d.gen.name} แตกพ่าย`);
         const rr = destroyArmy(d, { by: a.fac, decisive: ctx.decisive, pre: preD, at: node.id });
@@ -1662,6 +1760,7 @@ async function battle(a, node, opts = {}) {
     bloodTick();
   }
   log(`${ctx.breakout ? '🏃 ' + facName(A.fac) + ' ตีฝ่าวงล้อมเข้า' : '⚔️ ' + facName(A.fac) + ' บุก'} ${node.name} (${facName(prevOwner)}) — ${ctx.atkWin ? 'ฝ่ายบุกชนะ' : 'ฝ่ายรับชนะ'}`);
+  emitFx({ t: 'battle', node: node.id, atk: A.fac, def: D.fac, win: ctx.atkWin, lostA: sumU(A.lost), lostD: sumU(D.lost), human: !!human });
   if (human) await Ctrl.showBattle(ctx, human);
   return ctx;
 }
@@ -1681,6 +1780,8 @@ async function endPlayerTurn() {
   if (UI.tut) finishTutorial();
   clearUndo();
   UI.busy = true; UI.selArmy = null; S.phase = 'ai';
+  UI.ghost = false; FX.steps = []; FX.cur = null; FX.played = 0; FX.last = null; FX.rec = Ctrl.fx;
+  const keepView = UI.view;
   homelessTick(0);
   Ctrl.render();
   try {
@@ -1688,7 +1789,7 @@ async function endPlayerTurn() {
       if (f.human || !f.alive || S.over) continue;
       S.current = f.id;
       Ctrl.render();
-      await Ctrl.delay(350);
+      await Ctrl.delay(Math.round(350 * Ctrl.aiPace()));
       await aiTurn(f.id);
       if (!S.over) homelessTick(f.id);
     }
@@ -1699,6 +1800,7 @@ async function endPlayerTurn() {
         S.phase = 'player'; S.current = 0;
         wanderReturn();
         bossRound();
+        await Ctrl.aiCatchUp();
         const inc = startFactionTurn(0);
         log(`— เทิร์น ${S.turn}: รับรายได้ ${inc} 💰 —`);
         const H = fac(0).homeless;
@@ -1706,7 +1808,15 @@ async function endPlayerTurn() {
         saveGame();
       }
     }
-  } finally { UI.busy = false; }
+  } finally {
+    UI.busy = false;
+    // จบรอบ: การกระทำทั้งหมดค้างบนแผนที่แบบจาง ๆ จนกว่าผู้เล่นจะเริ่มสั่งการ (กด 🔁 ดูซ้ำได้)
+    FX.rec = false; FX.cur = null;
+    FX.last = FX.steps.length ? FX.steps : null; FX.steps = [];
+    UI.ghost = !!FX.last;
+    if (FX.panned) { UI.view = keepView; FX.panned = false; }
+    Ctrl.fxClear();
+  }
   Ctrl.render();
   if (S.over) Ctrl.gameOver();
   else showNotices();
@@ -1818,6 +1928,39 @@ function playerLeads() {
   const cnt = S.factions.map(F => F.alive ? S.nodes.filter(n => n.owner === F.id).length : -1);
   return cnt[0] > Math.max(...cnt.slice(1));
 }
+// เลือกเป้าแบบยุติธรรม (โหมดปกติ ใช้กับผู้เล่นและ AI เหมือนกันหมด — โหมดศึกชิงอิสรภาพไม่ใช้)
+// ความแค้น: ถูกฝ่ายไหนบุก จะเล็งฝ่ายนั้นเต็มที่ GRUDGE.full เทิร์น แล้วค่อย ๆ ลดลงจนหมดใน GRUDGE.fade เทิร์น
+const GRUDGE = { bonus: 6, full: 3, fade: 4 };
+const PREY_BONUS = 6;      // ฉวยโอกาส: ฝ่ายที่เสียเมืองหลวงจนไร้แผ่นดิน หรือทหารรวมน้อยกว่าครึ่งของค่าเฉลี่ย
+const BALANCE_BONUS = 7;   // ถ่วงดุลอำนาจ (จอมพลขึ้นไป): ฝ่ายที่ครองดินแดนนำห่าง
+function grudgeBonus(f, g) {
+  const t = S.grudge && S.grudge[f] && S.grudge[f][g];
+  if (t == null) return 0;
+  const age = S.turn - t;
+  return age <= GRUDGE.full ? GRUDGE.bonus : Math.max(0, GRUDGE.bonus * (1 - (age - GRUDGE.full) / GRUDGE.fade));
+}
+const troopsOf = f => S.armies.reduce((t, a) => t + (a.fac === f ? sumU(a.units) : 0), 0) + S.nodes.reduce((t, n) => t + (n.owner === f ? sumU(n.garrison) : 0), 0);
+function isPrey(g) {
+  if (g < 0 || !fac(g).alive) return false;
+  if (fac(g).capital == null && fac(g).homeless && fac(g).homeless.left != null) return true; // ไร้แผ่นดินระหว่างเกม (ไม่นับสปาร์ตาคัสที่ไร้แผ่นดินโดยกำเนิด)
+  const alive = S.factions.filter(F => F.alive);
+  const avg = alive.reduce((t, F) => t + troopsOf(F.id), 0) / alive.length;
+  return troopsOf(g) < avg / 2;
+}
+// ฝ่ายที่ครองดินแดนนำห่าง (มากกว่าอันดับสองอย่างน้อย 3 แห่ง และ 25%) หรือ null
+function runawayFac() {
+  const cnt = S.factions.map(F => F.alive ? S.nodes.filter(n => n.owner === F.id).length : -1);
+  const order = cnt.map((c, i) => i).sort((a, b) => cnt[b] - cnt[a]);
+  const [top, second] = [cnt[order[0]], Math.max(0, cnt[order[1]])];
+  return top - second >= Math.max(3, Math.ceil(second * 0.25)) ? order[0] : null;
+}
+function targetBonus(f, g) {
+  if (isBoss() || g < 0 || g === f || TUNE.nofair) return 0;
+  let v = grudgeBonus(f, g);
+  if (isPrey(g)) v += PREY_BONUS;
+  if (aiLevel(f) >= 2 && runawayFac() === g) v += BALANCE_BONUS;
+  return v;
+}
 function nodeValue(f, n) {
   let v = (n.owner === NEUTRAL ? 9 : 13) + TERRAINS[n.terrain].income * 1.5;
   if (isSeat(n)) v += 50;
@@ -1826,8 +1969,9 @@ function nodeValue(f, n) {
   // ทัพจอมทัพของฝ่ายที่ไร้แผ่นดิน: ตีแตก = ฝ่ายนั้นแพ้ และได้ดินแดนทั้งหมดของมัน
   const hx = armyAt(n.id);
   if (!TUNE.nohunt && hx && hx.gen.leader && hx.fac !== f && fac(hx.fac).capital == null) v += 40 + 4 * S.nodes.filter(m => m.owner === hx.fac).length;
-  if (isHumanFac(n.owner) && !isHumanFac(f)) v += aiLevel(f) >= 2 && !TUNE.nofocusp ? 7 : 3;
+  if (TUNE.oldbias && isHumanFac(n.owner) && !isHumanFac(f)) v += aiLevel(f) >= 2 ? 7 : 3; // พฤติกรรมเดิม (ไว้เทียบใน ?sim เท่านั้น)
   if (isBoss() && isHumanFac(n.owner) && !isHumanFac(f)) v += 20; // หุ่นเชิดและ Ares รุมผู้เล่น
+  v += targetBonus(f, n.owner);
   v += legendValue(f, n);
   // ตำนาน: ถ้าผู้เล่นครองดินแดนมากที่สุด ทุกฝ่ายหันมาเน้นโจมตีผู้เล่น
   if (aiLevel(f) >= 3 && !isHumanFac(f) && playerLeads()) {
@@ -2086,10 +2230,19 @@ async function aiCoordinatedStrike(f) {
     if (S.over || !fac(f).alive || S.nodes[plan.node].owner === f) break;
     if (!S.armies.includes(a) || !moveTargets(a).includes(plan.node)) continue;
     if (i === order.length - 1 && estimateRatio(a, plan.node) < 1.0) break;
-    await moveArmy(a, plan.node);
-    Ctrl.render();
-    await Ctrl.delay(450);
+    await aiMove(a, plan.node);
   }
+}
+
+// เดินทัพของ AI พร้อมแสดงบนแผนที่: ลูกศรวิ่งไปก่อน แล้วค่อยแสดงผล (💥 ทหารที่เสีย ดินแดนเปลี่ยนเจ้าของ)
+async function aiMove(a, to) {
+  const st = fxBegin(a.fac, a.node, to, S.nodes[to].owner === a.fac ? 'move' : 'atk');
+  if (st) await Ctrl.aiArrow(st);
+  const res = await moveArmy(a, to);
+  fxEnd(st, res.type === 'invalid' || res.type === 'cancel');
+  Ctrl.render();
+  await Ctrl.aiCatchUp();
+  return res;
 }
 
 async function aiTakeActions(fid) {
@@ -2097,6 +2250,7 @@ async function aiTakeActions(fid) {
   S.focus[fid] = aiLevel(fid) >= 2 && !TUNE.nocoord ? aiFocusTarget(fid) : null;
   if (S.focus[fid]) S.rstats.focus++;
   aiRecruit(fid);
+  await Ctrl.aiCatchUp();
   if (aiLevel(fid) >= 2 && !TUNE.nocoord) await aiCoordinatedStrike(fid);
   if (S.over || !fac(fid).alive) return;
   const armies = S.armies.filter(a => a.fac === fid).sort((x, y) => sumU(y.units) - sumU(x.units));
@@ -2105,16 +2259,25 @@ async function aiTakeActions(fid) {
     while (!S.over && S.armies.includes(a) && canMove(a) && guard++ < 3) {
       const to = aiChooseMove(a);
       if (to == null) break;
-      const res = await moveArmy(a, to);
+      const res = await aiMove(a, to);
       if (res.type === 'invalid' || res.type === 'cancel') break;
-      Ctrl.render();
-      await Ctrl.delay(450);
       if (!fac(fid).alive || S.over) return;
     }
   }
-  if (!S.over && fac(fid).alive) aiRecruit(fid);
+  if (!S.over && fac(fid).alive) { aiRecruit(fid); await Ctrl.aiCatchUp(); }
+}
+// สถิติ ?sim: ดินแดนของฝ่ายอื่นที่ติดพรมแดนเรา แยกเป็นของผู้เล่น / ของ AI
+function sampleBorder(f) {
+  const T = S.tstats;
+  if (!T || isHumanFac(f)) return;
+  const seen = new Set();
+  for (const n of S.nodes) if (n.owner === f) for (const nb of neighbors(n.id)) {
+    const o = S.nodes[nb.id].owner;
+    if (o >= 0 && o !== f && passable(f, nb) && !seen.has(nb.id)) { seen.add(nb.id); if (isHumanFac(o)) T.bP++; else T.bAI++; }
+  }
 }
 async function aiTurn(fid) {
+  sampleBorder(fid);
   startFactionTurn(fid);
   await aiTakeActions(fid);
 }
@@ -2136,6 +2299,8 @@ function loadSave() {
     if (d.v === 2) Object.assign(d.s, wanderFields(), { v: SAVE_VERSION }); // เซฟเก่า: เล่นต่อได้โดยไม่มีตำนานพเนจร
     for (const f of d.s.factions) { if (f.start == null) f.start = f.capital; if (f.homeless === undefined) f.homeless = null; }
     if (!d.s.size) { d.s.size = 's'; d.s.maxTurns = MAX_TURNS; }
+    if (!d.s.grudge) d.s.grudge = {};
+    if (!d.s.tstats) d.s.tstats = { onP: 0, onAI: 0, bP: 0, bAI: 0 };
     return d.s;
   } catch (e) { return null; }
 }
@@ -2187,8 +2352,10 @@ function renderTop() {
   btn.disabled = S.phase !== 'player' || UI.busy || !!S.over;
   btn.textContent = S.phase === 'player' ? (S.turn === maxTurns() ? 'จบเทิร์นสุดท้าย ▶' : 'จบเทิร์น ▶') : 'ศัตรูกำลังเดิน…';
   const ban = $('phaseBanner');
-  if (S.phase === 'ai' && !S.over) { ban.classList.remove('hidden'); ban.textContent = `ตาของ ${facIcon(S.current)} ${facName(S.current)}…`; }
+  if (S.phase === 'ai' && !S.over && !UI.retreatPick) { ban.classList.remove('hidden'); ban.textContent = `ตาของ ${facIcon(S.current)} ${facName(S.current)}…`; }
   else ban.classList.add('hidden');
+  $('btnReplay').disabled = !(FX.last && S.phase === 'player' && !UI.busy && !S.over);
+  renderSpeed();
 }
 
 function renderMap() {
@@ -2213,7 +2380,12 @@ function renderMap() {
     s += `<line class="edge ${e.mountain ? 'mtn' : ''}" x1="${A.x}" y1="${A.y}" x2="${B.x}" y2="${B.y}"/>`;
     if (e.mountain) s += `<text class="edge-ico" x="${(A.x + B.x) / 2}" y="${(A.y + B.y) / 2}" text-anchor="middle" dominant-baseline="central">🏔️</text>`;
   }
-  const lm = S.lastMove;
+  // การกระทำของฝ่ายอื่นรอบที่แล้ว (จาง ๆ) / ปลายทางถอนทัพ
+  const gh = UI.ghost && FX.last && S.phase === 'player' && !UI.busy ? ghostLayers() : null;
+  const rp = UI.retreatPick ? retreatLayers() : null;
+  if (gh) s += gh.under;
+  if (rp) s += rp.under;
+  const lm = !gh && !rp && S.lastMove;
   if (lm && S.nodes[lm.from] && S.nodes[lm.to] && fac(lm.fac)) {
     const A = S.nodes[lm.from], B = S.nodes[lm.to];
     const dx = B.x - A.x, dy = B.y - A.y, L = Math.hypot(dx, dy) || 1;
@@ -2244,7 +2416,94 @@ function renderMap() {
     s += `<text class="nname" y="80">${esc(n.name)}</text>`;
     s += `</g>`;
   }
+  if (gh) s += gh.over;
+  if (rp) s += rp.over;
   $('map').innerHTML = s;
+}
+
+// ลูกศรจากดินแดน from ไป to (หยุดก่อนถึงวงดินแดน) เยื้องไปทางขวาของทิศทาง off หน่วย เพื่อไม่ให้ลูกศรไป-กลับทับกัน
+function arrowPts(from, to, off = 0) {
+  const A = S.nodes[from], B = S.nodes[to];
+  const dx = B.x - A.x, dy = B.y - A.y, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L;
+  const px = -uy * off, py = ux * off;
+  return { x1: A.x + ux * 56 + px, y1: A.y + uy * 56 + py, x2: B.x - ux * 70 + px, y2: B.y - uy * 70 + py };
+}
+const lineAttr = P => `x1="${P.x1.toFixed(1)}" y1="${P.y1.toFixed(1)}" x2="${P.x2.toFixed(1)}" y2="${P.y2.toFixed(1)}"`;
+// ความกว้างโดยประมาณของข้อความบนแผนที่ (สระ/วรรณยุกต์ไทยไม่กินที่ อีโมจิกว้างกว่าตัวอักษร)
+const textW = (str, fs) => [...str].reduce((w, c) => w + (/[\u0E31\u0E34-\u0E3A\u0E47-\u0E4E\uFE0F\u200D]/.test(c) ? 0 : c.codePointAt(0) > 0x2000 && !/[\u0E00-\u0E7F]/.test(c) ? fs * 1.15 : fs * 0.62), 0);
+// ป้ายเล็ก (สี่เหลี่ยมมุมมน + ข้อความ) จัดกึ่งกลางที่ x หรือชิดขวา
+function tagSvg(txt, { x = 0, y = 0, fs = 22, fill = '#fffaf0', stroke = '#3b2a1d', color = '#2b2118', align = 'mid', cls = '' } = {}) {
+  const w = Math.round(textW(txt, fs) + 18), h = Math.round(fs * 1.55), x0 = align === 'right' ? x - w : x - w / 2;
+  return `<g class="tag-g ${cls}"><rect x="${x0}" y="${y - h / 2}" width="${w}" height="${h}" rx="${(h / 2.6).toFixed(1)}" fill="${fill}" stroke="${stroke}" stroke-width="3.5"/><text x="${x0 + w / 2}" y="${y + 1}" style="font-size:${fs}px;fill:${color}">${esc(txt)}</text></g>`;
+}
+// ผลของการบุกในรอบที่บันทึกไว้: ฝ่ายบุกได้ดินแดนนั้นไหม
+const stepWon = st => st.ev.some(e => e.t === 'own' && e.node === st.to && e.to === st.fac);
+// ไอคอนเล็กบนดินแดน: เกณฑ์ทหาร (+จำนวน) / แต่งตั้งแม่ทัพ / ได้ตำนาน / พลังของ Ares / ภูมิประเทศเปลี่ยน
+const MARK_ICON = { hire: '🎖️', legend: '✨', ares: '🩸', terrain: '🌀' };
+function stepMarks(st, marks = {}) {
+  for (const e of st.ev) {
+    const ids = e.t === 'terrain' ? e.nodes : e.node != null ? [e.node] : [];
+    for (const id of ids) {
+      if (e.t !== 'recruit' && !MARK_ICON[e.t]) continue;
+      const m = marks[id] || (marks[id] = { fac: e.fac, add: 0, icons: [] });
+      if (e.t === 'recruit') { m.add += e.n; m.fac = e.fac; }
+      else { if (!m.icons.includes(MARK_ICON[e.t])) m.icons.push(MARK_ICON[e.t]); if (e.fac >= 0) m.fac = e.fac; }
+    }
+  }
+  return marks;
+}
+const markText = m => (m.add ? `+${m.add}` : '') + m.icons.join('');
+// ภาพจาง ๆ ของทุกการกระทำในรอบที่แล้ว: ลูกศรเดินทัพ / ลูกศรบุก ⚔️ (เขียว = ยึดได้ แดง = ถูกตีกลับ) / ถอนทัพ 🏃
+function ghostLayers() {
+  const arrows = new Map(), marks = {};
+  for (const st of FX.last) {
+    if (st.from != null) {
+      const key = `${st.from}>${st.to}`, old = arrows.get(key);
+      arrows.set(key, { from: st.from, to: st.to, fac: st.fac, kind: st.kind, won: stepWon(st) || !!(old && old.won) });
+    }
+    for (const e of st.ev) if (e.t === 'retreat') arrows.set(`${e.from}>${e.to}r`, { from: e.from, to: e.to, fac: e.fac, kind: 'retreat' });
+    stepMarks(st, marks);
+  }
+  let under = '', over = '';
+  for (const g of arrows.values()) {
+    const P = arrowPts(g.from, g.to, 12), col = facColor(g.fac);
+    const dash = g.kind === 'retreat' ? ' stroke-dasharray="14 12"' : g.kind === 'move' ? ' stroke-dasharray="3 14"' : '';
+    under += `<g class="ghost" data-ghost="${g.kind}"><line ${lineAttr(P)} stroke="#fffaf0" stroke-width="15" opacity=".45" stroke-linecap="round"/><line ${lineAttr(P)} stroke="${col}" stroke-width="8" opacity=".6" stroke-linecap="round" marker-end="url(#arrow)"${dash}/></g>`;
+    if (g.kind === 'move') continue;
+    const bx = P.x1 + (P.x2 - P.x1) * 0.5, by = P.y1 + (P.y2 - P.y1) * 0.5;
+    const fill = g.kind === 'retreat' ? col : g.won ? '#2f7d4f' : '#b03a2e';
+    const tip = g.kind === 'retreat' ? `${facName(g.fac)} ถอนทัพ` : `${facName(g.fac)} บุก ${S.nodes[g.to].name} — ${g.won ? 'ยึดได้' : 'ถูกตีกลับ'}`;
+    over += `<g class="ghost gbadge" data-won="${g.kind === 'atk' ? (g.won ? 1 : 0) : ''}" transform="translate(${bx.toFixed(1)},${by.toFixed(1)})"><title>${esc(tip)}</title><circle r="21" fill="${fill}" stroke="#fff" stroke-width="3.5" opacity=".92"/><text class="gh-ico">${g.kind === 'retreat' ? '🏃' : '⚔️'}</text></g>`;
+  }
+  for (const id in marks) {
+    const n = S.nodes[id], txt = markText(marks[id]);
+    if (txt) over += `<g class="ghost gmark" data-gmark="${id}" opacity=".95">${tagSvg(txt, { x: n.x - 28, y: n.y - 38, align: 'right', stroke: facColor(marks[id].fac), cls: 'gh-tag' })}</g>`;
+  }
+  return { under, over };
+}
+// ป้ายผลประเมินของปลายทางถอนทัพ
+function rpLabel(o) {
+  if (o.kind === 'safe') return { icon: '🛡️', text: 'ปลอดภัย' };
+  if (o.ratio === Infinity || o.ratio > 1.15) return { icon: '💪', text: o.ratio === Infinity ? 'ยึดได้ทันที' : 'ได้เปรียบ' };
+  if (o.ratio > 0.87) return { icon: '⚖️', text: 'สูสี' };
+  return { icon: '⚠️', text: 'เสี่ยง' };
+}
+const RP_COLOR = { safe: '#2f9d5a', break: '#e8862a' };
+// เลือกปลายทางถอนทัพบนแผนที่: วงเรืองแสง + ลูกศรจากจุดที่ถูกบุก (เขียว = ถอยเข้าดินแดนเรา, ส้ม = ตีฝ่าวงล้อม) + ป้ายผลประเมิน
+function retreatLayers() {
+  const P = UI.retreatPick;
+  let under = '', over = '';
+  if (P.from != null && P.from !== P.node && S.nodes[P.from]) under += `<line class="rp-atk" ${lineAttr(arrowPts(P.from, P.node, 0))} stroke="${facColor(P.atkFac)}" stroke-width="9" stroke-dasharray="16 10" opacity=".8" marker-end="url(#arrow)"/>`;
+  for (const o of P.opts) {
+    const sel = P.sel === o.to, col = RP_COLOR[o.kind], dim = P.sel != null && !sel;
+    under += `<line class="rp-arrow" data-rp-arrow="${o.to}" ${lineAttr(arrowPts(P.node, o.to, 0))} stroke="${col}" stroke-width="${sel ? 13 : 9}" stroke-linecap="round" opacity="${dim ? 0.45 : 0.95}" marker-end="url(#arrow)"/>`;
+    const n = S.nodes[o.to], L = rpLabel(o);
+    over += `<g class="rp" transform="translate(${n.x},${n.y})"><circle class="rp-ring ${sel ? 'on' : 'tgt'}" data-rp="${o.to}" r="${sel ? 68 : 62}" stroke="${col}"/>`
+      + tagSvg(`${sel ? '✅' : L.icon} ${L.text}`, { y: -100, fill: col, stroke: '#fff', color: '#fff', cls: 'rp-tag' }) + `</g>`;
+  }
+  const N = S.nodes[P.node];
+  over += `<g class="rp" transform="translate(${N.x},${N.y})"><circle class="rp-ring" r="64" stroke="#d1382b" stroke-dasharray="12 9"/>${tagSvg('🚨 ถูกบุก', { y: -100, fill: '#d1382b', stroke: '#fff', color: '#fff' })}</g>`;
+  return { under, over };
 }
 
 const legendTip = wid => { const W = WMAP[wid]; return `${W.icon} ${W.name} — ✨ ${W.skillName}: ${W.skillDesc} · ⚠️ ${W.weakName}: ${W.weakDesc}`; };
@@ -2267,7 +2526,8 @@ function legendWhere(wid) {
   const a = S.armies.find(x => x.gen.wid === wid);
   if (a) return { text: `อยู่กับ ${facIcon(a.fac)} ${facName(a.fac)} ที่ ${S.nodes[a.node].name}${isLoyal(a.gen, a.fac) ? '' : ` · ยังไม่ภักดี ${loyalLeft(a.gen)} เทิร์น`}`, node: a.node };
   const r = S.resting.find(x => x.wid === wid);
-  if (r) return { text: `หายไปพัก กลับมาเทิร์น ${r.back}`, node: null };
+  if (r) return { text: r.back > maxTurns() - WANDER_LATE ? 'หายไปพักจนจบศึก' : wanderClosed() ? 'หายไปจนจบศึก (ไม่กลับมาใน 2 เทิร์นสุดท้าย)'
+    : r.back <= S.turn ? 'พักครบแล้ว รอดินแดนว่าง (ไม่มีทัพ ไม่มีกองรักษาการณ์) ให้ปรากฏ' : `หายไปพัก กลับมาได้ตั้งแต่เทิร์น ${r.back}`, node: null };
   if (S.wgone.includes(wid)) return { text: 'จากไปตลอดกาล', node: null };
   return { text: 'กำลังหาที่ตั้งทัพ', node: null };
 }
@@ -2345,6 +2605,7 @@ function applyView() {
   const v = canZoom() && UI.view ? clampView(UI.view) : canZoom() ? defaultView() : mapBounds();
   if (canZoom() && UI.view) UI.view = v;
   $('map').setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`);
+  $('fx').setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`);
   $('board').classList.toggle('zoomable', canZoom());
 }
 const curView = () => { const [x, y, w, h] = $('map').getAttribute('viewBox').split(' ').map(Number); return { x, y, w, h }; };
@@ -2416,7 +2677,9 @@ function moveStatus(a) {
 function renderInfo() {
   const el = $('info'), id = UI.selNode;
   if (id == null) {
-    el.innerHTML = `<h3>คำแนะนำ</h3><div class="hint">• แตะดินแดนเพื่อดูข้อมูล / เกณฑ์ทหาร<br>• แตะทัพของเรา แล้วแตะวงที่เรืองแสงเพื่อเดินทัพ (🟢 เดิน, 🔴 โจมตี)<br>• เมื่อสั่งการครบ กด “จบเทิร์น”</div>`;
+    const gl = UI.ghost && FX.last && S.phase === 'player' ? `<div class="ghost-key"><b>ลูกศรจาง ๆ บนแผนที่ = สิ่งที่ฝ่ายอื่นทำในรอบที่แล้ว</b> (หายไปเมื่อเริ่มสั่งการ · กด 🔁 ดูซ้ำ)<br>
+      <span class="gk gk-win">⚔️</span> บุกแล้วยึดได้ · <span class="gk gk-lose">⚔️</span> ถูกตีกลับ · 🏃 ถอนทัพ · +N เกณฑ์ทหาร · 🎖️ แต่งตั้งแม่ทัพ · ✨ ได้ตำนาน${isBoss() ? ' · 🩸 Ares ใช้พลัง · 🌀 ภูมิประเทศเปลี่ยน' : ''}</div>` : '';
+    el.innerHTML = `<h3>คำแนะนำ</h3>${gl}<div class="hint">• แตะดินแดนเพื่อดูข้อมูล / เกณฑ์ทหาร<br>• แตะทัพของเรา แล้วแตะวงที่เรืองแสงเพื่อเดินทัพ (🟢 เดิน, 🔴 โจมตี)<br>• เมื่อสั่งการครบ กด “จบเทิร์น”</div>`;
     return;
   }
   const n = S.nodes[id], T = TERRAINS[n.terrain], a = armyAt(id);
@@ -2607,7 +2870,150 @@ const Ctrl = {
   delay: ms => new Promise(r => setTimeout(r, Ctrl.auto ? Math.min(ms, 20) : ms)),
   render: () => render(),
   gameOver: () => uiGameOver(),
+  // แสดงตาของฝ่ายอื่นบนแผนที่ (?sim ปิดทั้งหมด)
+  fx: true,
+  aiArrow: st => fxArrowLive(st),
+  aiCatchUp: () => fxCatchUp(),
+  aiPace: () => fxK(),
+  fxClear: () => fxClear(),
 };
+
+/* ---------- แสดงการกระทำของฝ่ายอื่นบนแผนที่: ลูกศร 💥 ตัวเลขทหารที่เสีย ดินแดนกะพริบ / ดูซ้ำ ---------- */
+const AI_SPEEDS = { normal: { name: 'ปกติ', icon: '▶️', k: 1 }, fast: { name: 'เร็ว', icon: '⏩', k: 0.4 }, skip: { name: 'ข้าม', icon: '⏭️', k: 0 } };
+const SPEED_KEY = 'legendsWarlord.aiSpeed';
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+// ตัวคูณเวลาแอนิเมชัน (0 = ข้าม) — โหมดทดสอบอัตโนมัติเร่งให้สั้นมาก
+const fxK = (speed = UI.aiSpeed) => (AI_SPEEDS[speed] || AI_SPEEDS.normal).k * (Ctrl.auto ? 0.04 : 1);
+const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+// เดินภาพทีละเฟรมด้วย setTimeout (ไม่ใช้ requestAnimationFrame เพื่อไม่ค้างตอนแท็บอยู่เบื้องหลัง)
+function tween(ms, fn) {
+  return new Promise(res => {
+    const t0 = performance.now();
+    const tick = () => { const k = ms > 0 ? Math.min(1, (performance.now() - t0) / ms) : 1; fn(k); if (k < 1) setTimeout(tick, 16); else res(); };
+    tick();
+  });
+}
+function fxAdd(html) {
+  const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  g.innerHTML = html;
+  $('fx').appendChild(g);
+  return g;
+}
+function fxClear() { if (typeof document !== 'undefined' && $('fx')) $('fx').innerHTML = ''; }
+// เลื่อนมุมมอง (แผนที่กลาง/ใหญ่) ให้เห็นดินแดนทั้งหมดใน ids — ถ้าเห็นอยู่แล้วไม่ขยับ
+async function fxFocus(ids, k) {
+  const pts = ids.filter(id => id != null && S.nodes[id]).map(id => S.nodes[id]);
+  if (!canZoom() || !k || !pts.length) return;
+  const v = curView(), m = 110;
+  if (pts.every(p => p.x > v.x + m && p.x < v.x + v.w - m && p.y > v.y + m && p.y < v.y + v.h - m)) return;
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y), r = boardRatio();
+  const w = Math.max(v.w, Math.max(...xs) - Math.min(...xs) + 340, (Math.max(...ys) - Math.min(...ys) + 340) / r);
+  const cx = (Math.max(...xs) + Math.min(...xs)) / 2, cy = (Math.max(...ys) + Math.min(...ys)) / 2;
+  const to = clampView({ x: cx - w / 2, y: cy - w * r / 2, w, h: w * r });
+  FX.panned = true;
+  await tween(380 * k, t => { const e = ease(t); UI.view = { x: v.x + (to.x - v.x) * e, y: v.y + (to.y - v.y) * e, w: v.w + (to.w - v.w) * e, h: v.h + (to.h - v.h) * e }; applyView(); });
+}
+// ลูกศรสีของฝ่ายนั้นวิ่งจาก from ไป to (บุก = ⚔️ ถอนทัพ = 🏃 เส้นประ)
+async function fxArrow(from, to, f, kind, k) {
+  const P = arrowPts(from, to, 12), col = facColor(f);
+  const dash = kind === 'retreat' ? ' stroke-dasharray="16 12"' : '';
+  const ico = kind === 'retreat' ? '🏃' : kind === 'atk' ? '⚔️' : '';
+  const g = fxAdd(`<line x1="${P.x1}" y1="${P.y1}" x2="${P.x1}" y2="${P.y1}" stroke="#fffaf0" stroke-width="17" stroke-linecap="round"/>`
+    + `<line class="fx-line" x1="${P.x1}" y1="${P.y1}" x2="${P.x1}" y2="${P.y1}" stroke="${col}" stroke-width="10" stroke-linecap="round"${dash}/>`
+    + `<g class="fx-head"><circle r="${ico ? 23 : 13}" fill="${col}" stroke="#fff" stroke-width="4"/>${ico ? `<text class="fx-ico">${ico}</text>` : ''}</g>`);
+  const lines = g.querySelectorAll('line'), head = g.querySelector('.fx-head');
+  await tween(560 * k, t => {
+    const e = ease(t), x = P.x1 + (P.x2 - P.x1) * e, y = P.y1 + (P.y2 - P.y1) * e;
+    for (const l of lines) { l.setAttribute('x2', x); l.setAttribute('y2', y); }
+    head.setAttribute('transform', `translate(${x},${y})`);
+  });
+  lines[1].setAttribute('marker-end', 'url(#arrow)');
+}
+const fxDur = (ms, k) => `animation-duration:${Math.max(40, Math.round(ms * k))}ms`;
+// 💥 + ตัวเลขทหารที่เสียลอยขึ้น (ซ้าย = ฝ่ายบุก ขวา = ฝ่ายรับ)
+function fxBoom(e, k) {
+  const n = S.nodes[e.node];
+  let h = `<text class="fx-boom" x="${n.x}" y="${n.y}" style="${fxDur(900, k)}">💥</text>`;
+  if (e.lostA) h += `<text class="fx-float" x="${n.x - 50}" y="${n.y - 30}" style="fill:${facColor(e.atk)};${fxDur(1300, k)}">-${e.lostA}</text>`;
+  if (e.lostD) h += `<text class="fx-float" x="${n.x + 50}" y="${n.y - 30}" style="fill:${facColor(e.def)};${fxDur(1300, k)}">-${e.lostD}</text>`;
+  fxAdd(h);
+}
+const fxFlash = (node, col, k) => { const n = S.nodes[node]; fxAdd(`<circle class="fx-flash" cx="${n.x}" cy="${n.y}" r="58" stroke="${col}" style="${fxDur(160, k)}"/>`); };
+// ดินแดนที่ต้องเห็นตอนเล่นเหตุการณ์เดี่ยว (ไม่เลื่อนแผนที่เพื่อการเกณฑ์ทหาร)
+const focusIds = st => st.ev.filter(e => e.t !== 'recruit' && e.t !== 'own').flatMap(e => e.t === 'terrain' ? e.nodes : e.node != null ? [e.node] : []);
+// ผลของ step: 💥/ตัวเลข → ดินแดนกะพริบ → ถอนทัพ → ไอคอนเกณฑ์ทหาร/แม่ทัพ/ตำนาน/พลัง Ares
+async function fxOutcome(st, k) {
+  for (const e of st.ev) {
+    if (e.t === 'battle') { if (!e.human) { fxBoom(e, k); await sleep(750 * k); } }
+    else if (e.t === 'own') { fxFlash(e.node, e.to >= 0 ? facColor(e.to) : '#8d8d8d', k); await sleep(140 * k); }
+    else if (e.t === 'retreat') await fxArrow(e.from, e.to, e.fac, 'retreat', k * 0.8);
+  }
+  const marks = stepMarks(st);
+  const ids = Object.keys(marks).filter(id => markText(marks[id]));
+  if (ids.length) {
+    fxAdd(ids.map(id => { const n = S.nodes[id]; return `<g class="fx-pop" style="${fxDur(1200, k)}">${tagSvg(markText(marks[id]), { x: n.x - 28, y: n.y - 38, align: 'right', stroke: facColor(marks[id].fac) })}</g>`; }).join(''));
+    await sleep(900 * k);
+  }
+  await sleep(220 * k);
+}
+// ตาของฝ่ายอื่นแบบสด: ลูกศรก่อนเดินทัพ
+async function fxArrowLive(st) {
+  const k = fxK();
+  if (!FX.rec || !k || typeof document === 'undefined') return;
+  fxClear();
+  await fxFocus([st.from, st.to], k);
+  await fxArrow(st.from, st.to, st.fac, st.kind, k);
+}
+// แสดงผลของทุก step ที่ยังไม่ได้แสดง
+async function fxCatchUp() {
+  if (!FX.rec) return;
+  const k = fxK();
+  if (!k || typeof document === 'undefined') { FX.played = FX.steps.length; return; }
+  if (FX.played >= FX.steps.length) return;
+  render();
+  while (FX.played < FX.steps.length) {
+    const st = FX.steps[FX.played++];
+    if (st.from == null) { fxClear(); await fxFocus(focusIds(st), k); }
+    await fxOutcome(st, k);
+  }
+  fxClear();
+}
+// 🔁 ดูตาศัตรูอีกครั้ง: เล่นทุก step ของรอบล่าสุดบนสถานะแผนที่ตอนนั้น
+async function replayRound() {
+  if (!S || !FX.last || UI.busy || S.phase !== 'player' || S.over) return;
+  const real = S, steps = FX.last, k = fxK() || fxK('normal'), keep = UI.view;
+  UI.busy = true;
+  render();
+  const ban = $('phaseBanner');
+  ban.classList.remove('hidden');
+  try {
+    for (let i = 0; i < steps.length; i++) {
+      const st = steps[i];
+      S = JSON.parse(st.pre);
+      ban.textContent = `🔁 ดูซ้ำ: ${facIcon(st.fac)} ${facName(st.fac)}`;
+      renderMap(); fxClear();
+      if (st.from != null) { await fxFocus([st.from, st.to], k); await fxArrow(st.from, st.to, st.fac, st.kind, k); }
+      else await fxFocus(focusIds(st), k);
+      S = i + 1 < steps.length ? JSON.parse(steps[i + 1].pre) : real;
+      renderMap();
+      await fxOutcome(st, k);
+    }
+  } finally {
+    S = real; fxClear(); UI.busy = false;
+    if (FX.panned) { UI.view = keep; FX.panned = false; }
+    render();
+  }
+}
+function setAiSpeed(sp) {
+  if (!AI_SPEEDS[sp]) return;
+  UI.aiSpeed = sp;
+  try { localStorage.setItem(SPEED_KEY, sp); } catch (e) { /* ignore */ }
+  renderSpeed();
+}
+function renderSpeed() {
+  const sp = AI_SPEEDS[UI.aiSpeed];
+  $('btnSpeed').innerHTML = `${sp.icon} <small>${sp.name}</small>`;
+}
 
 // แจ้งเหตุสำคัญของฝ่ายเรา (เมืองหลวงแตก / ไร้แผ่นดิน / เหลือเทิร์นสุดท้าย)
 function showNotices() {
@@ -2654,7 +3060,7 @@ function renderTitle() {
 
 function startGame(legendId, numAI, level = UI.setupLevel, size = UI.setupSize, boss = false) {
   newGame(legendId, numAI, undefined, level, size, { boss, troy: loadProgress().bossWon });
-  UI.busy = false; UI.view = null;
+  UI.busy = false; UI.view = null; UI.ghost = false; UI.retreatPick = null; FX.last = null;
   clearUndo();
   UI.tut = $('optTut').checked ? 'army' : null;
   if (UI.tut) { UI.selNode = null; UI.selArmy = null; }
@@ -2689,7 +3095,7 @@ function continueGame() {
   const sv = loadSave();
   if (!sv) { renderTitle(); return; }
   S = sv; S.phase = 'player'; S.current = 0;
-  UI.selNode = null; UI.selArmy = null; UI.busy = false; UI.tut = null; UI.view = null;
+  UI.selNode = null; UI.selArmy = null; UI.busy = false; UI.tut = null; UI.view = null; UI.ghost = false; UI.retreatPick = null; FX.last = null;
   clearUndo();
   showScreen('game');
   render();
@@ -2699,7 +3105,7 @@ async function onNodeClick(id) {
   if (!S || S.over) return;
   const sa = selArmy();
   if (S.phase === 'player' && !UI.busy && sa && moveTargets(sa).includes(id)) {
-    UI.busy = true;
+    UI.busy = true; UI.ghost = false;
     pushUndo();
     try {
       const res = await moveArmy(sa, id);
@@ -2720,6 +3126,7 @@ async function onNodeClick(id) {
   UI.selNode = id;
   const a = armyAt(id);
   UI.selArmy = a && a.fac === 0 ? a.id : null;
+  if (UI.selArmy != null && S.phase === 'player') UI.ghost = false; // เริ่มสั่งการ: ภาพตาศัตรูจาง ๆ หายไป
   if (UI.tut === 'army' && UI.selArmy != null && canMove(a)) UI.tut = 'target';
   else if (UI.tut === 'target' && UI.selArmy == null) UI.tut = 'army';
   render();
@@ -2736,6 +3143,7 @@ function onInfoClick(e) {
   else if (b.dataset.act === 'absorb' && a) { absorbGarrison(a); changed = true; }
   else if (b.dataset.act === 'split' && a) { splitToGarrison(a); changed = true; }
   if (!changed) UI.undo.pop();
+  else UI.ghost = false;
   saveGame();
   render();
 }
@@ -2751,13 +3159,27 @@ function sideCardHtml(side, label) {
 }
 const stratTag = s => `${STRATEGIES[s].icon} <b>${STRATEGIES[s].name}</b>`;
 
-function retreatOptionHtml(o) {
+// รายละเอียดปลายทางถอนทัพที่เลือก (แสดงในแถบด้านล่างตอนเลือกบนแผนที่)
+function retreatInfoHtml(o) {
   const n = S.nodes[o.to];
-  if (o.kind === 'safe') {
-    return `<button class="btn ret safe" data-retreat="${o.to}"><b>🛡️ ถอยเข้า ${esc(n.name)}</b> (ดินแดนเรา)<br>ปลอดภัย · ทัพเหลือราว ${o.after} นาย</button>`;
-  }
+  if (o.kind === 'safe') return `<b>🛡️ ถอยเข้า ${esc(n.name)}</b> (ดินแดนเรา) · ปลอดภัย · ทัพเหลือราว ${o.after} นาย`;
   const est = o.ratio === Infinity ? 'ไม่มีทหารป้องกัน ยึดได้ทันที' : `ประเมิน (รวมทัพล้า -20%): <b>${estimateText(o.ratio)}</b>`;
-  return `<button class="btn ret break" data-retreat="${o.to}"><b>⚔️ ตีฝ่าวงล้อมเข้า ${esc(n.name)}</b> (${facIcon(n.owner)} ${esc(facName(n.owner))})<br>${est} · ทัพเหลือราว ${o.after} นายก่อนรบ<br>ชนะ = ยึด ${esc(n.name)} · แพ้ = ทัพแตกทั้งหมด</button>`;
+  return `<b>⚔️ ตีฝ่าวงล้อมเข้า ${esc(n.name)}</b> (${facIcon(n.owner)} ${esc(facName(n.owner))}) · ${est} · ทัพเหลือราว ${o.after} นายก่อนรบ<br>ชนะ = ยึด ${esc(n.name)} · แพ้ = ทัพแตกทั้งหมด`;
+}
+// แผนที่กลาง/ใหญ่: เลื่อนมุมมองให้เห็นจุดที่ถูกบุก ฝ่ายบุก และปลายทางทั้งหมด
+function fitRetreatView(P) {
+  if (!canZoom()) return;
+  const pts = [P.node, P.from, ...P.opts.map(o => o.to)].filter(id => id != null).map(id => S.nodes[id]);
+  const xs = pts.map(p => p.x), ys = pts.map(p => p.y);
+  const x0 = Math.min(...xs) - 150, y0 = Math.min(...ys) - 170, x1 = Math.max(...xs) + 150, y1 = Math.max(...ys) + 150;
+  UI.view = clampView(fitRatio({ x: x0, y: y0, w: x1 - x0, h: y1 - y0 }));
+}
+// แตะดินแดนบนแผนที่ระหว่างเลือกปลายทางถอนทัพ
+function retreatPickNode(id) {
+  const P = UI.retreatPick;
+  if (!P || !P.opts.some(o => o.to === id)) return;
+  P.sel = id;
+  P.refresh();
 }
 
 function uiAskStrategy(ctx, role) {
@@ -2803,20 +3225,42 @@ function uiAskStrategy(ctx, role) {
     h += `</div><div class="strat-help">ซุ่มโจมตี ชนะ บุกตรง · บุกตรง ชนะ ตั้งรับ · ตั้งรับ ชนะ ซุ่มโจมตี (+30%)</div>`;
     if (role === 'atk' && !ctx.breakout) h += `<div class="cancel-row"><button class="btn ghost" data-strat="">↩️ ยกเลิกการบุก</button></div>`;
     if (canRetreat) {
-      h += `<div class="cancel-row"><button class="btn ghost" data-retreat-open>🏃 ถอนทัพ (ไม่รบ)</button></div>
+      h += `<div class="cancel-row"><button class="btn ghost" data-retreat-open>🏃 ถอนทัพ (ไม่รบ) — เลือกปลายทางบนแผนที่</button></div>
         <div class="ret-note">ถอนแล้วเสีย ${esc(node.name)} และกองรักษาการณ์ ทัพเสียทหาร ${Math.round(ctx.retreatOpts[0].lossFrac * 100)}% จากการโดนไล่ล่า</div>`;
     }
     const chooseHtml = h;
-    const retreatHtml = () => `<h2>🏃 ถอนทัพจาก ${esc(node.name)}</h2>
-      <p class="center">ดินแดนนี้ตกเป็นของ ${esc(facName(ctx.atk.fac))} โดยไม่รบ · กองรักษาการณ์แตกกระจาย<br>
-      ทัพเสียทหาร <b>${Math.round(ctx.retreatOpts[0].lossFrac * 100)}%</b> (ตามสัดส่วนทหารม้าของฝ่ายบุก)</p>
-      <div class="kanit center">เลือกปลายทาง</div>
-      <div class="ret-row">${ctx.retreatOpts.map(retreatOptionHtml).join('')}</div>
-      <div class="cancel-row"><button class="btn ghost" data-retreat-back>↩️ กลับไปเลือกกลยุทธ์</button></div>`;
+    const lossPct = canRetreat ? Math.round(ctx.retreatOpts[0].lossFrac * 100) : 0;
+    // ถอนทัพ: หน้าต่างย่อเป็นแถบเล็ก แตะดินแดนที่เรืองแสงบนแผนที่เพื่อเลือก แล้วยืนยัน
+    const pickHtml = () => {
+      const P = UI.retreatPick, o = P.opts.find(x => x.to === P.sel);
+      return `<div class="rp-head"><b>🏃 ถอนทัพจาก ${esc(node.name)}</b> — แตะดินแดนที่เรืองแสงบนแผนที่
+        <span class="rp-key"><i style="background:${RP_COLOR.safe}"></i>ถอยเข้าดินแดนเรา<i style="background:${RP_COLOR.break}"></i>ตีฝ่าวงล้อม</span></div>
+        <div class="rp-chips">${P.opts.map(x => `<button class="rp-chip ${x.kind} ${x.to === P.sel ? 'on' : ''}" data-retreat-pick="${x.to}">${rpLabel(x).icon} ${esc(S.nodes[x.to].name)}</button>`).join('')}</div>
+        ${o ? `<div class="rp-info">${retreatInfoHtml(o)}</div>` : `<div class="muted">${esc(facName(ctx.atk.fac))} ยึด ${esc(node.name)} โดยไม่รบ · กองรักษาการณ์แตกกระจาย · ทัพเสียทหาร ${lossPct}% (ตามสัดส่วนทหารม้าของฝ่ายบุก)</div>`}
+        <div class="rp-btns"><button class="btn ghost" data-retreat-back>↩️ กลับไปเลือกกลยุทธ์</button>
+        <button class="btn primary" data-retreat-confirm ${o ? '' : 'disabled'}>${o ? `✅ ยืนยัน${o.kind === 'safe' ? 'ถอยเข้า' : 'ตีฝ่าวงล้อมเข้า'} ${esc(S.nodes[o.to].name)}` : 'เลือกปลายทางก่อน'}</button></div>`;
+    };
     const card = $('battleCard');
     let done = false;
     const finish = v => { if (done) return; done = true; card.onclick = null; resolve(v); };
     const show = html => { card.innerHTML = html; card.scrollTop = 0; };
+    const startPick = () => {
+      UI.retreatPick = { node: ctx.node, from: ctx.atk.pos, atkFac: ctx.atk.fac, opts: ctx.retreatOpts, sel: null, prevView: UI.view,
+        refresh: () => { show(pickHtml()); renderMap(); } };
+      $('battle').classList.add('mini');
+      fxClear(); // ลูกศรสดของฝ่ายบุกซ้ำกับลูกศรในโหมดเลือกปลายทาง
+      fitRetreatView(UI.retreatPick);
+      show(pickHtml());
+      renderMap(); renderTop();
+    };
+    const endPick = () => {
+      const P = UI.retreatPick;
+      if (!P) return;
+      UI.retreatPick = null;
+      $('battle').classList.remove('mini');
+      if (canZoom()) UI.view = P.prevView;
+      renderMap(); renderTop();
+    };
     show(chooseHtml);
     $('battle').classList.remove('hidden');
     if (UI.tut === 'target') UI.tut = 'strat';
@@ -2824,9 +3268,10 @@ function uiAskStrategy(ctx, role) {
     card.onclick = e => {
       const b = e.target.closest('button');
       if (!b || done) return;
-      if (b.hasAttribute('data-retreat-open')) { show(retreatHtml()); coachHide(); return; }
-      if (b.hasAttribute('data-retreat-back')) { show(chooseHtml); coachUpdate(); return; }
-      if (b.dataset.retreat != null) { finish({ retreat: +b.dataset.retreat }); return; }
+      if (b.hasAttribute('data-retreat-open')) { startPick(); coachHide(); return; }
+      if (b.hasAttribute('data-retreat-back')) { endPick(); show(chooseHtml); coachUpdate(); return; }
+      if (b.dataset.retreatPick != null) { UI.retreatPick.sel = +b.dataset.retreatPick; UI.retreatPick.refresh(); return; }
+      if (b.hasAttribute('data-retreat-confirm')) { const to = UI.retreatPick && UI.retreatPick.sel; if (to == null) return; endPick(); finish({ retreat: to }); return; }
       if (b.dataset.strat != null) {
         const v = b.dataset.strat || null;
         if (!v) $('battle').classList.add('hidden');
@@ -2836,8 +3281,9 @@ function uiAskStrategy(ctx, role) {
     if (Ctrl.auto) setTimeout(() => {
       if (canRetreat && Math.random() < 0.3) {
         card.querySelector('[data-retreat-open]').click();
-        const rs = card.querySelectorAll('[data-retreat]');
+        const rs = card.querySelectorAll('[data-retreat-pick]');
         rs[Math.floor(Math.random() * rs.length)].click();
+        card.querySelector('[data-retreat-confirm]').click();
         return;
       }
       const bs = card.querySelectorAll('.btn.strat');
@@ -2967,14 +3413,19 @@ function helpHtml() {
     <h3>กลยุทธ์ก่อนรบ (ได้เปรียบ +30%)</h3><ul><li>🌙 ซุ่มโจมตี ชนะ 🔥 บุกตรง</li><li>🔥 บุกตรง ชนะ 🧱 ตั้งรับ</li><li>🧱 ตั้งรับ ชนะ 🌙 ซุ่มโจมตี</li></ul>
     <h3>ถอนทัพ (ตอนถูกบุก)</h3><ul><li>ฝ่ายรับที่มีทัพอยู่กด “ถอนทัพ” แทนการรบได้ (ยกเว้นในเมืองหลวง)</li>
     <li>ดินแดนนั้นตกเป็นของฝ่ายบุกทันที กองรักษาการณ์แตกกระจาย ทัพเสียทหาร 10–30% ตามสัดส่วนทหารม้าของฝ่ายบุก</li>
+    <li>เลือกปลายทางบนแผนที่: วงเรืองแสง + ลูกศรเขียว = ถอยเข้าดินแดนเรา, ส้ม = ตีฝ่าวงล้อม พร้อมป้ายประเมิน (🛡️/💪/⚖️/⚠️) แตะเพื่อเลือกแล้วกดยืนยัน</li>
     <li>🛡️ ถอยเข้าดินแดนเราที่ว่าง: จบแค่นั้น</li>
     <li>⚔️ ตีฝ่าวงล้อมเข้าดินแดนกลาง/ศัตรู: รบต่อทันที ทัพล้า -20% ชนะ = ยึด, แพ้ = ทัพแตกทั้งหมด</li></ul>
+    <h3>ดูตาศัตรูบนแผนที่</h3><ul><li>ระหว่างตาศัตรู: ลูกศรสีของฝ่ายนั้นวิ่งไปยังจุดที่เดินทัพ การรบแสดง 💥 และทหารที่เสียลอยขึ้น ดินแดนที่เปลี่ยนเจ้าของกะพริบ (รวมการรบระหว่าง AI ด้วยกัน)</li>
+    <li>ถึงตาเรา: ลูกศรจาง ๆ ของรอบที่แล้วค้างไว้จนกว่าจะเริ่มสั่งการ — ⚔️ เขียว = บุกแล้วยึดได้ · ⚔️ แดง = ถูกตีกลับ · 🏃 ถอนทัพ · +N เกณฑ์ทหาร · 🎖️ แต่งตั้งแม่ทัพ · ✨ ได้ตำนาน</li>
+    <li>🔁 ดูตาศัตรูอีกครั้ง · ปุ่มความเร็ว ▶️ ปกติ / ⏩ เร็ว / ⏭️ ข้าม (เกมจำค่าไว้)</li></ul>
     <h3>ระดับ (ยศ) และการย้อน</h3><ul>${LEVELS.map(l => `<li>${l.icon} <b>${l.name}</b> — ${l.desc}</li>`).join('')}
     <li>ทุกระดับใช้กติกา เงิน และทรัพยากรเท่ากันทุกฝ่าย ต่างกันแค่ความฉลาดของ AI</li>
+    <li>AI ไม่ได้ชอบตีเราเป็นพิเศษ (ยกเว้นระดับตำนานตอนเราครองดินแดนมากที่สุด): ทุกฝ่ายแค้นฝ่ายที่เพิ่งบุกตัวเองราว 4 เทิร์น ฉวยโอกาสตีฝ่ายที่ไร้แผ่นดินหรือทหารน้อย และตั้งแต่จอมพลจะรุมฝ่ายที่ครองดินแดนนำห่าง — ใช้กับเราและ AI เหมือนกัน</li>
     <li>ย้อนได้เฉพาะการเดินทัพที่ไม่มีการรบ เกณฑ์ทหาร แต่งตั้งแม่ทัพ รวม/แบ่งทหาร ในเทิร์นเดียวกัน — เกิดการรบแล้วย้อนกลับไปก่อนหน้านั้นไม่ได้</li></ul>
     <h3>✨ ตำนานพเนจร</h3><ul><li>วิญญาณที่ Ares เพิ่งลักพามา ยังไม่มีฝ่าย — มีตั้งแต่ระดับแม่ทัพขึ้นไป (ระดับนายกองไม่มี) สุ่มมาตามขนาดแผนที่ (เล็ก 2–3 / กลาง 3 / ใหญ่ 3–4 ตัว) อยู่ในดินแดนกลางที่มีกองกำลังเฝ้า +${WANDER_GUARD} นาย</li>
     <li>ยึดดินแดนนั้นได้ = ตำนานนำทัพนั้นแทนแม่ทัพธรรมดา (ทหารอยู่ครบ) · ถ้าจอมทัพหรือตำนานนำทัพอยู่ ตำนานไปตั้งทัพใหม่ที่เมืองหลวง/ดินแดนว่างที่ใกล้ที่สุด · ทัพครบ ${MAX_ARMIES} หรือไม่มีที่ว่าง = เลือกปลดแม่ทัพธรรมดาหนึ่งคน</li>
-    <li>ตีทัพของตำนานฝ่ายอื่นแตกแบบชนะขาด (พลังรบเกิน ${CAPTURE_RATIO} เท่า) = จับตัวได้ ไม่งั้นตำนานหนีกลับไปพเนจร</li>
+    <li>ตีทัพของตำนานฝ่ายอื่นแตกแบบชนะขาด (พลังรบเกิน ${CAPTURE_RATIO} เท่า) = จับตัวได้ ไม่งั้นตำนานหนีกลับไปพเนจร (ไม่มีดินแดนกลาง = พัก ${WANDER_REST} เทิร์น แล้วโผล่ในดินแดนที่ไม่มีทัพ ไม่มีกองรักษาการณ์ และไม่ใช่เมืองหลวง/อดีตเมืองหลวง · ${WANDER_LATE} เทิร์นสุดท้ายไม่โผล่)</li>
     <li>ตำนานที่ถูกจับ: มาตัวเปล่า · ${WANDER_LOYAL} เทิร์นแรกยังไม่ภักดี (สกิลใช้ไม่ได้ แพ้การรบ = ทิ้งทัพหนีไป) · รบกับเจ้าของเก่า -20% ตลอดเกม</li>
     ${WANDERERS.map(w => `<li>${w.icon} <b>${w.name}</b> (${w.origin}) — ✨ ${w.skillName}: ${w.skillDesc} · ⚠️ ${w.weakName}: ${w.weakDesc}</li>`).join('')}</ul>
     <h3>🩸 ศึกชิงอิสรภาพ (ปลดล็อกหลังชนะระดับตำนาน)</h3><ul><li>แผนที่ใหญ่ AI ระดับตำนาน บัลลังก์แห่ง Ares อยู่กลางแผนที่ ล้อมด้วยเมืองหลวงหุ่นเชิด 🎭 ที่ช่วยกันรุมเราและไม่รบกันเอง</li>
@@ -3091,9 +3542,12 @@ function bindUI() {
   $('map').addEventListener('click', e => {
     if (UI.suppressClick && Date.now() - UI.suppressClick < 400) { UI.suppressClick = 0; return; } // เพิ่งลากแผนที่ ไม่นับเป็นการแตะ
     const g = e.target.closest('[data-node]');
+    if (UI.retreatPick) { if (g) retreatPickNode(+g.dataset.node); return; }
     if (g) onNodeClick(+g.dataset.node);
   });
   $('info').addEventListener('click', onInfoClick);
+  $('btnReplay').addEventListener('click', replayRound);
+  $('btnSpeed').addEventListener('click', () => { const ks = Object.keys(AI_SPEEDS); setAiSpeed(ks[(ks.indexOf(UI.aiSpeed) + 1) % ks.length]); });
   $('coach').addEventListener('click', e => { if (e.target.closest('[data-tut]')) finishTutorial(); });
   window.addEventListener('resize', coachUpdate);
   $('panel').addEventListener('scroll', coachUpdate);
@@ -3111,6 +3565,7 @@ function bindUI() {
     const a = armyById(+b.dataset.army);
     if (a) {
       UI.selArmy = a.id; UI.selNode = a.node;
+      if (S.phase === 'player') UI.ghost = false;
       if (UI.tut === 'army' && canMove(a)) UI.tut = 'target';
       render();
     }
@@ -3187,6 +3642,7 @@ async function runTests(mode, n, opt = {}) {
     Ctrl.delay = async () => {};
     Ctrl.render = () => {};
     Ctrl.gameOver = () => {};
+    Ctrl.fx = false; Ctrl.aiArrow = async () => {}; Ctrl.aiCatchUp = async () => {}; Ctrl.fxClear = () => {};
   } else {
     Ctrl.gameOver = () => {};
     showScreen('game');
@@ -3221,6 +3677,8 @@ async function runTests(mode, n, opt = {}) {
         h[0]++; if (S.over && S.over.win) h[1]++;
       }
       report.battles += S.stats.battles;
+      const TS = report.target = report.target || { onP: 0, onAI: 0, bP: 0, bAI: 0 };
+      for (const k in TS) TS[k] += S.tstats[k];
       if (over) {
         if (over.win) report.wins++;
         report.reasons[over.reason + (over.win ? '-win' : '-lose')] = (report.reasons[over.reason + (over.win ? '-win' : '-lose')] || 0) + 1;
@@ -3242,6 +3700,8 @@ async function runTests(mode, n, opt = {}) {
   report.avgTurns = +(report.turns / Math.max(1, report.games)).toFixed(1);
   report.avgNodes = +(report.nodes / Math.max(1, report.games)).toFixed(1);
   report.uiErrors = window.__errs || [];
+  // สัดส่วนการบุกของ AI ที่ลงที่ผู้เล่น เทียบกับสัดส่วนดินแดนผู้เล่นในพรมแดนของ AI (ควรใกล้กัน)
+  if (report.target) { const T = report.target; T.atkOnPlayerPct = Math.round(100 * T.onP / Math.max(1, T.onP + T.onAI)); T.borderPlayerPct = Math.round(100 * T.bP / Math.max(1, T.bP + T.bAI)); }
   report.seatWinPct = {};
   for (const k in report.byLegend) report.seatWinPct[k] = Math.round(100 * report.byLegend[k][1] / report.byLegend[k][0]);
   for (const k in report.legendAll) { const x = report.legendAll[k]; x.alivePct = Math.round(100 * x.alive / x.games); x.sharePct = Math.round(100 * x.share / x.games); delete x.share; }
@@ -3592,9 +4052,30 @@ async function runLegendTest() {
     S.wild = []; S.wInGame = ['liubei'];
     wanderAway('liubei', null);
     check('no neutral → rests', S.resting.length === 1 && S.resting[0].back === S.turn + WANDER_REST);
-    S.turn += WANDER_REST; wanderReturn();
+    S.turn += WANDER_REST;
+    for (const n of S.nodes) if (sumU(n.garrison) === 0) n.garrison.inf = 1;
+    wanderReturn();
+    check('return: no empty land → keeps waiting', S.resting.length === 1 && !S.wild.length && /รอดินแดนว่าง/.test(legendWhere('liubei').text));
+    // ว่างหลายแบบ แต่โผล่ได้เฉพาะดินแดนที่ไม่มีทัพ ไม่มีกองรักษาการณ์ และไม่ใช่เมืองหลวง/อดีตเมืองหลวง
+    for (const n of S.nodes.filter(n => n.capitalOf !== null)) n.garrison = Z();
+    for (const a of S.armies) S.nodes[a.node].garrison = Z();
+    const okNode = S.nodes.find(n => n.capitalOf === null && !armyAt(n.id));
+    okNode.garrison = Z();
+    S.turn++; wanderReturn();
     const lw = S.wild.find(w => w.wid === 'liubei');
-    check('returns on armyless non-capital node', !!lw && S.nodes[lw.node].capitalOf === null && !armyAt(lw.node) && S.nodes[lw.node].owner === NEUTRAL, inv());
+    check('returns only on empty land (no army/garrison, not capital or ex-capital)', !!lw && lw.node === okNode.id && S.nodes[lw.node].owner === NEUTRAL && sumU(S.nodes[lw.node].garrison) === WANDER_GUARD, inv());
+    // 2 เทิร์นสุดท้ายไม่โผล่ (หายไปจนจบเกม)
+    S.wild = []; S.resting = [{ wid: 'liubei', back: 1 }];
+    const ok2 = S.nodes.find(n => n.capitalOf === null && !armyAt(n.id) && n.id !== okNode.id);
+    ok2.garrison = Z();
+    let late = true;
+    for (const t of [maxTurns() - 1, maxTurns()]) { S.turn = t; wanderReturn(); if (S.wild.length || S.resting.length !== 1) late = false; }
+    check('no return in last 2 turns', late && /จนจบศึก/.test(legendWhere('liubei').text));
+    S.turn = maxTurns() - 2; wanderReturn();
+    check('returns at 3rd-to-last turn', S.wild.some(w => w.wid === 'liubei' && w.node === ok2.id) && !S.resting.length, inv());
+    S.resting = [{ wid: 'joan', back: maxTurns() - 1 }]; S.turn = 3;
+    check('rest ending in last 2 turns shown as gone till end', /จนจบศึก/.test(legendWhere('joan').text));
+    S.resting = []; S.turn = 1;
 
     // --- หนุมาน: ลมพัดคืนชีพครั้งแรกเท่านั้น ---
     fresh();
@@ -4092,9 +4573,15 @@ async function runTutorialTest(stopAt) {
   await waitPlayer();
   if (S.over) return done();
   // ทัพในเมืองหลวงไม่นับ + เงินต่ำกว่า 40 ไม่เตือน
+  // (ตาศัตรูสุ่มได้ทุกแบบ — ถ้าเมืองหลวงแตกหรือถูกล้อมจนทัพในเมืองหลวงเดินไม่ได้ เริ่มเกมใหม่ให้สถานการณ์แน่นอน)
+  const capReady = () => fac(0).capital != null && (armyAt(fac(0).capital) ? armyAt(fac(0).capital).fac === 0 : true);
+  if (!capReady()) { Ctrl.auto = true; startGame('kongming', 2, 1); }
   for (const a of S.armies) if (a.fac === 0 && a.node !== fac(0).capital) a.used = 99;
   fac(0).gold = HIRE_COST;
-  const capArmy = armyAt(fac(0).capital) || hireGeneral(0);
+  let capArmy = armyAt(fac(0).capital) || hireGeneral(0);
+  if (capArmy && !moveTargets({ ...capArmy, used: 0, units: { ...capArmy.units, inf: capArmy.units.inf + 5 } }).length) {
+    startGame('kongming', 2, 1); fac(0).gold = HIRE_COST; capArmy = armyAt(fac(0).capital);
+  }
   if (capArmy) { capArmy.units.inf += 5; capArmy.used = 0; }
   check('capital army can move', !!capArmy && moveTargets(capArmy).length > 0);
   fac(0).gold = END_WARN_GOLD - 1;
@@ -4199,14 +4686,30 @@ async function runFeatureTest() {
     let p = moveArmy(sc.foe, sc.X);
     await wait(30);
     check('retreat button shown', bOn() && !!q('#battleCard [data-retreat-open]'));
+    const viewBefore = UI.view;
     q('#battleCard [data-retreat-open]').click();
-    const opts = [...document.querySelectorAll('#battleCard [data-retreat]')];
-    const safeBtn = opts.find(b => b.classList.contains('safe') && +b.dataset.retreat === sc.cap);
-    check('retreat options with estimates', opts.length >= 2 && !!safeBtn && /ประเมิน|ยึดได้ทันที/.test(q('#battleCard .ret.break') ? q('#battleCard .ret.break').textContent : 'ประเมิน'));
+    const opts = [...document.querySelectorAll('#battleCard [data-retreat-pick]')];
+    check('retreat pick: dialog shrinks to a bar, map shows rings + arrows', $('battle').classList.contains('mini') && opts.length >= 2
+      && document.querySelectorAll('#map .rp-ring[data-rp]').length === opts.length && document.querySelectorAll('#map .rp-arrow').length === opts.length && /ถูกบุก/.test($('map').textContent));
+    check('retreat pick: green = own land, orange = breakout, estimate tag on each', [...document.querySelectorAll('#map .rp-arrow')].every(l => {
+      const o = UI.retreatPick.opts.find(x => x.to === +l.dataset.rpArrow); return l.getAttribute('stroke') === RP_COLOR[o.kind];
+    }) && document.querySelectorAll('#map .rp-tag').length === opts.length && [...document.querySelectorAll('#map .rp-tag')].every(t => /🛡️|💪|⚖️|⚠️/.test(t.textContent)));
+    if (canZoom()) {
+      const v = curView(), ids = [sc.X, sc.Y, ...UI.retreatPick.opts.map(o => o.to)];
+      check('retreat pick: view shows attacked node + all destinations', ids.every(id => { const n = S.nodes[id]; return n.x > v.x && n.x < v.x + v.w && n.y > v.y && n.y < v.y + v.h; }));
+    }
+    check('retreat pick: confirm needs a choice', q('#battleCard [data-retreat-confirm]').disabled);
+    q(`#map [data-node="${sc.cap}"]`).dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    check('retreat pick: tap node on map selects it', UI.retreatPick.sel === sc.cap && !q('#battleCard [data-retreat-confirm]').disabled && /ถอยเข้า/.test(q('#battleCard .rp-info').textContent) && !!q(`#map .rp-ring.on[data-rp="${sc.cap}"]`));
+    q(`#map [data-node="${sc.Y}"]`).dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    check('retreat pick: non-destination tap ignored', UI.retreatPick.sel === sc.cap);
+    const brChip = q('#battleCard .rp-chip.break');
+    if (brChip) { brChip.click(); check('retreat pick: breakout shows estimate', /ประเมิน|ยึดได้ทันที/.test(q('#battleCard .rp-info').textContent)); }
     q('#battleCard [data-retreat-back]').click();
-    check('back to strategies', !!q('#battleCard .btn.strat'));
+    check('back to strategies', !!q('#battleCard .btn.strat') && !$('battle').classList.contains('mini') && !UI.retreatPick && !q('#map .rp-ring') && UI.view === viewBefore);
     q('#battleCard [data-retreat-open]').click();
-    q(`#battleCard [data-retreat="${sc.cap}"]`).click();
+    q(`#battleCard [data-retreat-pick="${sc.cap}"]`).click();
+    q('#battleCard [data-retreat-confirm]').click();
     await wait(30);
     check('retreat summary shown', bOn() && /ถอนทัพ/.test($('battleCard').textContent));
     $('btContinue').click();
@@ -4223,11 +4726,12 @@ async function runFeatureTest() {
     p = moveArmy(sc.foe, sc.X);
     await wait(30);
     q('#battleCard [data-retreat-open]').click();
-    const br = q('#battleCard .ret.break');
+    const br = q('#battleCard .rp-chip.break');
     check('break option exists', !!br);
-    const brTo = +br.dataset.retreat;
+    const brTo = +br.dataset.retreatPick;
     const hadDef = sumU(defSide(brTo).units) > 0;
     br.click();
+    q('#battleCard [data-retreat-confirm]').click();
     await wait(30);
     $('btContinue').click();
     await wait(60);
@@ -4252,8 +4756,9 @@ async function runFeatureTest() {
     p = moveArmy(sc.foe, sc.X);
     await wait(30);
     q('#battleCard [data-retreat-open]').click();
-    check('hopeless breakout estimate shown', /เสียเปรียบมาก/.test(q(`#battleCard [data-retreat="${bad}"]`).textContent));
-    q(`#battleCard [data-retreat="${bad}"]`).click();
+    q(`#battleCard [data-retreat-pick="${bad}"]`).click();
+    check('hopeless breakout estimate shown', /เสียเปรียบมาก/.test(q('#battleCard .rp-info').textContent) && /⚠️/.test(q(`#battleCard [data-retreat-pick="${bad}"]`).textContent));
+    q('#battleCard [data-retreat-confirm]').click();
     await wait(30);
     $('btContinue').click();
     await wait(60);
@@ -4297,6 +4802,116 @@ async function runFeatureTest() {
     check('นายกอง AI never retreats', aiRetreatCase(0) === null);
     check('แม่ทัพ AI retreats when crushed', aiRetreatCase(1) !== null);
 
+    // --- เลือกเป้าแบบยุติธรรม: ไม่มีโบนัสตีผู้เล่น / ความแค้น / ฉวยโอกาส / ถ่วงดุลอำนาจ ---
+    // ดินแดนสองแห่งที่เหมือนกันทุกอย่าง ต่างกันแค่เจ้าของ (ผู้เล่น vs AI อีกฝ่าย) — มองจาก AI ฝ่าย 1
+    const fairCase = lvl => {
+      for (let sd = 300 + lvl * 50; ; sd++) { newGame('napoleon', 2, sd, lvl, 'm'); if (!S.factions.some(F => legendOf(F.id).landless)) break; }
+      for (const n of S.nodes) if (n.capitalOf === null && n.owner === NEUTRAL) n.garrison = Z();
+      const free = S.nodes.filter(n => n.capitalOf === null && !armyAt(n.id) && !wildAt(n.id));
+      const nP = free[0], nA = free[1];
+      nP.terrain = nA.terrain = 'plain'; nP.owner = 0; nA.owner = 2;
+      return { nP, nA, v: () => [nodeValue(1, nP), nodeValue(1, nA)] };
+    };
+    for (const lvl of [0, 1, 2]) {
+      const c = fairCase(lvl), [vp, va] = c.v();
+      check(`fair ${LEVELS[lvl].name}: player land not favoured`, Math.abs(vp - va) < 1e-9, `p=${vp} ai=${va}`);
+    }
+    {
+      const c = fairCase(3);
+      for (const n of S.nodes.filter(n => n.owner === NEUTRAL).slice(0, 3)) n.owner = 0;
+      const [vp, va] = c.v();
+      check('ตำนาน: still gangs up when player leads', playerLeads() && vp > va + 10, `p=${vp} ai=${va}`);
+    }
+    {
+      const c = fairCase(1);
+      const [p0, a0] = c.v();
+      noteAttack(2, 1);
+      const a1 = c.v()[1];
+      noteAttack(0, 1);
+      const p1 = c.v()[0];
+      check('grudge: attacked AI targets its attacker (same for player & AI)', a1 - a0 === GRUDGE.bonus && p1 - p0 === GRUDGE.bonus);
+      const t0 = S.turn;
+      S.turn = t0 + GRUDGE.full; const full = c.v()[1] - a0;
+      S.turn = t0 + GRUDGE.full + 1; const fading = c.v()[1] - a0;
+      S.turn = t0 + GRUDGE.full + GRUDGE.fade; const gone = c.v()[1] - a0;
+      check('grudge: full 3–4 turns then fades out', full === GRUDGE.bonus && fading > 0 && fading < GRUDGE.bonus && gone === 0, `full=${full} fading=${fading} gone=${gone}`);
+      S.turn = t0;
+      check('grudge only on the attacker', grudgeBonus(2, 0) === 0 && grudgeBonus(1, 2) === GRUDGE.bonus);
+    }
+    {
+      const c = fairCase(1);
+      S.grudge = {};
+      const [p0, a0] = c.v();
+      fac(2).capital = null; fac(2).homeless = { left: 3, fresh: false };
+      const a1 = c.v()[1];
+      fac(2).capital = fac(2).start; fac(2).homeless = null;
+      for (const a of S.armies.filter(a => a.fac === 0)) a.units = { inf: 1, cav: 0, arc: 0 };
+      for (const n of S.nodes.filter(n => n.owner === 0)) n.garrison = Z();
+      const p1 = c.v()[0];
+      check('opportunism: homeless / weak side is juicier (AI or player)', a1 - a0 === PREY_BONUS && isPrey(0) && p1 - p0 === PREY_BONUS && !isPrey(1));
+      newGame('spartacus', 2, 361, 1, 'm');
+      check('opportunism: born-landless Spartacus is not prey just for being landless', fac(0).capital == null && !isPrey(0));
+    }
+    for (const lvl of [1, 2]) {
+      const c = fairCase(lvl);
+      for (const n of S.nodes.filter(n => n.owner === NEUTRAL).slice(0, 5)) n.owner = 2;
+      const [vp, va] = c.v();
+      check(`balance of power ${LEVELS[lvl].name}: ${lvl >= 2 ? 'targets' : 'ignores'} runaway AI`, runawayFac() === 2 && (lvl >= 2 ? va - vp === BALANCE_BONUS : va === vp), `p=${vp} ai=${va}`);
+    }
+    {
+      const c = fairCase(2);
+      for (const n of S.nodes.filter(n => n.owner === NEUTRAL).slice(0, 5)) n.owner = 0;
+      const [vp, va] = c.v();
+      check('balance of power: runaway player targeted the same way', runawayFac() === 0 && vp - va === BALANCE_BONUS);
+    }
+    {
+      // ยึด/รบจริงผ่าน moveArmy ก็จดความแค้น
+      newGame('napoleon', 2, 333, 1, 'm');
+      for (const f of S.factions) f.human = f.id === 0;
+      const e = S.edges.find(e => !e.mountain && S.nodes[e.a].capitalOf === null && S.nodes[e.b].capitalOf === null && !armyAt(e.a) && !armyAt(e.b));
+      S.nodes[e.a].owner = 2; S.nodes[e.b].owner = 1; S.nodes[e.b].garrison = { inf: 2, cav: 0, arc: 0 };
+      const ga = newArmy(2, e.a, { name: 'x', icon: '🎖️', leader: false }, { inf: 30, cav: 30, arc: 30 });
+      await moveArmy(ga, e.b);
+      check('real attack records grudge', S.grudge[1] && S.grudge[1][2] === S.turn && S.tstats.onAI === 1);
+      newGame('napoleon', 2, 334, 3, 'l', { boss: true });
+      check('boss mode: fair-targeting rules off (puppets still gang up)', targetBonus(1, 0) === 0 && (noteAttack(0, 1), !S.grudge[1]));
+    }
+
+    // --- ตาของฝ่ายอื่นแสดงบนแผนที่ ---
+    startGame('napoleon', 2, 1, 'm');
+    Ctrl.auto = true; setAiSpeed('normal');
+    let sawFx = 0, sawBoom = 0;
+    const fxObs = new MutationObserver(recs => { for (const r of recs) for (const nd of r.addedNodes) { sawFx++; if (nd.querySelector && nd.querySelector('.fx-boom')) sawBoom++; } });
+    fxObs.observe($('fx'), { childList: true });
+    await endPlayerTurn();
+    check('AI turn: arrows animate on map', sawFx > 0 && !FX.panned, `fx=${sawFx} boom=${sawBoom}`);
+    check('AI turn: battles show 💥 (incl. AI vs neutral/AI)', sawBoom > 0 || !FX.last.some(st => st.ev.some(e => e.t === 'battle' && !e.human)));
+    check('round recorded', !!FX.last && FX.last.some(st => st.from != null) && UI.ghost && $('fx').childElementCount === 0);
+    UI.selNode = null; render();
+    check('player turn: faded arrows + key shown', !!q('#map .ghost[data-ghost]') && !!q('#info .ghost-key'));
+    check('attack badge colour = result', [...document.querySelectorAll('#map .gbadge[data-won="1"] circle')].every(c => c.getAttribute('fill') === '#2f7d4f')
+      && [...document.querySelectorAll('#map .gbadge[data-won="0"] circle')].every(c => c.getAttribute('fill') === '#b03a2e'));
+    const recruited = FX.last.some(st => st.ev.some(e => e.t === 'recruit'));
+    check('recruit +N icon on map', !recruited || [...document.querySelectorAll('#map .gmark')].some(g => /\+\d+/.test(g.textContent)));
+    check('replay button enabled', !$('btnReplay').disabled);
+    sawFx = 0;
+    const stBefore = JSON.stringify(S);
+    await replayRound();
+    check('🔁 replay plays the round again and restores state', sawFx > 0 && JSON.stringify(S) === stBefore && !UI.busy && !!q('#map .ghost'));
+    await onNodeClick(leaderArmy(0).node);
+    check('faded arrows clear when player starts commanding', !UI.ghost && !q('#map .ghost') && !q('#info .ghost-key'));
+    setAiSpeed('skip');
+    sawFx = 0;
+    await endPlayerTurn();
+    let spd = null; try { spd = localStorage.getItem(SPEED_KEY); } catch (e) { /* ignore */ }
+    check('speed "skip": no animation but still recorded', sawFx === 0 && !!FX.last && UI.ghost, `fx=${sawFx}`);
+    $('btnSpeed').click();
+    check('speed choice remembered + cycles', spd === 'skip' && UI.aiSpeed === 'normal' && /ปกติ/.test($('btnSpeed').textContent));
+    setAiSpeed('normal');
+    fxObs.disconnect();
+    Ctrl.auto = false;
+    check('invariants after fx rounds', checkInvariants().length === 0, checkInvariants().join(';'));
+
     // --- ปุ่มกลับไปสั่งการเลือกทัพนอกเมืองหลวงก่อน ---
     startGame('napoleon', 2, 1);
     setEndWarnOff(false);
@@ -4324,6 +4939,8 @@ function boot() {
   $('optTut').checked = !tutDone();
   UI.setupLevel = loadProgress().unlocked;
   try { const sz = localStorage.getItem(SIZE_KEY); if (MAP_SIZES[sz]) UI.setupSize = sz; } catch (e) { /* ignore */ }
+  try { const sp = localStorage.getItem(SPEED_KEY); if (AI_SPEEDS[sp]) UI.aiSpeed = sp; } catch (e) { /* ignore */ }
+  renderSpeed();
   renderTitle();
   const q = new URLSearchParams(location.search);
   const errs = [];
@@ -4371,6 +4988,29 @@ function boot() {
         UI.notices.push('⚠️ ไร้แผ่นดิน: เหลือเทิร์นนี้เป็นเทิร์นสุดท้าย! ยึดเมืองหลวงแห่งใดก็ได้ภายในเทิร์นนี้ ไม่งั้นแพ้'); showNotices();
       }
       if (q.get('shot') === 'legend') { UI.selNode = S.wild[0].node; UI.selArmy = null; render(); }
+      if (q.get('shot') === 'ghost') {
+        // ภาพตาศัตรูจาง ๆ หลังเล่นไป 3 รอบ (&level= ระดับ AI)
+        (async () => {
+          S.level = +(q.get('level') || 2);
+          Ctrl.auto = true; UI.aiSpeed = 'skip';
+          for (let i = 0; i < 3 && !S.over; i++) { if (i) await aiTakeActions(0); await endPlayerTurn(); }
+          Ctrl.auto = false; UI.selNode = null; UI.selArmy = null; closeDialog(); render();
+          document.title = 'SHOTREADY';
+        })();
+      }
+      if (q.get('shot') === 'aiturn') { UI.aiSpeed = 'normal'; UI.selArmy = null; endPlayerTurn(); }  // ภาพระหว่างตาศัตรู (ใช้คู่กับ virtual time)
+      if (q.get('shot') === 'retreatpick') {
+        // ศัตรูบุกทัพเรา แล้วกดถอนทัพ → เลือกปลายทางบนแผนที่
+        const cap = fac(0).capital;
+        const X = neighbors(cap).filter(nb => !nb.mountain).map(nb => nb.id).find(id => S.nodes[id].capitalOf === null && neighbors(id).filter(nb => !nb.mountain && nb.id !== cap).length >= 2);
+        const Y = neighbors(X).filter(nb => !nb.mountain).map(nb => nb.id).find(id => id !== cap && S.nodes[id].capitalOf === null && !armyAt(id));
+        const me = armyAt(cap); me.node = X; S.nodes[X].owner = 0; me.units = { inf: 10, cav: 0, arc: 10 };
+        const foe = leaderArmy(1); foe.node = Y; S.nodes[Y].owner = 1; foe.units = { inf: 20, cav: 20, arc: 20 };
+        for (const nb of neighbors(X)) if (nb.id !== Y && nb.id !== cap && S.nodes[nb.id].owner === NEUTRAL) S.nodes[nb.id].garrison = { inf: 3, cav: 2, arc: 2 };
+        S.phase = 'ai'; S.current = 1; UI.busy = true; render();
+        moveArmy(foe, X);
+        setTimeout(() => { document.querySelector('#battleCard [data-retreat-open]').click(); if (q.has('sel')) document.querySelector('#battleCard .rp-chip.break, #battleCard .rp-chip').click(); document.title = 'SHOTREADY'; }, 50);
+      }
       if (q.get('shot') === 'legbattle') {
         // ทัพตำนานศัตรู (ยังไม่ภักดี เคยเป็นของเรา) ยืนติดเมืองหลวงเรา แล้วเราบุก
         const a = armyAt(fac(0).capital), t = moveTargets(a).find(id => S.nodes[id].capitalOf === null && !wildAt(id));
