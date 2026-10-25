@@ -506,22 +506,22 @@ const LEGENDS = [
   { id: 'genghis', hist: true, name: 'เจงกิสข่าน', icon: '🏇', color: '#d9822b', origin: 'จักรวรรดิมองโกล',
     capitalName: 'คาราโครัม', skillName: 'ม้าเร็วแห่งทุ่งหญ้า',
     skillDesc: 'ทัพที่มีทหารม้าตั้งแต่ครึ่งหนึ่งขึ้นไป เดินได้ 2 ช่องต่อเทิร์น', skill: { cavRush: true },
-    weakName: 'ไม่ถนัดตีเมือง', weakDesc: 'บุกเมืองหลวงศัตรู กำแพงเมืองของฝ่ายรับเป็น +40% แทน +25%', weak: { siegeWall: 1.4 },
+    weakName: 'ไม่ถนัดตีเมือง', weakDesc: 'บุกเมืองหลวงศัตรู กำแพงเมืองของฝ่ายรับเป็น +40% แทน +25% (ทัพตำนานพเนจรไม่โดน)', weak: { siegeWall: 1.4 },
     start: { inf: 5, cav: 15, arc: 5 } },
   { id: 'hannibal', hist: true, name: 'ฮันนิบาล', icon: '🐘', color: '#8e44ad', origin: 'คาร์เธจ',
     capitalName: 'คาร์เธจ', skillName: 'ข้ามเทือกเขาแอลป์',
     skillDesc: 'พาทัพข้ามเทือกเขาที่ปิดกั้นได้ และไม่โดนโทษ/ชัยภูมิของภูเขา', skill: { crossMountain: true },
-    weakName: 'ราคาของแอลป์', weakDesc: 'ทุกครั้งที่ข้ามเทือกเขา ทัพเสียทหาร 10%', weak: { alpsToll: 0.1 },
+    weakName: 'ราคาของแอลป์', weakDesc: 'ทุกครั้งที่ข้ามเทือกเขา ทัพเสียทหาร 10% (ทัพตำนานพเนจรไม่โดน)', weak: { alpsToll: 0.1 },
     start: { inf: 10, cav: 5, arc: 10 } },
   { id: 'kongming', hist: true, name: 'ขงเบ้ง', icon: '🪶', color: '#23955a', origin: 'จ๊กก๊ก ยุคสามก๊ก',
     capitalName: 'เฉิงตู', skillName: 'หยั่งรู้ฟ้าดิน',
     skillDesc: 'เห็นกลยุทธ์ที่ศัตรูจะเลือกก่อนรบ', skill: { foresight: true },
-    weakName: 'บุกเหนือไม่สำเร็จ', weakDesc: 'ตอนเป็นฝ่ายบุก พลังรบ -10%', weak: { atkMod: 0.9 },
+    weakName: 'บุกเหนือไม่สำเร็จ', weakDesc: 'ตอนเป็นฝ่ายบุก พลังรบ -10% (ทัพตำนานพเนจรไม่โดน)', weak: { atkMod: 0.9 },
     start: { inf: 10, cav: 5, arc: 10 } },
   { id: 'napoleon', hist: true, name: 'นโปเลียน', icon: '🎩', color: '#2e6fd8', origin: 'จักรวรรดิฝรั่งเศส',
     capitalName: 'ปารีส', skillName: 'กองทัพใหญ่',
     skillDesc: 'ทัพยิ่งใหญ่ยิ่งแกร่ง: +4% ทุกทหาร 10 นาย (สูงสุด +30%)', skill: { bigArmy: 0.004, bigArmyCap: 0.3 },
-    weakName: 'ขยายเกินตัว', weakDesc: 'ทัพที่อยู่ห่างเมืองหลวงเกิน 3 ช่อง พลังรบ -15%', weak: { overreach: 3, mod: 0.85 },
+    weakName: 'ขยายเกินตัว', weakDesc: 'ทัพที่อยู่ห่างเมืองหลวงเกิน 3 ช่อง พลังรบ -15% (ทัพตำนานพเนจรไม่โดน)', weak: { overreach: 3, mod: 0.85 },
     start: { inf: 15, cav: 5, arc: 5 } },
   { id: 'spartacus', hist: true, name: 'สปาร์ตาคัส', icon: '⛓️', color: '#a83232', origin: 'กบฏทาสแห่งโรม',
     capitalName: 'ค่ายกบฏ', landless: true, skillName: 'ปลดแอก',
@@ -916,13 +916,15 @@ function neighbors(id) {
 const passable = (f, nb) => !nb.mountain || skill(f, 'crossMountain');
 const adjacent = (u, v) => neighbors(u).some(nb => nb.id === v);
 const fweak = f => f >= 0 ? legendOf(f).weak : {};
+// จุดอ่อนจอมทัพที่มีผลรายทัพ (กำแพงเมือง/แอลป์/บุก/ขยายเกินตัว): ทัพที่ตำนานพเนจรนำไม่โดน (มีจุดอ่อนของตัวเองอยู่แล้ว)
+const lweak = (f, g) => (g && g.wid) ? {} : fweak(f);
 // เมืองหลวงปัจจุบันของฝ่ายใดฝ่ายหนึ่ง (เมืองหลวงย้ายได้ จึงไม่ใช้ capitalOf ซึ่งเป็นแค่เครื่องหมายว่าเคยเป็นเมืองหลวง)
 const isSeat = n => n.owner >= 0 && fac(n.owner).alive && fac(n.owner).capital === n.id;
 const leaderArmy = f => S.armies.find(a => a.fac === f && a.gen.leader);
 const homeNode = f => fac(f).capital != null ? fac(f).capital : (leaderArmy(f) ? leaderArmy(f).node : fac(f).start);
 const mountainEdge = (u, v) => S.edges.some(e => e.mountain && ((e.a === u && e.b === v) || (e.a === v && e.b === u)));
 // ราคาของแอลป์ (ฮันนิบาล): สัดส่วนทหารที่เสียถ้าทัพ a ข้ามจาก u ไป v
-const alpsFrac = (a, u, v) => (fweak(a.fac).alpsToll && mountainEdge(u, v)) ? fweak(a.fac).alpsToll : 0;
+const alpsFrac = (a, u, v) => (lweak(a.fac, a.gen).alpsToll && mountainEdge(u, v)) ? lweak(a.fac, a.gen).alpsToll : 0;
 function payAlps(a, u, v) {
   const fr = alpsFrac(a, u, v);
   if (!fr) return Z();
@@ -1098,7 +1100,7 @@ function powerOf(side, other, nodeId, role, opts = {}) {
   else if (T.atkMod < 1 && ws.riverWalk) note(`✨ ${W.skillName}: ข้ามแม่น้ำไม่โดนโทษ`);
   else push('บุกข้ามแม่น้ำ', T.atkMod);
   if (role === 'def' && isSeat(node)) {
-    const sw = fweak(other.fac).siegeWall;
+    const sw = lweak(other.fac, other.gen).siegeWall;
     if (wsk(other.gen, other.fac).trojanHorse) note('✨ ม้าไม้เมืองทรอย: ไม่โดนกำแพงเมือง');
     else if (isBoss() && node.id === S.boss.throne && S.boss.jar) note('🏺 ไหทองแดง: บัลลังก์ไม่มีกำแพงเมือง');
     else push(sw ? `กำแพงเมืองหลวง (⚠️ ${legendOf(other.fac).weakName})` : 'กำแพงเมืองหลวง', sw || CAPITAL_WALL);
@@ -1108,7 +1110,7 @@ function powerOf(side, other, nodeId, role, opts = {}) {
   const sk = { ...(side.fac >= 0 ? legendOf(side.fac).skill : {}), ...(g && g.lid ? LEG(g.lid).skill : {}) };
   if (sk.bigArmy) push('กองทัพใหญ่', 1 + Math.min(sk.bigArmyCap, sumU(side.units) * sk.bigArmy));
   // จุดอ่อนของจอมทัพฝ่ายนี้
-  const fw = fweak(side.fac);
+  const fw = lweak(side.fac, g);
   if (fw.tenYears && g && !g.leader && !g.wid && !g.lid && S.turn >= Math.ceil(fw.tenYears * maxTurns())) push(`⚠️ ศึกสิบปี (แม่ทัพธรรมดา)`, fw.tenYearsMod);
   if (fw.atkMod && role === 'atk') push(`⚠️ ${legendOf(side.fac).weakName}`, fw.atkMod);
   if (fw.overreach && g && side.pos != null) {
@@ -5175,6 +5177,32 @@ async function runLegendTest() {
     la2.node = free1; S.nodes[free1].owner = 1; fac(1).gold = 100;
     const ha = hireGeneral(1);
     check('hire (AI): 5 infantry', !!ha && JSON.stringify(ha.units) === JSON.stringify({ inf: 5, cav: 0, arc: 0 }));
+
+    // --- จุดอ่อนจอมทัพ (รายทัพ) ไม่มีผลกับทัพที่ตำนานพเนจรนำ — แม่ทัพธรรมดายังโดน ---
+    {
+      const U10 = { inf: 10, cav: 0, arc: 0 }, NG = { name: 'แม่ทัพ', icon: '🎖️', leader: false };
+      const has = (pw, re) => pw.mods.some(m => re.test(m.label));
+      const side = (gen, pos = null) => ({ fac: 0, units: U10, gen, pos, armyN: 10 });
+      const foe = { fac: 1, units: U10, gen: null };
+      newGame('kongming', 2, 7101, 1);
+      const nk = S.nodes.find(n => n.capitalOf === null).id, kw = legendOf(0).weakName;
+      check('kongming weakness: legend army exempt, general not',
+        !has(powerOf(side(legendGen('musashi', null)), foe, nk, 'atk'), new RegExp(kw)) && has(powerOf(side(NG), foe, nk, 'atk'), new RegExp(kw)));
+      newGame('napoleon', 2, 7102, 1, 'l');
+      const dist = bfs(fac(0).capital, 0, () => true).dist, farN = S.nodes.find(n => dist[n.id] == null || dist[n.id] > 3);
+      const nw = new RegExp(legendOf(0).weakName);
+      check('napoleon overreach: legend army exempt, general not', !!farN
+        && !has(powerOf(side(legendGen('musashi', null), farN.id), foe, farN.id, 'atk'), nw) && has(powerOf(side(NG, farN.id), foe, farN.id, 'atk'), nw));
+      newGame('hannibal', 2, 7103, 1, 'l');
+      const me = S.edges.find(e => e.mountain);
+      check('hannibal alps toll: legend army exempt, general not', !!me
+        && alpsFrac({ fac: 0, gen: legendGen('wukong', null) }, me.a, me.b) === 0 && alpsFrac({ fac: 0, gen: NG }, me.a, me.b) === 0.1);
+      newGame('genghis', 2, 7104, 1);
+      const c1 = fac(1).capital, wall = pw => (pw.mods.find(m => /กำแพงเมืองหลวง/.test(m.label)) || {}).m;
+      check('genghis siege wall: legend attacker faces +25%, general +40%',
+        wall(powerOf(defSide(c1), side(legendGen('achilles', null), c1), c1, 'def')) === CAPITAL_WALL && wall(powerOf(defSide(c1), side(NG, c1), c1, 'def')) === 1.4);
+      check('leader skill still applies to legend army (genghis cav moves 2)', maxMoves({ fac: 0, gen: legendGen('achilles', null), units: { inf: 0, cav: 10, arc: 0 } }) === 2);
+    }
     check('pichai cannot retreat', retreatOptions(h2, h2.node, lead3).length === 0);
 
     // --- จับตำนานศัตรูแบบชนะขาด ---
