@@ -187,16 +187,20 @@ button{font:inherit;color:inherit}
 .end-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:12px 0}
 .end-stats div{background:#f1e7d2;border-radius:8px;padding:6px 10px}
 /* Tutorial coach */
-#coach{position:absolute;z-index:70;width:270px;max-width:calc(100vw - 16px);background:#2b2118;color:#fff4dd;border-radius:12px;padding:10px 12px;font-size:15px;line-height:1.45;box-shadow:0 6px 20px #0007}
+#coach{position:fixed;z-index:70;width:270px;max-width:calc(100vw - 16px);background:#2b2118;color:#fff4dd;border-radius:12px;padding:10px 12px;font-size:15px;line-height:1.45;box-shadow:0 6px 20px #0007}
 #coach .c-step{font-size:12px;color:#e8c98a;font-family:'Kanit',sans-serif}
 #coach .c-btns{display:flex;gap:6px;justify-content:flex-end;margin-top:8px}
 #coach .c-btns button{border:0;border-radius:8px;padding:4px 12px;cursor:pointer;background:#ffffff26;color:inherit;font-size:14px}
 #coach .c-btns .go{background:var(--accent)}
-#coachArrow{position:absolute;z-index:70;font-size:42px;line-height:1;pointer-events:none;filter:drop-shadow(0 2px 3px #0009)}
+#coachArrow{position:fixed;z-index:70;font-size:42px;line-height:1;pointer-events:none;filter:drop-shadow(0 2px 3px #0009)}
 #coachArrow.down{animation:bobD .7s ease-in-out infinite alternate}
 #coachArrow.up{animation:bobU .7s ease-in-out infinite alternate}
 @keyframes bobD{from{transform:translate(-50%,-100%)}to{transform:translate(-50%,-80%)}}
 @keyframes bobU{from{transform:translate(-50%,0)}to{transform:translate(-50%,-20%)}}
+#coachArrow.left{animation:bobL .7s ease-in-out infinite alternate}
+#coachArrow.right{animation:bobR .7s ease-in-out infinite alternate}
+@keyframes bobL{from{transform:translate(0,-50%)}to{transform:translate(20%,-50%)}}
+@keyframes bobR{from{transform:translate(-100%,-50%)}to{transform:translate(-80%,-50%)}}
 .tgt.tut{stroke-width:11}
 .opt{display:flex;gap:8px;align-items:center;cursor:pointer}
 .opt input{width:18px;height:18px}
@@ -254,6 +258,39 @@ button{font:inherit;color:inherit}
 .ghost-key{font-size:13px;background:#f1e7d2;border-radius:8px;padding:6px 8px;margin-bottom:6px;line-height:1.6}
 .gk{display:inline-block;border-radius:99px;padding:0 4px;color:#fff}
 .gk-win{background:#2f7d4f} .gk-lose{background:#b03a2e}
+/* ⏱️ ศึกพร้อมกัน */
+.btn.wego-btn{background:#2c3e57;color:#fff}
+.wego-card{border-left:6px solid #2c3e57}
+.wego-card h3{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.wg-time{font-family:'Kanit',sans-serif;font-size:20px;color:#2c3e57;background:#e5ebf3;border-radius:8px;padding:0 8px}
+.wg-time.low{color:#fff;background:#d1382b;animation:glow 1s ease-in-out infinite}
+.wg-status{display:flex;gap:6px;flex-wrap:wrap;margin:4px 0 8px;font-size:13px}
+.wg-status span{background:#f1e7d2;border-radius:99px;padding:1px 8px}
+.wg-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:6px 0;font-size:14px}
+.wg-seg{display:inline-flex;gap:4px}
+.wg-seg button{border:2px solid var(--line);background:#fffaf0;border-radius:8px;padding:3px 8px;cursor:pointer;font-size:14px}
+.wg-seg button.on{background:var(--dark);color:#fff4dd;border-color:var(--dark)}
+.wg-list{display:flex;flex-direction:column;gap:4px;margin:6px 0}
+.wg-item{display:flex;gap:6px;align-items:center;text-align:left;background:#f4ead6;border:2px solid transparent;border-radius:8px;padding:4px 8px;cursor:pointer;font-size:13px}
+.wg-item.sel{border-color:var(--accent)}
+.wg-box{margin:0 0 10px;padding:8px 10px;border-radius:10px;background:#e9eff6;border:2px solid #2c3e57;font-size:14px;line-height:1.5}
+.wg-box .opt{font-size:14px;margin-top:4px}
+#map .wg,#map .wg *{pointer-events:none}
+#map .wg text{text-anchor:middle;dominant-baseline:central}
+.auto-bar{position:absolute;left:50%;top:44px;transform:translateX(-50%);background:#2c3e57;color:#fff;padding:6px 8px 6px 14px;border-radius:99px;font-size:14px;display:flex;gap:8px;align-items:center;white-space:nowrap;box-shadow:0 2px 10px #0005;z-index:5}
+.auto-bar button{border:0;border-radius:99px;padding:3px 12px;background:#fff;color:#2c3e57;cursor:pointer;font:inherit}
+/* ยืนยันก่อนเดินทัพ */
+.pend-box{margin:8px 0;padding:8px 10px;border-radius:10px;background:#fff3d6;border:2px solid #e2a23a;font-size:14px;line-height:1.5}
+.pend-box .btn{width:100%;margin-top:6px}
+.pend-ring{fill:none;stroke:#2b2118;stroke-width:8;stroke-dasharray:6 8}
+/* แถบหลังจบเกม / โหมดผู้ชม */
+.over-bar{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:6px 12px;background:#3b2a1d;color:#fff4dd;font-size:14px}
+.over-bar.spec{background:#2c3e57}
+.over-bar .ob-btns{display:flex;gap:6px;flex-wrap:wrap}
+.over-bar .btn{padding:6px 12px;font-size:14px;color:var(--ink)}
+.over-bar .btn.primary{color:#fff}
+.rank{margin:6px 0 12px;padding-left:24px;line-height:1.8}
+.rank .me{font-weight:600}
 /* เลือกปลายทางถอนทัพบนแผนที่: หน้าต่างรบย่อเป็นแถบเล็กด้านล่าง */
 #battle.mini{background:transparent;pointer-events:none;align-items:flex-end;padding:8px}
 #battle.mini .modal{pointer-events:auto;max-height:36vh;padding:10px 12px;border:3px solid #e8862a;box-shadow:0 4px 22px #0006}
@@ -267,10 +304,41 @@ button{font:inherit;color:inherit}
 .rp-btns{display:flex;gap:8px;justify-content:space-between;margin-top:8px;flex-wrap:wrap}
 @media (max-width:600px){
   .gh-ico,.fx-ico{font-size:28px}
-  #chips{flex-basis:100%}
-  .sb-gap{display:block;flex:1}
   .fx-btn .lbl{display:none}
   #scorebar .btn{padding:8px 10px}
+}
+/* แผงข้าง: คอม = แผงขวาเหมือนเดิม / มือถือ (จอแคบกว่า 900px) = แผ่นเลื่อนจากล่าง */
+.sheet-head{display:none}
+#sheetBody{display:contents}
+@media (max-width:899px){
+  #game.active{position:fixed;inset:0;height:auto}
+  #scorebar{flex-wrap:nowrap;padding:5px 8px;gap:6px}
+  #chips{flex:1 1 auto;min-width:0;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  #chips::-webkit-scrollbar{display:none}
+  #chips .chip{flex:none}
+  #scorebar .btn{padding:7px 9px;font-size:14px;flex:none}
+  #btnEnd{position:fixed;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));z-index:45;box-shadow:0 4px 16px #0007;border-radius:14px;padding:11px 15px;font-size:15px;max-width:60vw}
+  #main{position:relative;flex:1;min-height:0}
+  #board{position:absolute;inset:0;aspect-ratio:auto;max-height:none;height:auto}
+  .map-btns{top:8px;bottom:auto}
+  #panel{position:fixed;left:0;right:0;bottom:0;height:56px;z-index:40;padding:0;gap:0;display:flex;flex-direction:column;background:var(--bg);border-radius:16px 16px 0 0;box-shadow:0 -4px 18px #0004;transition:height .22s ease;overflow:hidden}
+  #panel.dragging,.test-mode #panel{transition:none}
+  .sheet-head{display:block;flex:none;padding:6px 12px 0;touch-action:none;cursor:grab;user-select:none}
+  .sheet-grip{width:46px;height:5px;border-radius:3px;background:#b9a582;margin:0 auto 6px}
+  .sheet-title{font-size:15px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:min(190px,52vw);min-height:21px}
+  .sheet-tabs{display:flex;gap:4px;overflow-x:auto;margin:6px -4px 0;padding:0 4px 6px;scrollbar-width:none}
+  .sheet-tabs::-webkit-scrollbar{display:none}
+  .sheet-tabs button{flex:none;border:0;border-radius:99px;padding:5px 12px;background:#e6d6b4;font-size:14px;cursor:pointer}
+  .sheet-tabs button.on{background:var(--dark);color:#fff4dd}
+  #panel.peek .sheet-tabs{display:none}
+  #panel.side{border-radius:16px 0 0 16px;box-shadow:-4px 0 18px #0004}
+  #panel.side .sheet-title{padding-right:0}
+  #sheetBody{display:flex;flex-direction:column;gap:10px;flex:1;min-height:0;overflow-y:auto;padding:4px 10px 84px;overscroll-behavior:contain}
+  #sheetBody > .card:not(.tab-on){display:none!important}
+  /* ข้อมูลดินแดน: ปุ่มสั่งการขึ้นก่อนรายละเอียด จะได้ไม่ต้องเลื่อน */
+  .node-card{display:flex;flex-direction:column}
+  .node-card > .nc-d{order:5}
+  .over-bar{padding:4px 10px;font-size:13px}
 }
 @media (prefers-reduced-motion:reduce){.tgt,.ready,#coachArrow,.fx-flash{animation:none!important}}
 </style>
@@ -311,6 +379,7 @@ button{font:inherit;color:inherit}
   </div>
   <div class="title-actions" style="margin-top:10px">
     <button class="btn boss-btn" id="btnBoss" disabled>🔒 ศึกชิงอิสรภาพ</button>
+    <button class="btn wego-btn" id="btnWego">⏱️ ศึกพร้อมกัน</button>
   </div>
 </div>
 
@@ -332,19 +401,25 @@ button{font:inherit;color:inherit}
     <button class="btn" id="btnUndo" title="ย้อนการสั่งการ">↩️ ย้อน</button>
     <button class="btn primary" id="btnEnd">จบเทิร์น ▶</button>
   </div>
+  <div id="overBar" class="over-bar hidden"></div>
   <div id="main">
     <div id="board">
       <svg id="map" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" aria-label="แผนที่"></svg>
       <svg id="fx" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
       <div id="phaseBanner" class="hidden"></div>
+      <div id="autoBar" class="auto-bar hidden"></div>
       <div class="map-btns"><button class="map-btn" id="btnZoomIn" title="ซูมเข้า" aria-label="ซูมเข้า">＋</button><button class="map-btn" id="btnZoomOut" title="ซูมออก" aria-label="ซูมออก">－</button><button class="map-btn" id="btnView" title="รีเซ็ตมุมมอง" aria-label="รีเซ็ตมุมมอง">⟲</button></div>
     </div>
     <aside id="panel">
-      <div id="info" class="card"></div>
-      <div class="card"><h3>ทัพของเรา</h3><div id="armyList" class="army-list"></div></div>
-      <div class="card boss-card hidden" id="bossCard"></div>
-      <div class="card" id="legCard"><h3>✨ ตำนานพเนจรในศึกนี้</h3><div id="legList" class="leg-list"></div></div>
-      <div class="card"><h3>บันทึกศึก</h3><ol id="log"></ol></div>
+      <div class="sheet-head" id="sheetHead"><div class="sheet-grip" aria-label="ลากหรือแตะเพื่อขยาย/ย่อแผง"></div><div class="sheet-title" id="sheetTitle"></div><div class="sheet-tabs" id="sheetTabs"></div></div>
+      <div id="sheetBody">
+      <div class="card wego-card hidden" id="wegoCard" data-tab="info"></div>
+      <div id="info" class="card" data-tab="info"></div>
+      <div class="card" id="armyCard" data-tab="army"><h3>ทัพของเรา</h3><div id="armyList" class="army-list"></div></div>
+      <div class="card boss-card hidden" id="bossCard" data-tab="boss"></div>
+      <div class="card" id="legCard" data-tab="leg"><h3>✨ ตำนานพเนจรในศึกนี้</h3><div id="legList" class="leg-list"></div></div>
+      <div class="card" id="logCard" data-tab="log"><h3>บันทึกศึก</h3><ol id="log"></ol></div>
+      </div>
     </aside>
   </div>
 </div>
@@ -598,7 +673,8 @@ const hostile = (f, g) => g !== f && !allied(f, g);
 const isAres = f => isBoss() && f === S.boss.ares;
 // บุคคลในประวัติศาสตร์จริง (บาดเจ็บจากมนุษย์): จอมทัพ / จอมทัพที่ถูกปลดปล่อย / ตำนานพเนจร — แม่ทัพธรรมดาไม่นับ
 const historical = (g, f) => !!g && (g.lid ? LEG(g.lid).hist : g.wid ? WMAP[g.wid].hist : g.leader ? legendOf(f).hist : false);
-const armyAt = n => S.armies.find(a => a.node === n);
+// ทัพที่กำลังเดินทาง (transit — ศึกพร้อมกัน: ออกจากจุดเดิมแล้ว) ไม่นับว่าอยู่ในดินแดนนั้น
+const armyAt = n => S.armies.find(a => a.node === n && !a.transit);
 const armyById = id => S.armies.find(a => a.id === id);
 const facName = f => f === NEUTRAL ? 'กองกำลังท้องถิ่น' : legendOf(f).name;
 const facIcon = f => f === NEUTRAL ? '🏳️' : legendOf(f).icon;
@@ -660,6 +736,13 @@ function newGame(legendId, numAI, seed, level = 1, size = 's', opts = {}) {
   const inc = startFactionTurn(0);
   log(`${me.name} เริ่มศึกที่ ${S.nodes[fac(0).start].name}! ศัตรู: ${others.map(o => o.name).join(', ')}`);
   log(`— เทิร์น 1: รับรายได้ ${inc} 💰 —`);
+  if (opts.wego) {
+    // ศึกพร้อมกัน: ทุกฝ่ายรับรายได้ต้นเทิร์นพร้อมกัน แล้วเข้าช่วงวางแผน
+    S.mode = 'wego'; S.undoLeft = 0;
+    S.wego = { time: opts.time == null ? 60 : opts.time, orders: {}, phase: 'plan' };
+    for (const F of S.factions) if (F.id !== 0) startFactionTurn(F.id);
+    wegoBeginPlan();
+  }
 }
 
 // สถานะตำนานพเนจร: wild = อยู่บนแผนที่ (ดินแดนกลาง), resting = หายไปพัก, wgone = หายไปถาวร,
@@ -896,11 +979,13 @@ function maxMoves(a) {
   return (askill(a.fac, a.gen, 'cavRush') && a.units.cav > 0 && a.units.cav * 2 >= sumU(a.units)) ? 2 : 1;
 }
 const canMove = a => a.used < maxMoves(a) && sumU(a.units) > 0;
+// ศึกพร้อมกัน: ทัพม้าเจงกิสข่านชนะศึกช่องแรก (หรือฝ่ายรับถอนทัพ) แล้วบุกช่องที่ 2 ต่อได้ (ทหารม้ายังต้องเหลือครึ่งหนึ่ง)
+const wegoRush = a => isWego() && askill(a.fac, a.gen, 'cavRush');
 function moveTargets(a) {
   if (!canMove(a)) return [];
   return neighbors(a.node).filter(nb => passableA(a, nb)).map(nb => nb.id).filter(id => {
     const o = armyAt(id);
-    return !(o && o.fac === a.fac) && !allied(a.fac, S.nodes[id].owner);
+    return !(o && o.fac === a.fac) && !allied(a.fac, S.nodes[id].owner) && !(WG.claim && WG.claim.has(id));
   });
 }
 
@@ -911,6 +996,7 @@ function canRecruitAt(f, nodeId) {
 function recruit(f, nodeId, type) {
   const F = fac(f), cost = UNITS[type].cost;
   if (!canRecruitAt(f, nodeId) || F.gold < cost) return false;
+  if (WG.rec && WG.rec.fac === f) WG.rec.acts.push({ t: 'recruit', node: nodeId, type });
   emitFx({ t: 'recruit', fac: f, node: nodeId, n: PACK });
   F.gold -= cost;
   const a = armyAt(nodeId);
@@ -945,10 +1031,12 @@ function hireGeneral(f) {
   }
   const a = newArmy(f, cap, { name, icon: '🎖️', leader: false }, Z());
   log(`${facName(f)} แต่งตั้ง ${name}`);
+  if (WG.rec && WG.rec.fac === f) WG.rec.acts.push({ t: 'hire', id: a.id });
   emitFx({ t: 'hire', fac: f, node: cap });
   return a;
 }
 function absorbGarrison(a, keep = 0) {
+  if (WG.rec && WG.rec.fac === a.fac) WG.rec.acts.push({ t: 'absorb', army: a.id, keep });
   const g = S.nodes[a.node].garrison;
   let left = keep;
   for (const t of UNIT_TYPES) {
@@ -970,7 +1058,7 @@ const atkSide = a => ({ fac: a.fac, units: a.units, gen: a.gen, pos: a.node, arm
 
 // พลังรบ = ทหาร × แพ้ทาง × ภูมิประเทศ × กลยุทธ์ × แม่ทัพ/สกิล × สุ่ม
 function powerOf(side, other, nodeId, role, opts = {}) {
-  const node = S.nodes[nodeId], T = TERRAINS[node.terrain];
+  const node = S.nodes[nodeId], T = opts.field ? FIELD : TERRAINS[node.terrain];
   const et = sumU(other.units);
   const hanni = askill(side.fac, side.gen, 'crossMountain');
   const g = side.gen, W = g && g.wid ? WMAP[g.wid] : null, ws = wsk(g, side.fac), wk = wwk(g);
@@ -1015,14 +1103,15 @@ function powerOf(side, other, nodeId, role, opts = {}) {
   if (ws.atkBonus && role === 'atk') push(`✨ ${W.skillName}`, ws.atkBonus);
   if (ws.underdog && sumU(side.units) < et) push(`✨ ${W.skillName}`, ws.underdog);
   if (side.pos != null && g && side.fac >= 0) {
-    const J = S.armies.find(x => x.fac === side.fac && wsk(x.gen, x.fac).aura && (x.node === side.pos || adjacent(x.node, side.pos)));
+    // ศึกพร้อมกัน: ทัพโจนที่กำลังเดินทาง (transit) ไม่ให้ธงแก่ทัพอื่น — ให้เฉพาะทัพของโจนเอง
+    const J = S.armies.find(x => x.fac === side.fac && wsk(x.gen, x.fac).aura && (!x.transit || x.gen === g) && (x.node === side.pos || adjacent(x.node, side.pos)));
     if (J) push(`✨ ธงแห่งศรัทธา (${J.gen.name})`, wsk(J.gen, J.fac).aura);
   }
   // จุดอ่อน (มีผลเสมอ)
   if (W) {
     if (wk.bigArmy && (side.armyN != null ? side.armyN : sumU(side.units)) > wk.bigArmy) push(`⚠️ ${W.weakName}`, wk.mod);
     if (wk.foeArcher && et > 0 && other.units.arc / et >= wk.foeArcher) push(`⚠️ ${W.weakName}`, wk.mod);
-    if (wk.terrain && node.terrain === wk.terrain) push(`⚠️ ${W.weakName}`, wk.mod);
+    if (wk.terrain && !opts.field && node.terrain === wk.terrain) push(`⚠️ ${W.weakName}`, wk.mod);
     if (wk.self) push(`⚠️ ${W.weakName}`, wk.self);
     if (wk.foeDefend && opts.foeStrat === 'defend') push(`⚠️ ${W.weakName}`, wk.foeDefend);
   }
@@ -1108,18 +1197,18 @@ function noteAttack(atk, def) {
   if (T && !isHumanFac(atk)) { if (isHumanFac(def)) T.onP++; else T.onAI++; }
 }
 
-async function moveArmy(a, to) {
-  const res = await moveArmyCore(a, to);
+async function moveArmy(a, to, opts = {}) {
+  const res = await moveArmyCore(a, to, opts);
   if (isBoss() && S.boss.pending && !S.over) { S.boss.pending = false; aresPower(); }
   if (S.joins.length) await processJoins();
   return res;
 }
-async function moveArmyCore(a, to) {
+async function moveArmyCore(a, to, opts = {}) {
   const node = S.nodes[to], from = a.node;
   if (!moveTargets(a).includes(to)) return { type: 'invalid' };
   if (node.owner === a.fac) {
     payAlps(a, from, to);
-    a.node = to; a.used++;
+    a.node = to; a.used++; delete a.transit;
     S.lastMove = { from, to, fac: a.fac };
     return { type: 'move' };
   }
@@ -1136,7 +1225,7 @@ async function moveArmyCore(a, to) {
     return { type: 'capture' };
   }
   const defFac = node.owner;
-  const ctx = await battle(a, node);
+  const ctx = await battle(a, node, opts);
   if (ctx.cancelled) return { type: 'cancel' };
   noteAttack(a.fac, defFac);
   S.lastMove = { from, to, fac: a.fac };
@@ -1145,6 +1234,8 @@ async function moveArmyCore(a, to) {
 
 function capture(a, node, prevOwner, preGarrison) {
   emitFx({ t: 'own', node: node.id, from: prevOwner, to: a.fac });
+  delete a.transit;
+  if (isWego()) a.wgCap = true; // ผู้ยึดใหม่ตั้งรับด้วยค่าเริ่มต้นของฝ่าย
   node.owner = a.fac;
   node.garrison = Z();
   a.node = node.id; // เข้ายึดก่อน เพื่อไม่ให้ทัพอื่น (เช่น จอมทัพที่ถูกปลดปล่อย) มาตั้งซ้อนที่เดียวกัน
@@ -1152,7 +1243,7 @@ function capture(a, node, prevOwner, preGarrison) {
     if (liberates(prevOwner, a.fac)) liberatePuppet(prevOwner, node);
     else loseSeat(prevOwner, a.fac);
   }
-  for (const x of S.armies.filter(x => x.node === node.id && x.fac !== a.fac)) destroyArmy(x, { by: a.fac });
+  for (const x of S.armies.filter(x => x.node === node.id && x.fac !== a.fac && !x.transit)) destroyArmy(x, { by: a.fac }); // ทัพที่ออกไปแล้วตัดสินตอนกลับ
   if (!fac(a.fac).alive) return;
   // บุเรงนอง: รวบรวมแผ่นดิน
   const gl = askv(a.fac, a.gen, 'gatherLand') || 0;
@@ -1191,7 +1282,7 @@ function liberatePuppet(p, capNode) {
     for (const t of UNIT_TYPES) g[t] += a.units[t];
   }
   S.armies = S.armies.filter(a => a.fac !== p || a === lead);
-  P.alive = false; P.capital = null; P.homeless = null; P.freed = true;
+  P.alive = false; P.capital = null; P.homeless = null; P.freed = true; P.outTurn = S.turn;
   let cnt = 0;
   for (const n of S.nodes) if (n.owner === p) { n.owner = 0; cnt++; }
   S.boss.freed++;
@@ -1309,7 +1400,7 @@ function loseSeat(f, by) {
   } else {
     F.capital = null; S.rstats.homeless = (S.rstats.homeless || 0) + 1;
     // เสียเมืองหลวงระหว่างตาของตัวเอง เทิร์นนี้ไม่นับ
-    F.homeless = { left: HOMELESS_TURNS, fresh: S.current === f };
+    F.homeless = { left: HOMELESS_TURNS, fresh: S.current === f || isWego() }; // ศึกพร้อมกัน: เทิร์นที่เสียไม่นับ
     log(`⛺ เมืองหลวง ${old.name} ของ ${facName(f)} แตกโดย ${facName(by)}! ${facName(f)} กลายเป็นไร้แผ่นดิน — ต้องยึดเมืองหลวงแห่งใดก็ได้ภายใน ${HOMELESS_TURNS} เทิร์น`);
     if (isHumanFac(f)) UI.notices.push(`⛺ เมืองหลวง ${old.name} แตก! เรากลายเป็น “ไร้แผ่นดิน”: ไม่มีรายได้เมืองหลวง แต่งตั้งแม่ทัพไม่ได้ ต้องยึดเมืองหลวงแห่งใดก็ได้ภายใน ${HOMELESS_TURNS} เทิร์น และถ้าทัพจอมทัพแตกระหว่างนี้ = แพ้ทันที`);
   }
@@ -1479,7 +1570,7 @@ async function processJoins() {
       } else {
         const cands = mine.filter(x => !x.gen.leader && !x.gen.wid);
         const fewest = () => cands.slice().sort((p, q) => sumU(p.units) - sumU(q.units))[0];
-        const out = !cands.length ? null : isHumanFac(j.fac) ? await Ctrl.askDismiss(j, gen, cands) : fewest();
+        const out = !cands.length ? null : isHumanFac(j.fac) && !isWego() ? await Ctrl.askDismiss(j, gen, cands) : fewest();
         if (!out) { log(`${facName(j.fac)} ไม่มีที่ให้ ${W.name} ตั้งทัพ`); wanderAway(j.wid, null); continue; }
         S.wstats.dismiss++;
         text = `${facName(j.fac)} ปลด ${out.gen.name} — ${W.name} รับช่วงนำทัพที่ ${S.nodes[out.node].name} (${sumU(out.units)} นาย)`;
@@ -1489,7 +1580,7 @@ async function processJoins() {
     log(`✨ ${text}`);
     const at = S.armies.find(x => x.gen === gen);
     if (at) emitFx({ t: 'legend', fac: j.fac, node: at.node, wid: j.wid });
-    if (isHumanFac(j.fac)) await Ctrl.showJoin(gen, text);
+    if (isHumanFac(j.fac) && !isWego()) await Ctrl.showJoin(gen, text);
   }
 }
 
@@ -1525,7 +1616,7 @@ function eliminate(loser, winner, why) {
   const L = fac(loser);
   if (!L.alive) return;
   if (winner >= 0 && !fac(winner).alive) winner = NEUTRAL;
-  L.alive = false; L.capital = null; L.homeless = null;
+  L.alive = false; L.capital = null; L.homeless = null; L.outTurn = S.turn;
   // ตำนานของฝ่ายที่ล่มสลาย: หนีกลับไปพเนจร (โจนหายไปถาวร)
   for (const a of S.armies.filter(a => a.fac === loser && a.gen.wid)) {
     if (WMAP[a.gen.wid].weak.perish) { S.wgone.push(a.gen.wid); S.wstats.gone++; log(`🕯️ ${a.gen.name} จากสนามรบนิรันดร์ไปตลอดกาล`); }
@@ -1605,7 +1696,7 @@ async function executeRetreat(ctx, a, d, node, opt) {
   ctx.retreat.lost = applyLoss(d.units, opt.lossFrac);
   ctx.retreat.garrisonLost = { ...node.garrison };
   node.garrison = Z();
-  a.used = 99;
+  a.used = wegoRush(a) ? a.used + 1 : 99;
   S.rstats.retreat++;
   log(`🏃 ${d.gen.name} ถอนทัพจาก ${node.name} (เสียทหาร ${sumU(ctx.retreat.lost)} นาย) — ${facName(a.fac)} ยึดได้โดยไม่ต้องรบ`);
   if (sumU(d.units) === 0) {
@@ -1616,7 +1707,7 @@ async function executeRetreat(ctx, a, d, node, opt) {
   else if (opt.kind === 'safe') { payAlps(d, node.id, opt.to); d.node = opt.to; d.used = 99; ctx.outcome.push(`${d.gen.name} ถอยเข้า ${dest.name}`); }
   else ctx.outcome.push(`${d.gen.name} ตีฝ่าวงล้อมไปยัง ${dest.name} — ต้องรบต่อทันที (ทัพล้า -20%)`);
   const human = isHumanFac(a.fac) ? 'atk' : isHumanFac(d.fac) ? 'def' : null;
-  if (human) await Ctrl.showRetreat(ctx, human);
+  if (human && !isWego()) await Ctrl.showRetreat(ctx, human);
   if (opt.kind === 'break' && S.armies.includes(d)) {
     if (sumU(defSide(opt.to).units) === 0) {
       payAlps(d, node.id, opt.to);
@@ -1649,13 +1740,19 @@ async function battle(a, node, opts = {}) {
   const preD = d ? { ...d.units } : null, preG = { ...node.garrison };
   let preA = { ...a.units };
   ctx.retreatOpts = ctx.breakout ? [] : retreatOptions(d, node.id, a);
-  // AI ฝ่ายรับตัดสินใจถอนทัพก่อนที่ใครจะเลือกกลยุทธ์
-  if (ctx.retreatOpts.length && !isHumanFac(d.fac)) {
+  // AI ฝ่ายรับตัดสินใจถอนทัพก่อนที่ใครจะเลือกกลยุทธ์ (ศึกพร้อมกัน: ใช้คำสั่งถอนทัพอัตโนมัติที่ตั้งไว้)
+  if (ctx.retreatOpts.length && isWego()) {
+    const opt = wegoRetreatChoice(ctx, d);
+    if (opt) { commit(); return executeRetreat(ctx, a, d, node, opt); }
+  } else if (ctx.retreatOpts.length && !isHumanFac(d.fac)) {
     const opt = aiRetreatChoice(ctx);
     if (opt) { commit(); return executeRetreat(ctx, a, d, node, opt); }
   }
-  await chooseStrategies(ctx);
-  if (ctx.cancelled) return ctx;
+  if (isWego()) wegoStrategies(ctx, d, opts);
+  else {
+    await chooseStrategies(ctx);
+    if (ctx.cancelled) return ctx;
+  }
   commit();
   if (ctx.retreatChoice != null) {
     const opt = ctx.retreatOpts.find(o => o.to === ctx.retreatChoice);
@@ -1740,7 +1837,7 @@ async function battle(a, node, opts = {}) {
     ctx.outcome.unshift(`${facName(D.fac)} รักษา ${node.name} ไว้ได้`);
     if (liberate(D, d && S.armies.includes(d) ? d : null, A.lost, node)) D.after = defSide(node.id).units;
   }
-  if (S.armies.includes(a)) a.used = 99;
+  if (S.armies.includes(a)) a.used = ctx.atkWin && wegoRush(a) ? a.used + 1 : 99;
   if (ctx.libText) ctx.outcome.push(ctx.libText);
   // ตำนานที่ยังไม่ภักดีแพ้การรบ = ทิ้งทัพหนีไป
   const loser = ctx.atkWin ? d : a;
@@ -1760,8 +1857,8 @@ async function battle(a, node, opts = {}) {
     bloodTick();
   }
   log(`${ctx.breakout ? '🏃 ' + facName(A.fac) + ' ตีฝ่าวงล้อมเข้า' : '⚔️ ' + facName(A.fac) + ' บุก'} ${node.name} (${facName(prevOwner)}) — ${ctx.atkWin ? 'ฝ่ายบุกชนะ' : 'ฝ่ายรับชนะ'}`);
-  emitFx({ t: 'battle', node: node.id, atk: A.fac, def: D.fac, win: ctx.atkWin, lostA: sumU(A.lost), lostD: sumU(D.lost), human: !!human });
-  if (human) await Ctrl.showBattle(ctx, human);
+  emitFx({ t: 'battle', node: node.id, atk: A.fac, def: D.fac, win: ctx.atkWin, lostA: sumU(A.lost), lostD: sumU(D.lost), human: !!human && !isWego(), as: A.strat, ds: D.strat });
+  if (human && !isWego()) await Ctrl.showBattle(ctx, human);
   return ctx;
 }
 
@@ -1820,6 +1917,406 @@ async function endPlayerTurn() {
   Ctrl.render();
   if (S.over) Ctrl.gameOver();
   else showNotices();
+}
+
+/* ---------- โหมดผู้ชม: ผู้เล่นแพ้ก่อนจบเกม บอทเล่นต่อ (ไม่นับผลชนะ/ปลดล็อก ไม่บันทึกเซฟ) ---------- */
+// จบเมื่อเหลือฝ่ายเดียว หรือไม่มีใครรบกันได้และไม่มีดินแดนกลางเหลือ (โหมดบอส: หุ่นเชิดกับ Ares ไม่รบกันเอง) หรือครบเทิร์น
+function specDone() {
+  const al = S.factions.filter(F => F.alive);
+  if (al.length <= 1) return true;
+  return !al.some(a => al.some(b => hostile(a.id, b.id))) && !S.nodes.some(n => n.owner === NEUTRAL);
+}
+const troopsTotal = f => S.armies.filter(a => a.fac === f).reduce((t, a) => t + sumU(a.units), 0) + S.nodes.filter(n => n.owner === f).reduce((t, n) => t + sumU(n.garrison), 0);
+// อันดับ: ฝ่ายที่ยังอยู่เรียงตามดินแดน (เท่ากันดูทหาร) แล้วตามด้วยฝ่ายที่แพ้ทีหลังก่อน
+function specRanking() {
+  const row = F => ({ id: F.id, alive: F.alive, nodes: S.nodes.filter(n => n.owner === F.id).length, troops: F.alive ? troopsTotal(F.id) : 0, out: F.outTurn || 0, freed: !!F.freed });
+  return S.factions.map(row).sort((a, b) => (b.alive - a.alive) || (b.nodes - a.nodes) || (b.troops - a.troops) || (b.out - a.out));
+}
+async function spectateRun() {
+  const G = S, lost = S.over;
+  if (lost.atTurn == null) lost.atTurn = S.turn;
+  // ตาที่ค้างอยู่ตอนผู้เล่นแพ้: ฝ่ายที่เล่นไปแล้วในเทิร์นนี้ (รวมฝ่ายที่ตีเราแตก) ไม่เล่นซ้ำ
+  let resumeAfter = S.phase === 'ai' ? S.current : 0;
+  S.spectate = true; S.over = null; S.phase = 'ai';
+  UI.busy = true; UI.ghost = false; UI.selArmy = null; UI.pending = null; UI.notices = [];
+  const quit = () => S !== G || !!(UI.spec && UI.spec.quit);
+  try {
+    if (isWego()) {
+      // ศึกพร้อมกัน: บอทวางแผนพร้อมกันแล้วคำนวณผลทีละเทิร์น (คำสั่งที่ค้างของเทิร์นที่ผู้เล่นแพ้ถูกทิ้ง)
+      let r = S.wego.phase === 'resolve' ? await wegoNextTurn() : 'next';
+      while (r === 'next' && !quit() && !specDone()) {
+        FX.steps = []; FX.cur = null; FX.played = 0; FX.rec = Ctrl.fx;
+        S.phase = 'ai';
+        Ctrl.render();
+        await Ctrl.gate();
+        await Ctrl.delay(Math.max(1, Math.round(350 * Ctrl.aiPace())));
+        if (quit()) break;
+        r = await wegoRound(S.wego.orders);
+        UI.notices = [];
+      }
+    }
+    else while (!quit() && !specDone()) {
+      FX.steps = []; FX.cur = null; FX.played = 0; FX.rec = Ctrl.fx;
+      for (const F of S.factions) {
+        if (F.human || !F.alive || F.id <= resumeAfter || quit() || specDone()) continue;
+        S.current = F.id;
+        Ctrl.render();
+        await Ctrl.gate();
+        await Ctrl.delay(Math.max(1, Math.round(350 * Ctrl.aiPace()))); // ให้หน้าจอวาดและกดหยุดได้ แม้ความเร็ว "ข้าม"
+        if (quit()) break;
+        await aiTurn(F.id);
+        homelessTick(F.id);
+        UI.notices = [];
+      }
+      resumeAfter = 0;
+      if (quit() || specDone() || S.turn >= maxTurns()) break;
+      S.turn++;
+      wanderReturn();
+      bossRound();
+      await Ctrl.aiCatchUp();
+      UI.notices = [];
+      log(`— เทิร์น ${S.turn} (โหมดผู้ชม) —`);
+    }
+  } finally {
+    FX.rec = false; FX.cur = null; FX.steps = [];
+    Ctrl.fxClear();
+    if (S === G) { UI.busy = false; S.spectate = false; S.over = lost; S.phase = 'player'; S.current = 0; }
+  }
+  if (S !== G || (UI.spec && UI.spec.quit)) return null;
+  const al = S.factions.filter(F => F.alive);
+  S.specResult = { reason: al.length <= 1 ? 'last' : specDone() ? 'still' : 'turns', turn: S.turn, rank: specRanking() };
+  return S.specResult;
+}
+
+/* =====================================================================
+   ⏱️ ศึกพร้อมกัน (WEGO) — แยก 3 ส่วนไว้รองรับเฟสออนไลน์
+   (ก) คำสั่งของแต่ละฝ่ายเป็นข้อมูลล้วน: S.wego.orders[f] = { moves: [{ army, path: [โหนด 1–2 ช่อง], strat }],
+       def: { [army]: { strat, retreat } }, garrison: กลยุทธ์ตั้งรับของกองรักษาการณ์, autoRet, acts: [การกระทำทันทีของบอท], ready }
+   (ข) resolveWego(orders): ผลขึ้นกับ S (รวม seed) + orders เท่านั้น — ตายตัวเสมอ (Ctrl.* แค่แสดงภาพ ไม่เปลี่ยนผล)
+   (ค) หน้าจอวางแผน/นับเวลา/สรุปผล อยู่ในส่วน UI
+   ===================================================================== */
+const isWego = () => !!(S && S.mode === 'wego');
+const WEGO_TIMES = [30, 60, 90, 0];
+// rec = บันทึกการกระทำทันทีของบอทตอนวางแผน / claim = เป้าที่ทัพอื่นของฝ่ายเดียวกันจองแล้ว / orders = คำสั่งระหว่างคำนวณผล
+const WG = { rec: null, claim: null, orders: null };
+const FIELD = { name: 'กลางทาง', unitMod: {}, defMod: 1, atkMod: 1 }; // ปะทะกลางทาง: ไม่มีโบนัสภูมิประเทศ/กำแพง
+const emptyOrders = () => ({ moves: [], def: {}, garrison: 'defend', autoRet: true, acts: [], ready: false });
+const myOrders = () => S.wego.orders[0] || NO_ORDERS; // ผู้เล่นแพ้แล้ว (โหมดผู้ชม) = ไม่มีคำสั่ง
+const NO_ORDERS = Object.freeze({ moves: Object.freeze([]), def: Object.freeze({}), garrison: 'defend', autoRet: false, acts: Object.freeze([]), ready: true });
+const defSetting = (O, id) => (O && O.def[id]) || { strat: 'defend', retreat: O ? O.autoRet : false };
+
+// ช่วงวางแผน: ผู้เล่นเริ่มจากคำสั่งว่าง (ค่าตั้งรับเดิมจำไว้) / บอทวางแผนทันทีบนสำเนาสถานะ (ไม่เห็นคำสั่งของใคร)
+// บอทขงเบ้ง (หยั่งรู้ฟ้าดิน) วางแผนตอนท้าย พร้อมข้อมูลลูกศรที่เล็งดินแดนตน
+function wegoBeginPlan() {
+  const W = S.wego, prev = W.orders && W.orders[0];
+  W.phase = 'plan'; W.ticked = false; W.orders = {};
+  for (const F of S.factions) {
+    if (!F.alive) continue;
+    if (F.human) {
+      const O = emptyOrders();
+      if (prev) { O.garrison = prev.garrison; O.autoRet = prev.autoRet; }
+      for (const a of S.armies) if (a.fac === F.id) O.def[a.id] = prev && prev.def[a.id] ? { ...prev.def[a.id] } : { strat: 'defend', retreat: O.autoRet };
+      W.orders[F.id] = O;
+    } else if (skill(F.id, 'foresight') && !TUNE.noforesight) W.orders[F.id] = { ...emptyOrders(), late: true, ready: true };
+    else W.orders[F.id] = wegoPlanBot(F.id, null);
+  }
+}
+// ดินแดนของฝ่าย f ที่ฝ่ายอื่นสั่งทัพเล็งมา → จำนวนทหารที่ยกมา (ข้อมูลของหยั่งรู้ฟ้าดิน — กลยุทธ์อยู่ใน wegoIntelStrat)
+function wegoIntel(f, orders) {
+  const inc = {};
+  for (const g in orders) {
+    const O = orders[g];
+    if (+g === f || !O || O.late) continue;
+    for (const m of O.moves) {
+      const a = armyById(m.army);
+      if (a) for (const n of m.path) if (S.nodes[n].owner === f) inc[n] = (inc[n] || 0) + sumU(a.units);
+    }
+  }
+  return inc;
+}
+// กลยุทธ์บุกที่ฝ่ายอื่นสั่งไว้กับดินแดนของ f → { [ดินแดน]: กลยุทธ์ของกำลังที่ยกมามากที่สุด } (หยั่งรู้ฟ้าดิน)
+function wegoIntelStrat(f, orders) {
+  const w = {};
+  for (const g in orders) {
+    const O = orders[g];
+    if (+g === f || !O || O.late) continue;
+    for (const m of O.moves) {
+      const a = armyById(m.army);
+      if (a && STRATEGIES[m.strat]) for (const n of m.path) if (S.nodes[n].owner === f) { w[n] = w[n] || {}; w[n][m.strat] = (w[n][m.strat] || 0) + sumU(a.units); }
+    }
+  }
+  const out = {};
+  for (const n in w) out[n] = STRAT_KEYS.reduce((b, s) => (w[n][s] || 0) > (w[n][b] || 0) ? s : b);
+  return out;
+}
+const counterStrat = s => STRAT_KEYS.find(k => STRATEGIES[k].beats === s);
+// บอทวางแผน: ใช้ตรรกะ AI เดิม (เกณฑ์ทหาร/เลือกเป้า/กลยุทธ์) บนสำเนาสถานะ — การกระทำทันทีถูกบันทึกเป็น acts แล้วมีผลตอนคำนวณผล
+function wegoPlanBot(f, intel, istrat) {
+  const real = S, O = emptyOrders(), fxRec = FX.rec;
+  O.autoRet = aiLevel(f) > 0;
+  S = JSON.parse(JSON.stringify(real));
+  S.seed = (S.seed ^ Math.imul(f + 1, 0x9E3779B1) ^ (S.turn << 9)) | 0;
+  FX.rec = false;
+  WG.rec = { fac: f, acts: O.acts };
+  WG.claim = new Set();
+  try {
+    if (!S.focus) S.focus = {};
+    S.focus[f] = aiLevel(f) >= 2 && !TUNE.nocoord ? aiFocusTarget(f) : null;
+    aiRecruit(f);
+    WG.rec = null;
+    for (const a of S.armies.filter(x => x.fac === f).sort((x, y) => sumU(y.units) - sumU(x.units))) {
+      a.used = 0;
+      const start = a.node;
+      let to = aiChooseMove(a);
+      if (intel) {
+        // หยั่งรู้ฟ้าดิน: ศัตรูเล็งดินแดนที่ทัพอยู่ด้วยกำลังที่รับไหว → อยู่ป้องกัน (เว้นแต่บุกได้เปรียบมาก) / มากเกินรับไหว → หลบตามแผนเดิม
+        // ทัพที่ไม่ได้บุกแบบได้เปรียบมาก ไปเสริมดินแดนข้างเคียงที่ถูกเล็งและไม่มีทัพ
+        const good = to != null && S.nodes[to].owner !== f && estimateRatio(a, to) >= 1.5;
+        const inc = intel[start] || 0, hold = sumU(a.units) + sumU(S.nodes[start].garrison);
+        if (!good && inc > sumU(S.nodes[start].garrison) && inc <= hold * 1.6) to = null;
+        else if (!good && !inc) {
+          const help = moveTargets(a).filter(id => S.nodes[id].owner === f && (intel[id] || 0) > sumU(S.nodes[id].garrison))
+            .sort((x, y) => (intel[y] - sumU(S.nodes[y].garrison)) - (intel[x] - sumU(S.nodes[x].garrison)))[0];
+          if (help != null) to = help;
+        }
+      }
+      if (to == null) continue;
+      const path = [to], tgt = S.nodes[to];
+      const side = atkSide(a), strat = tgt.owner === f ? 'charge' : aiPickStrategy('atk', { atk: side, def: defSide(to) }, side);
+      WG.claim.add(to);
+      if (tgt.owner === f) {
+        a.node = to; a.used = 1;
+        if (canMove(a)) { const t2 = aiChooseMove(a); if (t2 != null && t2 !== start) { path.push(t2); WG.claim.add(t2); } }
+      } else if (wegoRush(a) && maxMoves(a) > 1 && estimateRatio(a, to) >= 1.5) {
+        // เจงกิสข่าน: ชนะช่องแรกได้สบาย → วางแผนบุกช่องที่ 2 ต่อ (คิดเหมือนยึดช่องแรกได้แล้ว)
+        const own0 = tgt.owner; tgt.owner = f; a.node = to; a.used = 1;
+        const t2 = aiChooseMove(a);
+        tgt.owner = own0;
+        if (t2 != null && t2 !== start && S.nodes[t2].owner !== f) { path.push(t2); WG.claim.add(t2); }
+      }
+      O.moves.push({ army: a.id, path, strat: path.length > 1 && S.nodes[path[1]].owner !== f ? aiPickStrategy('atk', { atk: atkSide(a), def: defSide(path[1]) }, atkSide(a)) : strat });
+      a.node = start;
+    }
+    const near = id => { for (const nb of neighbors(id)) { const x = armyAt(nb.id); if (x && hostile(f, x.fac)) return atkSide(x); } return { fac: NEUTRAL, units: Z(), gen: null }; };
+    for (const a of S.armies.filter(x => x.fac === f)) {
+      const ds = defSide(a.node);
+      // หยั่งรู้ฟ้าดิน: รู้กลยุทธ์บุกที่เล็งดินแดนนี้ → ตั้งรับด้วยกลยุทธ์ที่แก้ทาง
+      const seen = istrat && istrat[a.node];
+      O.def[a.id] = { strat: seen ? counterStrat(seen) : aiPickStrategy('def', { atk: near(a.node), def: ds }, ds), retreat: O.autoRet };
+    }
+    const big = istrat && intel ? Object.keys(istrat).sort((x, y) => (intel[y] || 0) - (intel[x] || 0))[0] : null;
+    O.garrison = big != null ? counterStrat(istrat[big]) : aiPickStrategy('def', null, { fac: f });
+  } finally { WG.rec = null; WG.claim = null; FX.rec = fxRec; S = real; }
+  O.ready = true;
+  return O;
+}
+// การกระทำทันทีของบอท (บันทึกตอนวางแผน) มีผลตอนเริ่มคำนวณผล — แม่ทัพที่แต่งตั้งได้เลขใหม่ จึงแปลงเลขในคำสั่งให้ตรง
+function wegoApplyActs(f, O) {
+  const idMap = {};
+  for (const x of O.acts || []) {
+    if (x.t === 'recruit') recruit(f, x.node, x.type);
+    else if (x.t === 'hire') { const a = hireGeneral(f); if (a) idMap[x.id] = a.id; }
+    else if (x.t === 'absorb') { const a = armyById(idMap[x.army] != null ? idMap[x.army] : x.army); if (a && a.fac === f) absorbGarrison(a, x.keep); }
+  }
+  O.acts = [];
+  for (const m of O.moves) if (idMap[m.army] != null) m.army = idMap[m.army];
+  for (const k of Object.keys(idMap)) if (O.def[k]) { O.def[idMap[k]] = O.def[k]; delete O.def[k]; }
+}
+// ถอนทัพอัตโนมัติ (ตั้งไว้ล่วงหน้า): เสียเปรียบมาก (เหมือนป้าย "เสียเปรียบมาก") → ถอยเข้าดินแดนเราที่ปลอดภัยที่สุด ไม่ตีฝ่าวงล้อม
+function wegoRetreatChoice(ctx, d) {
+  const O = WG.orders && WG.orders[d.fac];
+  if (!O || !defSetting(O, d.id).retreat) return null;
+  if (1 / estimateSides(ctx.atk, ctx.def, ctx.node) >= 0.67) return null;
+  const safe = ctx.retreatOpts.filter(o => o.kind === 'safe');
+  return safe.length ? safe.reduce((b, o) => threatAt(o.to, d.fac) < threatAt(b.to, d.fac) ? o : b) : null;
+}
+// กลยุทธ์จากคำสั่ง: ฝ่ายบุกใช้กลยุทธ์บุกของคำสั่ง / ฝ่ายรับใช้ค่าตั้งรับของทัพ (ผู้ยึดใหม่และกองรักษาการณ์ใช้ค่าเริ่มต้นของฝ่าย)
+function wegoStrategies(ctx, d, opts) {
+  ctx.atk.strat = STRATEGIES[opts.strat] ? opts.strat : aiPickStrategy('atk', ctx, ctx.atk);
+  const owner = S.nodes[ctx.node].owner, O = owner >= 0 && WG.orders ? WG.orders[owner] : null;
+  const st = !O ? null : d && !d.wgCap && O.def[d.id] ? O.def[d.id].strat : O.garrison;
+  ctx.def.strat = STRATEGIES[st] ? st : aiPickStrategy('def', ctx, ctx.def);
+  if (isHumanFac(ctx.atk.fac)) S.stratHist.atk[ctx.atk.strat]++;
+  if (isHumanFac(ctx.def.fac)) S.stratHist.def[ctx.def.strat]++;
+}
+// เดิน 1 ช่องตามคำสั่ง (ลูกศร → ผล) — คืนผลแบบ moveArmy
+async function wegoStep(o, k) {
+  const a = o.a, to = o.path[k];
+  if (!S.armies.includes(a) || S.over || !moveTargets(a).includes(to)) return { type: 'invalid' };
+  const st = fxBegin(a.fac, a.node, to, S.nodes[to].owner === a.fac ? 'move' : 'atk');
+  if (st) await Ctrl.aiArrow(st);
+  const res = await moveArmy(a, to, { strat: o.strat });
+  fxEnd(st, res.type === 'invalid');
+  Ctrl.render();
+  await Ctrl.aiCatchUp();
+  await Ctrl.gate();
+  return res;
+}
+// บุกสวนกันบนเส้นทางเดียวกัน = ปะทะกลางทาง (ไม่มีภูมิประเทศ/กำแพง ใช้กลยุทธ์บุกของทั้งคู่)
+// ผู้แพ้ถอยกลับจุดเดิม (ทหารหมด/จุดเดิมไม่ใช่ของตัวเอง = ทัพแตก) ผู้ชนะเดินหน้าบุกเป้าเดิมต่อ
+async function wegoClash(o1, o2) {
+  const A = o1.a, B = o2.a;
+  const st = fxBegin(A.fac, A.node, B.node, 'atk');
+  if (st) await Ctrl.aiArrow(st);
+  const sd = x => ({ fac: x.fac, units: { ...x.units }, gen: x.gen, pos: x.node, armyN: sumU(x.units) });
+  const sA = sd(A), sB = sd(B);
+  const pa = powerOf(sA, sB, A.node, 'atk', { field: true, stratAdv: STRATEGIES[o1.strat].beats === o2.strat, luck: 0.9 + rng() * 0.2, myStrat: o1.strat, foeStrat: o2.strat });
+  const pb = powerOf(sB, sA, B.node, 'atk', { field: true, stratAdv: STRATEGIES[o2.strat].beats === o1.strat, luck: 0.9 + rng() * 0.2, myStrat: o2.strat, foeStrat: o1.strat });
+  const aWin = pa.power >= pb.power;
+  const [W, L, oL] = aWin ? [A, B, o2] : [B, A, o1];
+  const pw = Math.max(pa.power, pb.power), r = pw > 0 ? Math.min(pa.power, pb.power) / pw : 0;
+  const preL = { ...L.units };
+  const lw = applyLoss(W.units, (0.1 + 0.4 * r) * (wsk(W.gen, W.fac).winLossHalf ? 0.5 : 1));
+  const ll = applyLoss(L.units, 0.55 + 0.45 * (1 - r));
+  wipeIfTiny(L.units, ll);
+  const lib = askv(W.fac, W.gen, 'liberate') || 0;
+  if (lib) { let n = 0; for (const t of UNIT_TYPES) { const g = Math.round(ll[t] * lib); W.units[t] += g; n += g; } if (n) log(`⛓️ ปลดแอก: ทหารศัตรู ${n} นายเข้าร่วม ${facName(W.fac)}`); }
+  noteAttack(A.fac, B.fac); noteAttack(B.fac, A.fac);
+  for (const x of [A, B]) if (isHumanFac(x.fac)) { S.stats.battles++; if (x === W) S.stats.won++; }
+  log(`⚔️ ${facName(A.fac)} กับ ${facName(B.fac)} บุกสวนกัน ปะทะกลางทางระหว่าง ${S.nodes[A.node].name}–${S.nodes[B.node].name}: ${W.gen.name} (${facName(W.fac)}) ชนะ`);
+  emitFx({ t: 'battle', node: B.node, mid: [A.node, B.node], atk: A.fac, def: B.fac, win: aWin, lostA: sumU(aWin ? lw : ll), lostD: sumU(aWin ? ll : lw), human: false, clash: true });
+  oL.ok = false; oL.clashed = true;
+  delete L.transit; L.used = 99;
+  const home = S.nodes[L.node];
+  if (sumU(L.units) === 0 || home.owner !== L.fac) destroyArmy(L, { by: W.fac, decisive: r < 1 / CAPTURE_RATIO, pre: preL, at: L.node });
+  else if (L.gen.wid && !isLoyal(L.gen, L.fac)) legendDesert(L);
+  if (S.joins.length) await processJoins();
+  fxEnd(st, false);
+  Ctrl.render();
+  await Ctrl.aiCatchUp();
+  await Ctrl.gate();
+}
+// (ข) คำนวณผลจากคำสั่งของทุกฝ่าย ตามลำดับตายตัว:
+// 0 การกระทำทันทีของบอท → 1 ทุกทัพที่มีคำสั่งออกจากจุดเดิมพร้อมกัน → (แต่ละช่องของเส้นทาง) 2 เดินในดินแดนตัวเองก่อน (ต่อเป็นขบวนได้)
+// → 3 บุกสวนกัน = ปะทะกลางทาง → 4 การบุก เรียงตามดินแดนเป้า แล้วตามสัดส่วนทหารม้ามากไปน้อย (เท่ากันสุ่มจาก seed)
+// → ทัพที่บุกไม่สำเร็จกลับจุดเดิม (จุดเดิมเสียไปแล้ว = ทัพแตก)
+async function resolveWego(orders) {
+  WG.orders = orders;
+  S.current = -2;
+  const list = [];
+  try {
+    for (const F of S.factions) if (F.alive && orders[F.id]) wegoApplyActs(F.id, orders[F.id]);
+    const seen = new Set();
+    for (const F of S.factions) {
+      const O = orders[F.id];
+      if (!F.alive || !O) continue;
+      for (const m of O.moves) {
+        const a = armyById(m.army);
+        if (!a || a.fac !== F.id || seen.has(a.id) || !m.path.length || sumU(a.units) === 0) continue;
+        seen.add(a.id);
+        list.push({ a, path: m.path.slice(0, 2), strat: STRATEGIES[m.strat] ? m.strat : 'charge', ok: true, r: 0 });
+      }
+    }
+    for (const a of S.armies) a.used = 0;
+    for (const o of list) o.a.transit = true;
+    for (let k = 0; k < 2 && !S.over; k++) {
+      const legs = list.filter(o => o.ok && o.path[k] != null && S.armies.includes(o.a));
+      if (k === 1) for (const o of legs) o.a.transit = true;
+      for (const o of legs) o.own = S.nodes[o.path[k]].owner === o.a.fac;
+      // 2) เดินในดินแดนตัวเอง
+      for (const o of legs.filter(o => o.own)) {
+        if (S.over) break;
+        const res = await wegoStep(o, k);
+        o.ok = res.type === 'move';
+      }
+      // 3) บุกสวนกัน
+      const atk = legs.filter(o => !o.own);
+      for (const o1 of atk) for (const o2 of atk) {
+        if (S.over || o1 === o2 || !o1.ok || !o2.ok || !o1.a.transit || !o2.a.transit || !S.armies.includes(o1.a) || !S.armies.includes(o2.a)) continue;
+        if (o1.path[k] === o2.a.node && o2.path[k] === o1.a.node && hostile(o1.a.fac, o2.a.fac)) await wegoClash(o1, o2);
+      }
+      // 4) การบุก
+      for (const o of atk) o.r = rng();
+      const cavR = a => sumU(a.units) ? a.units.cav / sumU(a.units) : 0;
+      const order = atk.filter(o => o.ok).sort((x, y) => (x.path[k] - y.path[k]) || (cavR(y.a) - cavR(x.a)) || (x.r - y.r));
+      for (const o of order) {
+        if (S.over) break;
+        if (!o.ok || !S.armies.includes(o.a)) continue;
+        await wegoStep(o, k);
+        o.ok = S.armies.includes(o.a) && o.a.node === o.path[k] && o.a.used < 99;
+      }
+    }
+  } finally {
+    // ทัพที่ยังค้างกลางทาง (บุกไม่สำเร็จ) กลับจุดเดิม
+    for (const o of list) {
+      const a = o.a;
+      if (!S.armies.includes(a) || !a.transit) continue;
+      delete a.transit; a.used = 99;
+      const home = S.nodes[a.node], blocked = S.armies.some(x => x !== a && x.node === a.node && !x.transit);
+      if (home.owner === a.fac && !blocked) continue;
+      if (home.owner === a.fac) {
+        const alt = neighbors(a.node).find(nb => passableA(a, nb) && S.nodes[nb.id].owner === a.fac && !S.armies.some(x => x.node === nb.id && !x.transit));
+        if (alt) { emitFx({ t: 'retreat', fac: a.fac, from: a.node, to: alt.id, kind: 'fall' }); log(`🏃 ${a.gen.name} กลับ ${home.name} ไม่ได้ (มีทัพอื่นอยู่) จึงไป ${S.nodes[alt.id].name}`); a.node = alt.id; continue; }
+      }
+      log(`💥 ${a.gen.name} กลับ ${home.name} ไม่ได้ (${home.owner === a.fac ? 'ไม่มีที่ว่าง' : `ถูก${home.owner >= 0 ? ' ' + facName(home.owner) : 'กองกำลังท้องถิ่น'} ยึดไปแล้ว`}) — ทัพแตก`);
+      destroyArmy(a, { by: home.owner !== a.fac ? home.owner : NEUTRAL, at: a.node, avoid: [a.node] });
+    }
+    for (const a of S.armies) { delete a.transit; delete a.wgCap; }
+    WG.orders = null;
+  }
+  if (S.joins.length) await processJoins();
+  S.current = 0;
+}
+// หลังคำนวณผล: นับไร้แผ่นดิน → เทิร์นใหม่ (ทุกฝ่ายรับรายได้พร้อมกัน) → ช่วงวางแผน
+// คืน 'over' (มีผลแพ้ชนะ) / 'timeup' (ครบเทิร์น ผู้เรียกตัดสินผลเอง) / 'next'
+async function wegoNextTurn() {
+  const W = S.wego;
+  if (!W.ticked) { W.ticked = true; for (const F of S.factions) if (F.alive && !S.over) homelessTick(F.id); }
+  if (S.over) return 'over';
+  if (S.turn >= maxTurns()) return 'timeup';
+  S.turn++;
+  wanderReturn();
+  bossRound();
+  await Ctrl.aiCatchUp();
+  for (const F of S.factions) if (F.alive) { const inc = startFactionTurn(F.id); if (F.human) log(`— เทิร์น ${S.turn}: รับรายได้ ${inc} 💰 —`); }
+  S.phase = 'player'; S.current = 0;
+  wegoBeginPlan();
+  return 'next';
+}
+// (ก) ความถูกต้องของคำสั่ง: ปลายทางที่ทัพ a ของฝ่าย f สั่งเดินช่องที่ step ได้ (m = คำสั่งเดิมของทัพนั้น)
+// ห้ามสองทัพของเราไปดินแดนเดียวกัน / เดินเข้าดินแดนเราที่มีทัพอยู่ได้เฉพาะเมื่อทัพนั้นมีคำสั่งออก (เดินเป็นขบวน)
+function planTargets(f, a, step, m) {
+  const O = S.wego.orders[f];
+  if (!O || !a || a.fac !== f || sumU(a.units) === 0 || step >= maxMoves(a)) return [];
+  const from = step === 0 ? a.node : m.path[step - 1];
+  const used = new Set(), leaving = new Set();
+  for (const x of O.moves) {
+    if (x.army === a.id || !x.path.length) continue;
+    for (const n of x.path) used.add(n);
+    const b = armyById(x.army);
+    if (b) leaving.add(b.node);
+  }
+  return neighbors(from).filter(nb => passableA(a, nb)).map(nb => nb.id).filter(id => {
+    if (id === a.node || (m && m.path.slice(0, step).includes(id)) || used.has(id) || allied(f, S.nodes[id].owner)) return false;
+    const x = armyAt(id);
+    return !(x && x.fac === f && !leaving.has(id));
+  });
+}
+// ตัดคำสั่งที่ไม่ถูกต้องแล้ว (เช่น ยกเลิกคำสั่งของทัพที่เปิดทางให้ขบวน) จนนิ่ง
+function wegoPrune(f) {
+  const O = S.wego.orders[f];
+  for (let pass = 0; pass < 6; pass++) {
+    let changed = false;
+    for (const m of O.moves.slice()) {
+      const a = armyById(m.army);
+      let k = 0;
+      while (k < m.path.length && planTargets(f, a, k, m).includes(m.path[k])) k++;
+      if (k < m.path.length) { m.path.length = k; changed = true; }
+      if (!m.path.length) { O.moves.splice(O.moves.indexOf(m), 1); changed = true; }
+    }
+    if (!changed) break;
+  }
+}
+// ทุกฝ่ายยืนยันแล้ว: บอทขงเบ้งวางแผน → คำนวณผล → เทิร์นถัดไป
+async function wegoRound(orders) {
+  for (const F of S.factions) {
+    const O = orders[F.id];
+    if (F.alive && O && O.late) orders[F.id] = wegoPlanBot(F.id, wegoIntel(F.id, orders), wegoIntelStrat(F.id, orders));
+  }
+  S.wego.phase = 'resolve'; S.phase = 'ai';
+  await resolveWego(orders);
+  if (S.over) return 'over';
+  return wegoNextTurn();
 }
 
 function checkInvariants() {
@@ -2242,6 +2739,7 @@ async function aiMove(a, to) {
   fxEnd(st, res.type === 'invalid' || res.type === 'cancel');
   Ctrl.render();
   await Ctrl.aiCatchUp();
+  await Ctrl.gate();
   return res;
 }
 
@@ -2286,13 +2784,15 @@ async function aiTurn(fid) {
    SAVE — localStorage พร้อมเลขเวอร์ชัน
    ===================================================================== */
 let saveDisabled = false;
+// ศึกพร้อมกันเซฟแยกคีย์ (บันทึกเฉพาะช่วงวางแผน)
+const WEGO_SAVE_KEY = 'legendsWarlord.wegoSave';
 function saveGame() {
-  if (saveDisabled || !S || S.over || S.phase !== 'player') return;
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify({ v: SAVE_VERSION, s: S })); } catch (e) { /* ไม่มีที่เก็บ — เล่นต่อได้ */ }
+  if (saveDisabled || !S || S.over || S.spectate || S.phase !== 'player' || (isWego() && S.wego.phase !== 'plan')) return;
+  try { localStorage.setItem(isWego() ? WEGO_SAVE_KEY : SAVE_KEY, JSON.stringify({ v: SAVE_VERSION, s: S })); } catch (e) { /* ไม่มีที่เก็บ — เล่นต่อได้ */ }
 }
-function loadSave() {
+function loadSave(key = SAVE_KEY) {
   try {
-    const raw = localStorage.getItem(SAVE_KEY);
+    const raw = localStorage.getItem(key);
     if (!raw) return null;
     const d = JSON.parse(raw);
     if (!d || !(d.v === SAVE_VERSION || d.v === 2) || !d.s || !Array.isArray(d.s.nodes) || d.s.over) return null;
@@ -2304,7 +2804,7 @@ function loadSave() {
     return d.s;
   } catch (e) { return null; }
 }
-function clearSave() { try { localStorage.removeItem(SAVE_KEY); } catch (e) { /* ignore */ } }
+function clearSave(key = S && isWego() ? WEGO_SAVE_KEY : SAVE_KEY) { try { localStorage.removeItem(key); } catch (e) { /* ignore */ } }
 
 /* =====================================================================
    RENDER — วาดแผนที่ SVG และแผงข้อมูล
@@ -2320,7 +2820,7 @@ const selArmy = () => {
 
 function render() {
   if (!S || typeof document === 'undefined') return;
-  renderTop(); renderMap(); renderInfo(); renderArmyList(); renderBoss(); renderLegends(); renderLog();
+  renderTop(); renderMap(); renderWego(); renderInfo(); renderArmyList(); renderBoss(); renderLegends(); renderLog(); renderSheet();
   coachUpdate();
 }
 
@@ -2336,31 +2836,44 @@ function renderTop() {
   const LV = LEVELS[S.level];
   const B = S.boss;
   const blood = B ? `<span class="chip blood ${B.gauge >= BLOOD_MAX - 1 ? 'full' : ''}" title="เกจโลหิตของ Ares: ครบ ${BLOOD_MAX} ช่องจะปล่อยพลัง">🩸 ${'▮'.repeat(B.gauge)}${'▯'.repeat(BLOOD_MAX - B.gauge)}${B.rage ? ` 🔥${B.rage}` : ''}${throneNet() ? ' 🕸️' : ''}${B.jar ? ' 🏺' : B.siege ? ` 🏺${B.siege}/3` : ''}</span>` : '';
-  $('chips').innerHTML = `<span class="chip" style="--c:#3b2a1d" title="ระดับความยาก">${B ? '🩸 ศึกชิงอิสรภาพ' : `${LV.icon} ${LV.name}`}</span>` + blood + S.factions.map(f => {
+  $('chips').innerHTML = `<span class="chip" style="--c:#3b2a1d" title="ระดับความยาก">${B ? '🩸 ศึกชิงอิสรภาพ' : isWego() ? `⏱️ ${LV.icon} ${LV.name}` : `${LV.icon} ${LV.name}`}</span>` + blood + S.factions.map(f => {
     const n = S.nodes.filter(x => x.owner === f.id).length;
     const cur = S.phase === 'ai' && S.current === f.id;
     const hl = f.alive && f.homeless ? (f.homeless.left == null ? ' ⛺' : ` ⛺${f.homeless.left}`) : '';
     const tip = facName(f.id) + (hl ? (f.homeless.left == null ? ' — ไร้แผ่นดิน' : ` — ไร้แผ่นดิน เหลือ ${f.homeless.left} เทิร์น`) : '');
     const tip2 = tip + (isBoss() && f.id > 0 && !isAres(f.id) ? (f.freed ? ' — ปลดปล่อยแล้ว' : ' — หุ่นเชิดของ Ares') : '');
-    return `<span class="chip ${f.alive ? '' : 'dead'} ${cur ? 'cur' : ''} ${hl ? 'homeless' : ''}" style="--c:${f.color}" title="${esc(tip2)}">${facIcon(f.id)} ${f.alive ? n : f.freed ? '⛓️‍💥' : '💀'}${hl}${f.human ? ' (เรา)' : ''}${isBoss() && f.alive && f.id > 0 && !isAres(f.id) ? ' 🎭' : ''}</span>`;
+    const wr = isWego() && S.wego.phase === 'plan' && f.alive && !S.spectate ? (S.wego.orders[f.id] && S.wego.orders[f.id].ready ? ' ✅' : ' ⏳') : '';
+    return `<span class="chip ${f.alive ? '' : 'dead'} ${cur ? 'cur' : ''} ${hl ? 'homeless' : ''}" style="--c:${f.color}" title="${esc(tip2)}${wr ? (wr === ' ✅' ? ' — ยืนยันคำสั่งแล้ว' : ' — กำลังวางแผน') : ''}">${facIcon(f.id)} ${f.alive ? n : f.freed ? '⛓️‍💥' : '💀'}${hl}${f.human ? ' (เรา)' : ''}${isBoss() && f.alive && f.id > 0 && !isAres(f.id) ? ' 🎭' : ''}${wr}</span>`;
   }).join('');
   const ub = $('btnUndo');
-  ub.classList.toggle('hidden', LV.undo === 0);
+  ub.classList.toggle('hidden', LV.undo === 0 || !!S.over || !!S.spectate || isWego());
   ub.disabled = !canUndo();
   ub.textContent = `↩️ ย้อน (${S.undoLeft < 0 ? '∞' : S.undoLeft})`;
   const btn = $('btnEnd');
   btn.disabled = S.phase !== 'player' || UI.busy || !!S.over;
-  btn.textContent = S.phase === 'player' ? (S.turn === maxTurns() ? 'จบเทิร์นสุดท้าย ▶' : 'จบเทิร์น ▶') : 'ศัตรูกำลังเดิน…';
+  btn.textContent = S.spectate ? '👁️ โหมดผู้ชม' : S.over ? '🏁 เกมจบแล้ว' : isWego() ? (S.wego.phase === 'plan' && S.phase === 'player' ? `✅ ยืนยันคำสั่ง${wegoTimeText()}` : '⚙️ กำลังคำนวณผล…')
+    : S.phase === 'player' ? (S.turn === maxTurns() ? 'จบเทิร์นสุดท้าย ▶' : 'จบเทิร์น ▶') : 'ศัตรูกำลังเดิน…';
+  if (isWego() && S.wego.phase === 'plan') btn.disabled = UI.busy || !!S.over || !!S.spectate || myOrders().ready;
+  const ob = $('overBar');
+  ob.classList.toggle('hidden', !S.over && !S.spectate);
+  ob.classList.toggle('spec', !!S.spectate);
+  if (S.spectate) ob.innerHTML = `<span>👁️ <b>โหมดผู้ชม</b> — บอทสู้กันต่อ (ไม่นับผล ไม่บันทึกเซฟ) · เทิร์น ${S.turn}/${maxTurns()} · แตะดูข้อมูลได้ทุกฝ่าย</span>
+    <span class="ob-btns"><button class="btn" data-ob="pause">${UI.spec && UI.spec.paused ? '▶ เล่นต่อ' : '⏸ หยุดชั่วคราว'}</button><button class="btn" data-ob="title">🏠 กลับหน้าหลัก</button></span>`;
+  else if (S.over) ob.innerHTML = `<span>🏁 <b>เกมจบแล้ว</b> — แตะดูข้อมูลดินแดนได้ แต่สั่งการไม่ได้</span>
+    <span class="ob-btns"><button class="btn" data-ob="summary">📜 ดูสรุปผล</button><button class="btn primary" data-ob="title">🏠 กลับหน้าหลัก</button></span>`;
   const ban = $('phaseBanner');
-  if (S.phase === 'ai' && !S.over && !UI.retreatPick) { ban.classList.remove('hidden'); ban.textContent = `ตาของ ${facIcon(S.current)} ${facName(S.current)}…`; }
+  if (S.phase === 'ai' && !S.over && !UI.retreatPick) { ban.classList.remove('hidden'); ban.textContent = S.current >= 0 ? `ตาของ ${facIcon(S.current)} ${facName(S.current)}…` : `⚙️ คำนวณผลพร้อมกัน เทิร์น ${S.turn}…`; }
   else ban.classList.add('hidden');
   $('btnReplay').disabled = !(FX.last && S.phase === 'player' && !UI.busy && !S.over);
   renderSpeed();
 }
 
+const wegoPlanning = () => isWego() && S.wego.phase === 'plan' && S.phase === 'player' && !UI.busy && !S.over && !S.spectate;
 function renderMap() {
-  const sa = S.phase === 'player' && !UI.busy ? selArmy() : null;
-  const targets = sa ? moveTargets(sa) : [];
+  const sa = S.phase === 'player' && !UI.busy && !S.over && !S.spectate ? selArmy() : null;
+  const pend = pendingMove(), wplan = wegoPlanning();
+  const wm = wplan && sa ? myOrders().moves.find(x => x.army === sa.id) : null;
+  const targets = !sa ? [] : wplan ? planTargets(0, sa, wm ? wm.path.length : 0, wm) : moveTargets(sa);
   // บทสอน: ไฮไลต์เป้าหมายที่ประเมินว่าได้เปรียบที่สุด
   let tutTarget = null;
   if (UI.tut === 'target' && sa) {
@@ -2383,8 +2896,12 @@ function renderMap() {
   // การกระทำของฝ่ายอื่นรอบที่แล้ว (จาง ๆ) / ปลายทางถอนทัพ
   const gh = UI.ghost && FX.last && S.phase === 'player' && !UI.busy ? ghostLayers() : null;
   const rp = UI.retreatPick ? retreatLayers() : null;
+  const wl = wplan || (isWego() && S.wego.phase === 'plan' && !S.over) ? wegoLayers(sa) : null;
   if (gh) s += gh.under;
   if (rp) s += rp.under;
+  if (wl) s += wl.under;
+  // ยืนยันก่อนเดินทัพ: เส้นทางจากทัพไปเป้าที่เลือก
+  if (pend && sa) s += `<line class="pend-arrow" data-pending="${pend.to}" ${lineAttr(arrowPts(sa.node, pend.to, 0))} stroke="${S.nodes[pend.to].owner === sa.fac ? '#2f9d5a' : '#d1382b'}" stroke-width="12" stroke-linecap="round" marker-end="url(#arrow)" pointer-events="none"/>`;
   const lm = !gh && !rp && S.lastMove;
   if (lm && S.nodes[lm.from] && S.nodes[lm.to] && fac(lm.fac)) {
     const A = S.nodes[lm.from], B = S.nodes[lm.to];
@@ -2400,6 +2917,7 @@ function renderMap() {
     s += `<circle r="66" fill="transparent"/>`;
     if (isT) s += `<circle class="tgt ${attack ? 'atk' : 'mv'} ${tutTarget === n.id ? 'tut' : ''}" r="62"/>`;
     if (UI.selNode === n.id) s += `<circle class="selring" r="70"/>`;
+    if (pend && pend.to === n.id) s += `<circle class="pend-ring" r="78"/>`;
     s += `<circle r="47" fill="${T.color}" stroke="${facColor(n.owner)}" stroke-width="10"/>`;
     s += `<text class="ticon" y="${a || wildAt(n.id) ? -10 : 0}">${T.icon}</text>`;
     if (isSeat(n)) s += `<text class="capico" x="0" y="-58">🏰</text>`;
@@ -2418,7 +2936,44 @@ function renderMap() {
   }
   if (gh) s += gh.over;
   if (rp) s += rp.over;
+  if (wl) s += wl.over;
   $('map').innerHTML = s;
+}
+// ศึกพร้อมกัน: ลูกศรคำสั่งของเรา (เขียว = เดินในดินแดนเรา, แดง = บุก + ไอคอนกลยุทธ์บุก)
+// ขงเบ้ง (หยั่งรู้ฟ้าดิน): ลูกศรประของศัตรูที่เล็งดินแดนเรา + ไอคอนกลยุทธ์บุกของลูกศรนั้น
+function wegoLayers(sa) {
+  let under = '', over = '';
+  const badge = (P, col, ico, k = 0.5) => `<g class="wg wg-badge" transform="translate(${(P.x1 + (P.x2 - P.x1) * k).toFixed(1)},${(P.y1 + (P.y2 - P.y1) * k).toFixed(1)})"><circle r="19" fill="#fffaf0" stroke="${col}" stroke-width="4"/><text class="gh-ico">${ico}</text></g>`;
+  for (const m of myOrders().moves) {
+    const a = armyById(m.army);
+    if (!a) continue;
+    let from = a.node;
+    const sel = sa && sa.id === a.id;
+    for (const n of m.path) {
+      const atk = S.nodes[n].owner !== 0, col = atk ? '#d1382b' : '#2f9d5a', P = arrowPts(from, n, 0);
+      under += `<line class="wg wg-arrow" data-worder="${a.id}" data-wto="${n}" ${lineAttr(P)} stroke="${col}" stroke-width="${sel ? 13 : 10}" opacity="${sel ? 1 : 0.8}" stroke-linecap="round" marker-end="url(#arrow)"/>`;
+      if (atk) over += badge(P, col, STRATEGIES[m.strat].icon);
+      from = n;
+    }
+  }
+  if (skill(0, 'foresight')) {
+    for (const g in S.wego.orders) {
+      const O = S.wego.orders[g];
+      if (+g === 0 || !O || O.late) continue;
+      for (const m of O.moves) {
+        const a = armyById(m.army);
+        if (!a || !m.path.some(n => S.nodes[n].owner === 0)) continue;
+        let from = a.node;
+        for (const n of m.path) {
+          const P = arrowPts(from, n, -12);
+          under += `<line class="wg wg-intel" data-wintel="${n}" ${lineAttr(P)} stroke="${facColor(+g)}" stroke-width="9" stroke-dasharray="14 9" stroke-linecap="round" marker-end="url(#arrow)"/>`;
+          if (S.nodes[n].owner === 0) over += badge(P, facColor(+g), STRATEGIES[m.strat] ? STRATEGIES[m.strat].icon : '👁️', 0.6);
+          from = n;
+        }
+      }
+    }
+  }
+  return { under, over };
 }
 
 // ลูกศรจากดินแดน from ไป to (หยุดก่อนถึงวงดินแดน) เยื้องไปทางขวาของทิศทาง off หน่วย เพื่อไม่ให้ลูกศรไป-กลับทับกัน
@@ -2572,14 +3127,28 @@ function renderLegends() {
 }
 
 /* ---------- ซูม/เลื่อนแผนที่ ---------- */
-const canZoom = () => !!S && S.size && S.size !== 's';
+// มือถือ: ซูม/เลื่อนได้ทุกขนาดแผนที่ (จอเล็ก + แผ่นด้านล่างบังบางส่วน)
+const isMobile = () => typeof window !== 'undefined' && window.matchMedia('(max-width: 899px)').matches;
+const canZoom = () => !!S && S.size && (S.size !== 's' || isMobile());
+const isLandscape = () => isMobile() && window.innerWidth > window.innerHeight;
+// ส่วนของแผนที่ที่ไม่ถูกแผ่นบัง (ยึดมุมซ้ายบน): แนวตั้ง = เหนือแผ่นด้านล่าง / แนวนอนครึ่งจอ = ซ้ายของแผ่นด้านขวา / คอม = ทั้งหมด
+function mapArea() {
+  const r = $('map').getBoundingClientRect();
+  let vw = r.width, vh = r.height;
+  if (isMobile()) {
+    if (UI.sheetW) vw = Math.max(r.width * 0.3, r.width - UI.sheetW);
+    else vh = Math.max(r.height * 0.2, r.height - Math.min(r.height * 0.8, UI.sheetH || 56));
+  }
+  return { w: r.width, h: r.height, vw, vh };
+}
 // ขอบเขตดินแดนทั้งหมด (เผื่อที่ให้ชื่อ/ป้าย)
 function mapBounds() {
   const xs = S.nodes.map(n => n.x), ys = S.nodes.map(n => n.y);
   const x0 = Math.min(...xs) - 105, y0 = Math.min(...ys) - 105;
   return { x: x0, y: y0, w: Math.max(...xs) + 105 - x0, h: Math.max(...ys) + 115 - y0 };
 }
-const boardRatio = () => { const r = $('map').getBoundingClientRect(); return r.width > 0 && r.height > 0 ? r.height / r.width : 1; };
+// สัดส่วนของส่วนที่มองเห็น (มือถือ: เหนือแผ่นด้านล่าง) — viewBox จริงยืดลงไปใต้แผ่น (fullRatio)
+const boardRatio = () => { const m = mapArea(); return m.vw > 0 && m.vh > 0 ? m.vh / m.vw : 1; };
 // ขยายกรอบให้สัดส่วนเท่าพื้นที่แผนที่บนจอ
 function fitRatio(b) {
   const k = boardRatio();
@@ -2589,6 +3158,13 @@ function fitRatio(b) {
 // มุมมองเริ่มต้น: ทั้งแผนที่ / จอแคบ + แผนที่กลาง/ใหญ่ = ซูมเข้าหาทัพเราให้ดินแดนใหญ่พอแตะได้แม่น
 function defaultView() {
   const full = fitRatio(mapBounds());
+  if (isMobile() && canZoom()) {
+    // มือถือ: เห็นทั้งแผนที่ถ้าดินแดนยังใหญ่พอแตะ (รัศมี ≥ 22px) ไม่งั้นซูมเข้าหาทัพเรา
+    const vwPx = mapArea().vw, k = boardRatio();
+    if (66 * vwPx / full.w >= 22) return full;
+    const h = S.nodes[homeNode(0)] || S.nodes[0], w = Math.min(full.w, vwPx * 1.95);
+    return clampView({ x: h.x - w / 2, y: h.y - w * k / 2, w, h: w * k });
+  }
   if (!canZoom() || $('map').getBoundingClientRect().width >= 600) return full;
   const h = S.nodes[homeNode(0)] || S.nodes[0];
   const w = Math.min(full.w, 760), k = boardRatio();
@@ -2597,18 +3173,28 @@ function defaultView() {
 function clampView(v) {
   const full = fitRatio(mapBounds()), k = boardRatio();
   let w = Math.max(420, Math.min(full.w, v.w)), h = w * k;
-  const cx = Math.max(full.x + w / 2, Math.min(full.x + full.w - w / 2, v.x + v.w / 2));
-  const cy = Math.max(full.y + h / 2, Math.min(full.y + full.h - h / 2, v.y + v.h / 2));
+  // มือถือ: เลื่อนได้แค่ในขอบเขตดินแดนจริง (ไม่เลื่อนไปทะเลว่างเหนือ/ใต้แผนที่) — คอมคงเดิม
+  const B = isMobile() ? mapBounds() : full;
+  const ax = (c, size, lo, len) => size >= len ? lo + len / 2 : Math.max(lo + size / 2, Math.min(lo + len - size / 2, c));
+  const cx = ax(v.x + v.w / 2, w, B.x, B.w), cy = ax(v.y + v.h / 2, h, B.y, B.h);
   return { x: cx - w / 2, y: cy - h / 2, w, h };
 }
 function applyView() {
   const v = canZoom() && UI.view ? clampView(UI.view) : canZoom() ? defaultView() : mapBounds();
   if (canZoom() && UI.view) UI.view = v;
-  $('map').setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`);
-  $('fx').setAttribute('viewBox', `${v.x} ${v.y} ${v.w} ${v.h}`);
+  // มือถือ: viewBox จริงยืดไปใต้แผ่น ส่วนที่เห็น (ซ้ายบน) = มุมมอง v
+  const m = mapArea(), aw = isMobile() && m.vw > 0 ? v.w * m.w / m.vw : v.w;
+  const vb = `${v.x} ${v.y} ${aw} ${isMobile() && m.w > 0 ? aw * m.h / m.w : v.h}`;
+  $('map').setAttribute('viewBox', vb);
+  $('fx').setAttribute('viewBox', vb);
   $('board').classList.toggle('zoomable', canZoom());
 }
-const curView = () => { const [x, y, w, h] = $('map').getAttribute('viewBox').split(' ').map(Number); return { x, y, w, h }; };
+const curView = () => {
+  const [x, y, w, h] = $('map').getAttribute('viewBox').split(' ').map(Number);
+  if (!isMobile()) return { x, y, w, h };
+  const m = mapArea(), vw = m.w > 0 ? w * m.vw / m.w : w;
+  return { x, y, w: vw, h: vw * m.vh / m.vw };
+};
 // จุดบนจอ → พิกัดแผนที่
 function toMap(cx, cy) {
   const m = $('map'), pt = m.createSVGPoint();
@@ -2679,32 +3265,40 @@ function renderInfo() {
   if (id == null) {
     const gl = UI.ghost && FX.last && S.phase === 'player' ? `<div class="ghost-key"><b>ลูกศรจาง ๆ บนแผนที่ = สิ่งที่ฝ่ายอื่นทำในรอบที่แล้ว</b> (หายไปเมื่อเริ่มสั่งการ · กด 🔁 ดูซ้ำ)<br>
       <span class="gk gk-win">⚔️</span> บุกแล้วยึดได้ · <span class="gk gk-lose">⚔️</span> ถูกตีกลับ · 🏃 ถอนทัพ · +N เกณฑ์ทหาร · 🎖️ แต่งตั้งแม่ทัพ · ✨ ได้ตำนาน${isBoss() ? ' · 🩸 Ares ใช้พลัง · 🌀 ภูมิประเทศเปลี่ยน' : ''}</div>` : '';
-    el.innerHTML = `<h3>คำแนะนำ</h3>${gl}<div class="hint">• แตะดินแดนเพื่อดูข้อมูล / เกณฑ์ทหาร<br>• แตะทัพของเรา แล้วแตะวงที่เรืองแสงเพื่อเดินทัพ (🟢 เดิน, 🔴 โจมตี)<br>• เมื่อสั่งการครบ กด “จบเทิร์น”</div>`;
+    el.innerHTML = `<h3>คำแนะนำ</h3>${gl}<div class="hint">• แตะดินแดนเพื่อดูข้อมูล / เกณฑ์ทหาร<br>• แตะทัพของเรา แล้วแตะวงที่เรืองแสงเพื่อเดินทัพ (🟢 เดิน, 🔴 โจมตี)${confirmOn() ? ' — แตะครั้งแรกดูเส้นทาง/ผลประเมิน แตะซ้ำหรือกดยืนยันเพื่อเดิน' : ''}<br>• เมื่อสั่งการครบ กด “จบเทิร์น”</div>`;
     return;
   }
   const n = S.nodes[id], T = TERRAINS[n.terrain], a = armyAt(id);
-  const myTurn = S.phase === 'player' && !UI.busy && !S.over;
+  const myTurn = S.phase === 'player' && !UI.busy && !S.over && !S.spectate;
   const capTag = isSeat(n) ? `<span class="tag">เมืองหลวง${n.capitalOf !== n.owner ? ' (ย้ายมา)' : ''}</span>` : n.capitalOf !== null ? '<span class="tag">อดีตเมืองหลวง</span>' : '';
   let h = `<div class="node-card" style="--c:${facColor(n.owner)};padding-left:10px">`;
   h += `<div class="nc-head"><span class="nc-ico">${T.icon}</span><div><div class="nc-name">${esc(n.name)} ${capTag}</div>`;
   h += `<div class="nc-sub">${T.name} · รายได้ ${nodeIncome(n)} 💰 · ${facIcon(n.owner)} ${esc(facName(n.owner))}</div></div></div>`;
-  h += `<div class="nc-terrain">${T.desc}</div>`;
-  if (sumU(n.garrison) > 0) h += `<div><b>กองรักษาการณ์:</b> ${unitsHtml(n.garrison)}</div>`;
+  h += `<div class="nc-terrain nc-d">${T.desc}</div>`;
+  if (sumU(n.garrison) > 0) h += `<div class="nc-d"><b>กองรักษาการณ์:</b> ${unitsHtml(n.garrison)}</div>`;
   if (a) {
-    h += `<div class="army-box" style="--c:${facColor(a.fac)}"><div><b>${a.gen.icon} ${esc(a.gen.name)}</b>${a.gen.leader ? '<span class="tag">จอมทัพ</span>' : ''}</div>`;
+    h += `<div class="army-box nc-d" style="--c:${facColor(a.fac)}"><div><b>${a.gen.icon} ${esc(a.gen.name)}</b>${a.gen.leader ? '<span class="tag">จอมทัพ</span>' : ''}</div>`;
     h += `<div>${unitsHtml(a.units)} รวม ${sumU(a.units)} นาย</div>`;
-    if (a.fac === 0) h += `<div class="muted">${moveStatus(a)}</div>`;
+    if (a.fac === 0 && !S.over && !S.spectate) h += `<div class="muted">${moveStatus(a)}</div>`;
     if (a.gen.wid) h += legendBoxHtml(a.gen.wid, a.gen, a.fac);
     h += `</div>`;
   }
   const wl = wildAt(id);
-  if (wl) h += legendBoxHtml(wl.wid, null, NEUTRAL);
-  const sa = selArmy();
-  if (sa && n.owner !== 0 && myTurn && moveTargets(sa).includes(id)) {
+  if (wl) h += `<div class="nc-d">${legendBoxHtml(wl.wid, null, NEUTRAL)}</div>`;
+  const sa = selArmy(), pend = pendingMove();
+  if (wegoPlanning() && sa) h = wegoArmyBox(sa) + h;
+  if (pend && pend.to === id) {
+    const atk = n.owner !== sa.fac, empty = sumU(defSide(id).units) === 0, alps = alpsFrac(sa, sa.node, id);
+    h += `<div class="pend-box">🧭 <b>${sa.gen.icon} ${esc(sa.gen.name)}</b>: ${esc(S.nodes[sa.node].name)} → <b>${esc(n.name)}</b>
+      ${atk ? `<br>⚔️ ${empty ? 'ไม่มีทหารป้องกัน ยึดได้ทันที' : `ประเมินกำลัง: <b>${estimateText(estimateRatio(sa, id))}</b>`}` : '<br>เดินเข้าดินแดนของเรา'}
+      ${alps ? `<br>🏔️ ข้ามเทือกเขา เสียทหาร ${Math.round(alps * 100)}%` : ''}
+      <button class="btn primary" data-act="confirmmove">${atk ? '⚔️ ยืนยันบุก' : '✅ ยืนยันเดินทัพ'}</button>
+      <div class="muted">หรือแตะ ${esc(n.name)} ซ้ำ · แตะดินแดนอื่นเพื่อเปลี่ยนเป้า</div></div>`;
+  } else if (sa && n.owner !== 0 && myTurn && moveTargets(sa).includes(id)) {
     h += `<div class="act-title">ประเมินกำลังถ้า ${esc(sa.gen.name)} บุก: ${estimateText(estimateRatio(sa, id))}</div>`;
   } else if (n.owner !== 0 && n.owner !== NEUTRAL) {
     const L = legendOf(n.owner);
-    h += `<div class="muted" style="margin-top:6px">✨ สกิล ${L.name}: ${L.skillName} — ${L.skillDesc}<br>⚠️ จุดอ่อน: ${L.weakName} — ${L.weakDesc}</div>`;
+    h += `<div class="muted nc-d" style="margin-top:6px">✨ สกิล ${L.name}: ${L.skillName} — ${L.skillDesc}<br>⚠️ จุดอ่อน: ${L.weakName} — ${L.weakDesc}</div>`;
   }
   if (n.owner === 0 && myTurn) {
     if (canRecruitAt(0, id)) {
@@ -2742,6 +3336,99 @@ function renderArmyList() {
     : '<div class="hint">ไม่มีทัพ</div>';
 }
 
+/* ---------- มือถือ: แผ่นเลื่อนจากล่าง 3 ระดับ (พับ / ครึ่งจอ / เต็มจอ) + แท็บ ---------- */
+const SHEET_TABS = [['info', 'ข้อมูล'], ['army', 'ทัพของเรา'], ['leg', '✨ ตำนาน'], ['log', 'บันทึกศึก'], ['boss', '🩸 Ares']];
+function sheetHeights() {
+  const top = $('main').getBoundingClientRect().top, avail = Math.max(120, window.innerHeight - top);
+  return { peek: 56, half: Math.round(Math.min(avail - 70, Math.max(150, avail * 0.52))), full: Math.round(avail) };
+}
+function setSheet(state, keepView) {
+  const P = $('panel');
+  if (!isMobile()) { for (const k of ['top', 'left', 'width', 'height']) P.style[k] = ''; UI.sheetH = 0; UI.sheetW = 0; return; }
+  UI.sheet = state;
+  const H = sheetHeights();
+  if (isLandscape() && state === 'half') {
+    // แนวนอน: ครึ่งจอ = แผงชิดขวาเต็มความสูง เห็นแผนที่ด้านซ้าย
+    UI.sheetW = Math.round(Math.min(430, window.innerWidth * 0.5)); UI.sheetH = 0;
+    Object.assign(P.style, { top: $('main').getBoundingClientRect().top + 'px', left: 'auto', width: UI.sheetW + 'px', height: 'auto' });
+  } else {
+    UI.sheetW = 0; UI.sheetH = H[state];
+    Object.assign(P.style, { top: 'auto', left: '0px', width: 'auto', height: UI.sheetH + 'px' });
+  }
+  P.classList.toggle('side', !!UI.sheetW);
+  for (const k of ['peek', 'half', 'full']) P.classList.toggle(k, k === state);
+  if (S && $('game').classList.contains('active')) { applyView(); if (!keepView && UI.selNode != null && state !== 'full') ensureVisible(UI.selNode); renderSheet(); coachUpdate(); }
+}
+// เลื่อนแผนที่ให้ดินแดนนั้นอยู่ในส่วนที่ไม่ถูกแผ่นบัง
+function ensureVisible(id) {
+  if (!isMobile() || !canZoom() || id == null) return;
+  const v = curView(), n = S.nodes[id], m = Math.min(110, v.w * 0.15);
+  if (n.x > v.x + m && n.x < v.x + v.w - m && n.y > v.y + m && n.y < v.y + v.h - m) return;
+  UI.view = clampView({ x: n.x - v.w / 2, y: n.y - v.h / 2, w: v.w, h: v.h });
+  applyView();
+}
+// แตะดินแดนหรือทัพ = แผ่นเด้งขึ้นครึ่งจอที่แท็บข้อมูล
+function sheetFocus(id) {
+  if (!isMobile()) return;
+  UI.tab = 'info';
+  if (UI.sheet !== 'half' && UI.sheet !== 'full') setSheet('half', true);
+  ensureVisible(id);
+}
+function renderSheet() {
+  if (!isMobile()) return;
+  const tabs = SHEET_TABS.filter(([k]) => k !== 'leg' || S.wInGame.length).filter(([k]) => k !== 'boss' || isBoss());
+  if (!tabs.some(([k]) => k === UI.tab)) UI.tab = 'info';
+  $('sheetTabs').innerHTML = tabs.map(([k, t]) => `<button data-tab="${k}" class="${UI.tab === k ? 'on' : ''}">${t}</button>`).join('');
+  for (const c of document.querySelectorAll('#sheetBody > .card')) c.classList.toggle('tab-on', c.dataset.tab === UI.tab);
+  const id = UI.selNode;
+  let t = '👆 แตะดินแดนหรือทัพเพื่อดูข้อมูลและสั่งการ';
+  if (id != null && S.nodes[id]) {
+    const n = S.nodes[id], a = armyAt(id);
+    t = `${TERRAINS[n.terrain].icon} <b>${esc(n.name)}</b> ${facIcon(n.owner)}${a ? ` · ${a.gen.icon} ${esc(a.gen.name)} ${sumU(a.units)}` : ''}`;
+  }
+  $('sheetTitle').innerHTML = t;
+}
+function bindSheet() {
+  const head = $('sheetHead'), P = $('panel');
+  let drag = null;
+  head.addEventListener('pointerdown', e => {
+    if (!isMobile() || e.target.closest('[data-tab]')) return;
+    drag = { y: e.clientY, h: P.getBoundingClientRect().height, moved: false, dy: 0 };
+    try { head.setPointerCapture(e.pointerId); } catch (err) { /* เหตุการณ์จำลอง */ }
+  });
+  head.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dy = drag.dy = e.clientY - drag.y;
+    if (!drag.moved && Math.abs(dy) < 6) return;
+    drag.moved = true;
+    if (UI.sheetW || isLandscape()) return; // แนวนอน: เปลี่ยนระดับตามทิศที่ลาก
+    const H = sheetHeights();
+    P.classList.add('dragging');
+    P.style.height = Math.max(H.peek, Math.min(H.full, drag.h - dy)) + 'px';
+  });
+  const end = () => {
+    if (!drag) return;
+    const d = drag; drag = null;
+    P.classList.remove('dragging');
+    const H = sheetHeights(), order = ['peek', 'half', 'full'], i = order.indexOf(UI.sheet || 'peek');
+    if (!d.moved) { setSheet(order[(i + 1) % 3]); return; }
+    if (isLandscape()) { setSheet(order[Math.max(0, Math.min(2, i + (d.dy < 0 ? 1 : -1) * (Math.abs(d.dy) > H.full * 0.5 ? 2 : 1)))]); return; }
+    const h = parseFloat(P.style.height) || P.getBoundingClientRect().height; // ความสูงที่ลากไว้ (ไม่อ่านค่าระหว่างเปลี่ยนขนาด)
+    setSheet(order.reduce((b, k) => Math.abs(H[k] - h) < Math.abs(H[b] - h) ? k : b, 'peek'));
+  };
+  head.addEventListener('pointerup', end);
+  head.addEventListener('pointercancel', end);
+  head.addEventListener('click', e => {
+    const b = e.target.closest('[data-tab]');
+    if (!b) return;
+    UI.tab = b.dataset.tab;
+    if (UI.sheet === 'peek') setSheet('half', true);
+    renderSheet();
+  });
+  window.addEventListener('resize', () => { if (isMobile()) setSheet(UI.sheet || 'peek', true); else setSheet('peek'); if (S) applyView(); });
+  P.addEventListener('transitionend', e => { if (e.target === P) coachUpdate(); }); // บทสอนชี้ตามตำแหน่งหลังแผ่นเลื่อนเสร็จ
+}
+
 function renderLog() {
   let h = '', last = null;
   for (const e of S.log.slice(0, 40)) {
@@ -2757,17 +3444,22 @@ function renderLog() {
 /* ---------- บทสอนเล่นเทิร์นแรก ---------- */
 const TUT_KEY = 'legendsWarlord.tutDone';
 const TUT_STEPS = {
-  army:   { step: 'ขั้นที่ 1/3', text: () => 'แตะ <b>ทัพของเรา</b> (แคปซูลสีที่กะพริบ) เพื่อเลือกทัพ',
+  army:   { step: () => `ขั้นที่ 1/${tutN()}`, text: () => 'แตะ <b>ทัพของเรา</b> (แคปซูลสีที่กะพริบ) เพื่อเลือกทัพ',
             sel: () => { const a = S.armies.find(x => x.fac === 0 && x.gen.leader); return a ? `#map [data-armybadge="${a.id}"]` : null; } },
-  target: { step: 'ขั้นที่ 2/3', text: () => 'แตะ <b>วงสีแดง</b> เพื่อบุกดินแดนข้างเคียง (วงเขียว = เดินในดินแดนเรา)<br>ลองจุดที่ชี้อยู่ ประเมินแล้วได้เปรียบที่สุด',
+  target: { step: () => `ขั้นที่ 2/${tutN()}`, text: () => (confirmOn()
+              ? 'แตะ <b>วงสีแดง</b> เพื่อเลือกเป้าบุก (วงเขียว = เดินในดินแดนเรา)<br>แตะครั้งแรกยังไม่เดิน — เกมจะแสดงเส้นทางและผลประเมินก่อน'
+              : 'แตะ <b>วงสีแดง</b> เพื่อบุกดินแดนข้างเคียง (วงเขียว = เดินในดินแดนเรา)') + '<br>ลองจุดที่ชี้อยู่ ประเมินแล้วได้เปรียบที่สุด',
             sel: () => '#map .tgt.tut' },
-  strat:  { step: 'ขั้นที่ 3/3', text: () => 'เลือก <b>กลยุทธ์</b> — ซุ่มโจมตี ชนะ บุกตรง · บุกตรง ชนะ ตั้งรับ · ตั้งรับ ชนะ ซุ่มโจมตี'
+  confirm: { step: () => `ขั้นที่ 3/${tutN()}`, text: () => 'ดูเส้นทางและผลประเมินในแผงข้อมูล แล้ว<b>แตะดินแดนเดิมซ้ำ</b> หรือกด <b>“ยืนยันบุก”</b> เพื่อบุกจริง<br>(แตะดินแดนอื่น = เปลี่ยนเป้า)',
+            sel: () => '#info [data-act="confirmmove"]' },
+  strat:  { step: () => `ขั้นที่ ${tutN()}/${tutN()}`, text: () => 'เลือก <b>กลยุทธ์</b> — ซุ่มโจมตี ชนะ บุกตรง · บุกตรง ชนะ ตั้งรับ · ตั้งรับ ชนะ ซุ่มโจมตี'
             + (skill(0, 'foresight') ? '<br>🪶 ขงเบ้งเห็นกลยุทธ์ศัตรูในกรอบเขียวแล้ว เลือกตัวที่แก้ทาง!' : ''),
             sel: () => '#battleCard .strats', below: true },
   result: { step: 'ผลรบ', text: () => 'ดูพลังรบและทหารที่เสีย แล้วกด <b>ดำเนินต่อ</b>', sel: () => '#btContinue' },
   end:    { step: 'เกือบเสร็จแล้ว', text: () => 'เกณฑ์ทหารเพิ่มได้ที่แผงข้อมูลของเมืองหลวง เมื่อสั่งการครบแล้วกด <b>จบเทิร์น</b> ให้ศัตรูเดิน',
             sel: () => '#btnEnd', done: true },
 };
+const tutN = () => confirmOn() ? 4 : 3;
 function tutDone() { try { return localStorage.getItem(TUT_KEY) === '1'; } catch (e) { return false; } }
 function finishTutorial() {
   UI.tut = null;
@@ -2780,40 +3472,46 @@ function coachUpdate() {
   const st = UI.tut && TUT_STEPS[UI.tut];
   if (!st || !S || S.phase !== 'player' || S.over || Ctrl.auto) { coachHide(); return; }
   const box = $('coach'), arr = $('coachArrow');
-  box.innerHTML = `<div class="c-step">📖 บทสอน · ${st.step}</div><div>${st.text()}</div>
+  box.innerHTML = `<div class="c-step">📖 บทสอน · ${typeof st.step === 'function' ? st.step() : st.step}</div><div>${st.text()}</div>
     <div class="c-btns">${st.done ? '<button class="go" data-tut="done">เข้าใจแล้ว</button>' : '<button data-tut="skip">ข้ามบทสอน</button>'}</div>`;
   box.classList.remove('hidden');
   const sel = st.sel(), el = sel && document.querySelector(sel);
   const r = el && el.getBoundingClientRect();
-  const sx = window.scrollX, sy = window.scrollY, vw = document.documentElement.clientWidth;
+  const vw = document.documentElement.clientWidth, vh = window.innerHeight, G = 48, M = 8;
   const bw = box.offsetWidth, bh = box.offsetHeight;
   if (!r || (r.width === 0 && r.height === 0)) {
     arr.classList.add('hidden');
-    box.style.left = (sx + (vw - bw) / 2) + 'px'; box.style.top = (sy + 70) + 'px';
+    box.style.left = ((vw - bw) / 2) + 'px'; box.style.top = '70px';
     return;
   }
-  const cx = r.left + r.width / 2;
-  const fitsBelow = r.bottom + 48 + bh < window.innerHeight;
-  const above = st.below && fitsBelow ? false : r.top > bh + 60;
-  arr.textContent = above ? '👇' : '👆';
-  arr.className = above ? 'down' : 'up';
-  arr.style.left = (sx + cx) + 'px';
-  arr.style.top = (sy + (above ? r.top - 2 : r.bottom + 2)) + 'px';
-  box.style.left = (sx + Math.max(8, Math.min(vw - bw - 8, cx - bw / 2))) + 'px';
-  box.style.top = (sy + (above ? r.top - 48 - bh : r.bottom + 48)) + 'px';
+  // วางกล่อง (พิกัดบนจอ): บน/ล่างเป้าก่อน ถ้าไม่พอ (เช่น มือถือแนวนอน) ไปขวา/ซ้าย สุดท้ายบีบให้อยู่ในจอ
+  const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+  const clampX = x => Math.max(M, Math.min(vw - bw - M, x)), clampY = y => Math.max(M, Math.min(vh - bh - M, y));
+  const fitsBelow = r.bottom + G + bh <= vh - M, fitsAbove = r.top >= bh + 60;
+  const fitsRight = r.right + G + bw <= vw - M, fitsLeft = r.left - G - bw >= M;
+  const mode = st.below && fitsBelow ? 'below' : fitsAbove ? 'above' : fitsBelow ? 'below' : fitsRight ? 'right' : fitsLeft ? 'left' : r.top > vh / 2 ? 'above' : 'below';
+  const P = {
+    above: ['👇', 'down', cx, r.top - 2, clampX(cx - bw / 2), clampY(r.top - G - bh)],
+    below: ['👆', 'up', cx, r.bottom + 2, clampX(cx - bw / 2), clampY(r.bottom + G)],
+    right: ['👈', 'left', r.right + 2, cy, r.right + G, clampY(cy - bh / 2)],
+    left: ['👉', 'right', r.left - 2, cy, r.left - G - bw, clampY(cy - bh / 2)],
+  }[mode];
+  arr.textContent = P[0]; arr.className = P[1];
+  arr.style.left = P[2] + 'px'; arr.style.top = P[3] + 'px';
+  box.style.left = P[4] + 'px'; box.style.top = P[5] + 'px';
 }
 
 /* ---------- ย้อนการสั่งการ ----------
    ย้อนได้เฉพาะการเดินทัพที่ไม่มีการรบ เกณฑ์ทหาร แต่งตั้งแม่ทัพ รวม/แบ่งทหาร ในเทิร์นเดียวกัน
    พอเกิดการรบ (รวมการถอนทัพ) สแต็กจะถูกล้าง */
 function pushUndo() {
-  if (!S || LEVELS[S.level].undo === 0) return;
+  if (!S || LEVELS[S.level].undo === 0 || isWego()) return;
   UI.undo.push(JSON.stringify(S));
   if (UI.undo.length > 40) UI.undo.shift();
 }
 const clearUndo = () => { UI.undo = []; };
 function canUndo() {
-  return !!S && LEVELS[S.level].undo !== 0 && UI.undo.length > 0 && S.undoLeft !== 0 && S.phase === 'player' && !UI.busy && !S.over;
+  return !!S && !isWego() && LEVELS[S.level].undo !== 0 && UI.undo.length > 0 && S.undoLeft !== 0 && S.phase === 'player' && !UI.busy && !S.over;
 }
 function doUndo() {
   if (!canUndo()) return;
@@ -2876,6 +3574,8 @@ const Ctrl = {
   aiCatchUp: () => fxCatchUp(),
   aiPace: () => fxK(),
   fxClear: () => fxClear(),
+  // โหมดผู้ชม: หยุดชั่วคราว
+  gate: async () => { while (UI.spec && UI.spec.paused && !UI.spec.quit) await sleep(120); },
 };
 
 /* ---------- แสดงการกระทำของฝ่ายอื่นบนแผนที่: ลูกศร 💥 ตัวเลขทหารที่เสีย ดินแดนกะพริบ / ดูซ้ำ ---------- */
@@ -2883,7 +3583,7 @@ const AI_SPEEDS = { normal: { name: 'ปกติ', icon: '▶️', k: 1 }, fast
 const SPEED_KEY = 'legendsWarlord.aiSpeed';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 // ตัวคูณเวลาแอนิเมชัน (0 = ข้าม) — โหมดทดสอบอัตโนมัติเร่งให้สั้นมาก
-const fxK = (speed = UI.aiSpeed) => (AI_SPEEDS[speed] || AI_SPEEDS.normal).k * (Ctrl.auto ? 0.04 : 1);
+const fxK = (speed = UI.aiSpeed) => (UI.spec && UI.spec.quit) ? 0 : (AI_SPEEDS[speed] || AI_SPEEDS.normal).k * (Ctrl.auto ? 0.04 : 1);
 const ease = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 // เดินภาพทีละเฟรมด้วย setTimeout (ไม่ใช้ requestAnimationFrame เพื่อไม่ค้างตอนแท็บอยู่เบื้องหลัง)
 function tween(ms, fn) {
@@ -3023,6 +3723,7 @@ function showNotices() {
 }
 function showScreen(id) {
   for (const s of document.querySelectorAll('.screen')) s.classList.toggle('active', s.id === id);
+  if (id === 'game') { UI.tab = UI.tab || 'info'; setSheet(UI.sheet && UI.sheetKeep ? UI.sheet : 'peek', true); }
 }
 
 function renderTitle() {
@@ -3060,7 +3761,7 @@ function renderTitle() {
 
 function startGame(legendId, numAI, level = UI.setupLevel, size = UI.setupSize, boss = false) {
   newGame(legendId, numAI, undefined, level, size, { boss, troy: loadProgress().bossWon });
-  UI.busy = false; UI.view = null; UI.ghost = false; UI.retreatPick = null; FX.last = null;
+  UI.busy = false; UI.view = null; UI.ghost = false; UI.retreatPick = null; UI.pending = null; FX.last = null; UI.gameNo = (UI.gameNo || 0) + 1;
   clearUndo();
   UI.tut = $('optTut').checked ? 'army' : null;
   if (UI.tut) { UI.selNode = null; UI.selArmy = null; }
@@ -3095,16 +3796,303 @@ function continueGame() {
   const sv = loadSave();
   if (!sv) { renderTitle(); return; }
   S = sv; S.phase = 'player'; S.current = 0;
-  UI.selNode = null; UI.selArmy = null; UI.busy = false; UI.tut = null; UI.view = null; UI.ghost = false; UI.retreatPick = null; FX.last = null;
+  UI.selNode = null; UI.selArmy = null; UI.busy = false; UI.tut = null; UI.view = null; UI.ghost = false; UI.retreatPick = null; UI.pending = null; FX.last = null; UI.gameNo = (UI.gameNo || 0) + 1;
   clearUndo();
   showScreen('game');
   render();
 }
 
+/* ---------- ⏱️ ศึกพร้อมกัน: หน้าตั้งค่า / วางแผน / นับเวลา / สรุปผล (ส่วน ค) ---------- */
+const WEGO_LEVEL_KEY = 'legendsWarlord.wegoLevel', WEGO_TIME_KEY = 'legendsWarlord.wegoTime', WEGO_INTRO_KEY = 'legendsWarlord.wegoIntro';
+const wegoTimeName = t => t ? `${t} วินาที` : 'ไม่จับเวลา';
+function wegoSetupHtml() {
+  const L = UI.setupLegend && LEGENDS.find(l => l.id === UI.setupLegend), sv = loadSave(WEGO_SAVE_KEY);
+  return `<h2>⏱️ ศึกพร้อมกัน</h2>
+    <p class="center muted">ทุกฝ่ายวางแผนพร้อมกันโดยไม่เห็นคำสั่งของกัน แล้วคำนวณผลพร้อมกัน · ไม่นับยศ/ปลดล็อก · ไม่มีปุ่มย้อน</p>
+    <p class="center">${L ? `${L.icon} <b>${esc(L.name)}</b>` : '⚠️ เลือกจอมทัพในหน้าแรกก่อน'} · ศัตรู ${UI.setupAI} ฝ่าย · แผนที่${MAP_SIZES[UI.setupSize].name} (${MAP_SIZES[UI.setupSize].turns} เทิร์น)</p>
+    <div class="setup-row"><span class="kanit">ระดับบอท:</span><div class="seg">${LEVELS.map(l => `<button data-wlvl="${l.id}" class="${UI.wegoLevel === l.id ? 'on' : ''}">${l.icon} ${l.name}</button>`).join('')}</div></div>
+    <div class="setup-row" style="margin-top:0"><span class="kanit">เวลาวางแผน:</span><div class="seg">${WEGO_TIMES.map(t => `<button data-wtime="${t}" class="${UI.wegoTime === t ? 'on' : ''}">${wegoTimeName(t)}</button>`).join('')}</div></div>
+    <div class="center" style="margin-top:12px"><button class="btn primary" data-act="wegostart" ${L ? '' : 'disabled'}>เริ่มศึกพร้อมกัน ⚔️</button>
+      ${sv ? ` <button class="btn green" data-act="wegocontinue">▶ เล่นต่อ (${esc(LEGENDS.find(l => l.id === sv.factions[0].legend).name)} · เทิร์น ${sv.turn}/${sv.maxTurns})</button>` : ''}
+      <button class="btn ghost" data-close>ปิด</button></div>`;
+}
+function wegoIntroHtml() {
+  return `<div class="story"><h2>⏱️ ศึกพร้อมกัน: หนึ่งเทิร์นมี 2 ช่วง</h2>
+    <p><b>1. 🧭 ช่วงวางแผน</b>${S.wego.time ? ` (${S.wego.time} วินาที)` : ''} — ทุกฝ่ายสั่งการพร้อมกัน ไม่เห็นคำสั่งของกัน<br>
+    • เกณฑ์ทหาร แต่งตั้งแม่ทัพ รวม/แบ่งทหาร มีผลทันที<br>
+    • แตะทัพ แล้วแตะปลายทาง = ลูกศรคำสั่ง (🟢 เดินในดินแดนเรา · 🔴 บุก) เลือกกลยุทธ์บุกในแผงข้อมูล · ทัพที่เดินได้ 2 ช่องวาดต่อได้อีกช่อง · แตะปลายลูกศรซ้ำเพื่อยกเลิก<br>
+    • ตั้งกลยุทธ์ตั้งรับและ “ถอนทัพอัตโนมัติถ้าเสียเปรียบมาก” ของแต่ละทัพ และกลยุทธ์ของกองรักษาการณ์ไว้ล่วงหน้า<br>
+    • กด ✅ ยืนยันคำสั่ง (หมดเวลา = ใช้คำสั่งเท่าที่ตั้งไว้)</p>
+    <p><b>2. ⚙️ ช่วงคำนวณผล</b> — ทุกทัพออกพร้อมกัน (ดินแดนที่ทัพออกไปเหลือแค่กองรักษาการณ์) → เดินในดินแดนตัวเองก่อน → บุกสวนกัน = ปะทะกลางทาง → การบุก (หลายฝ่ายบุกจุดเดียว ทัพที่มีทหารม้ามากกว่าได้บุกก่อน) แล้วดูภาพบนแผนที่และสรุปผล</p>
+    <p class="muted">${skill(0, 'foresight') ? '🪶 ขงเบ้ง: ช่วงวางแผนจะเห็นลูกศรคำสั่งของศัตรูที่เล็งดินแดนเรา พร้อมกลยุทธ์บุก · ' : ''}ไม่นับยศ/ปลดล็อก · ไม่มีปุ่มย้อน · เซฟแยกจากโหมดปกติ</p>
+    <div class="center"><button class="btn primary" data-close>เริ่มวางแผน 🧭</button></div></div>`;
+}
+function startWegoFromSetup() {
+  if (!UI.setupLegend) return;
+  closeDialog();
+  newGame(UI.setupLegend, UI.setupAI, undefined, UI.wegoLevel, UI.setupSize, { wego: true, time: UI.wegoTime, troy: loadProgress().bossWon });
+  enterWego();
+  let seen = false; try { seen = localStorage.getItem(WEGO_INTRO_KEY) === '1'; localStorage.setItem(WEGO_INTRO_KEY, '1'); } catch (e) { /* ignore */ }
+  if (!seen) openDialog(wegoIntroHtml());
+}
+function continueWego() {
+  const sv = loadSave(WEGO_SAVE_KEY);
+  if (!sv) return;
+  closeDialog();
+  S = sv; S.phase = 'player'; S.current = 0; S.wego.phase = 'plan';
+  enterWego();
+}
+function enterWego() {
+  UI.busy = false; UI.tut = null; UI.view = null; UI.ghost = false; UI.retreatPick = null; UI.pending = null; FX.last = null; UI.gameNo = (UI.gameNo || 0) + 1;
+  clearUndo();
+  UI.selNode = homeNode(0); UI.selArmy = leaderArmy(0) ? leaderArmy(0).id : null;
+  showScreen('game');
+  saveGame();
+  render();
+  startPlanTimer();
+}
+// นับเวลาถอยหลัง (หยุดนับระหว่างมีหน้าต่างเปิด) — หมดเวลา = ยืนยันคำสั่งเท่าที่ตั้งไว้ (ไม่มีผลต่อการคำนวณ)
+function startPlanTimer() {
+  if (UI.wTimerId) clearInterval(UI.wTimerId);
+  UI.wTimer = { left: (S.wego.time || 0) * 1000, last: performance.now(), on: S.wego.time > 0 };
+  UI.wTimerId = setInterval(planTick, 200);
+  planTick();
+}
+function planTick() {
+  if (!S || !isWego() || S.over || S.spectate) { clearInterval(UI.wTimerId); UI.wTimerId = null; return; }
+  const T = UI.wTimer, now = performance.now(), dt = now - T.last;
+  T.last = now;
+  const paused = UI.busy || S.wego.phase !== 'plan' || myOrders().ready || !$('game').classList.contains('active')
+    || !$('dialog').classList.contains('hidden') || !$('battle').classList.contains('hidden');
+  if (T.on && !paused) T.left -= dt;
+  const txt = wegoTimeText();
+  for (const el of document.querySelectorAll('.wg-time')) { el.textContent = txt.replace(' · ', '') || '∞'; el.classList.toggle('low', T.on && T.left <= 10000); }
+  const b = $('btnEnd');
+  if (S.wego.phase === 'plan' && !UI.busy && !myOrders().ready) b.textContent = `✅ ยืนยันคำสั่ง${txt}`;
+  if (T.on && T.left <= 0 && !paused) { T.on = false; log('⏱️ หมดเวลาวางแผน — ใช้คำสั่งเท่าที่ตั้งไว้'); uiWegoConfirm(); }
+}
+function wegoTimeText() {
+  const T = UI.wTimer;
+  if (!T || !T.on) return '';
+  const sec = Math.max(0, Math.ceil(T.left / 1000));
+  return ` · ${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`;
+}
+// ยืนยันคำสั่งของเรา — ครบทุกฝ่าย (บอทพร้อมตั้งแต่ต้นช่วง) = เริ่มคำนวณผลทันที
+async function uiWegoConfirm() {
+  if (!S || !isWego() || UI.busy || S.wego.phase !== 'plan' || S.over || S.spectate) return;
+  myOrders().ready = true;
+  if (S.factions.every(F => !F.alive || (S.wego.orders[F.id] && S.wego.orders[F.id].ready))) return uiWegoResolve();
+  render();
+}
+async function uiWegoResolve() {
+  UI.busy = true; UI.selArmy = null; UI.pending = null; UI.ghost = false;
+  FX.steps = []; FX.cur = null; FX.played = 0; FX.last = null; FX.rec = Ctrl.fx;
+  const keepView = UI.view, turn = S.turn;
+  Ctrl.render();
+  try {
+    const r = await wegoRound(S.wego.orders);
+    if (r === 'timeup') endByTurns();
+  } finally {
+    UI.busy = false;
+    FX.rec = false; FX.cur = null;
+    FX.last = FX.steps.length ? FX.steps : null; FX.steps = [];
+    UI.ghost = !!FX.last;
+    if (FX.panned) { UI.view = keepView; FX.panned = false; }
+    Ctrl.fxClear();
+  }
+  Ctrl.render();
+  if (S.over) { Ctrl.gameOver(); return; }
+  saveGame();
+  const lines = wegoSummary(FX.last);
+  UI.lastSummary = { turn, lines };
+  if (!Ctrl.auto) openDialog(`<h2>📜 ผลเทิร์น ${turn}</h2><ul class="outcome">${lines.map(x => `<li>${esc(x)}</li>`).join('')}</ul>
+    <div class="center"><button class="btn primary" data-close>🧭 วางแผนเทิร์น ${S.turn}</button></div>`);
+  startPlanTimer();
+}
+// สรุปเฉพาะเหตุการณ์ที่เกี่ยวกับเรา
+function wegoSummary(steps) {
+  const out = [], name = id => S.nodes[id].name, fought = new Set();
+  for (const st of steps || []) for (const e of st.ev) {
+    if (e.t === 'battle' && (e.atk === 0 || e.def === 0)) {
+      fought.add(e.node);
+      if (e.clash) out.push(`⚔️ ปะทะกลางทางกับ ${facName(e.atk === 0 ? e.def : e.atk)} (${name(e.mid[0])}–${name(e.mid[1])}) — ${(e.atk === 0) === e.win ? 'ชนะ' : 'แพ้ ถอยกลับ'} (เราเสีย ${e.atk === 0 ? e.lostA : e.lostD} นาย)`);
+      else if (e.atk === 0) out.push(`⚔️ เราบุก ${name(e.node)} (${facName(e.def)}) — ${e.win ? 'ยึดได้' : 'ถูกตีกลับ'} (เสีย ${e.lostA} นาย · ศัตรูเสีย ${e.lostD})`);
+      else out.push(`🛡️ ${facName(e.atk)} บุก ${name(e.node)} — ${e.win ? 'เสียดินแดนนี้' : 'รักษาไว้ได้'} (เราเสีย ${e.lostD} นาย · ศัตรูเสีย ${e.lostA})`);
+    } else if (e.t === 'own' && !fought.has(e.node) && (e.to === 0 || e.from === 0)) {
+      out.push(e.to === 0 ? `🚩 ยึด ${name(e.node)} ได้โดยไม่ต้องรบ` : `🏳️ เสีย ${name(e.node)} ให้ ${facName(e.to)}`);
+    } else if (e.t === 'retreat' && e.fac === 0) out.push(`🏃 ทัพของเราถอยจาก ${name(e.from)} ไป ${name(e.to)}`);
+    else if (e.t === 'legend' && e.fac === 0) out.push(`✨ ได้ ${WMAP[e.wid].name} มาเป็นแม่ทัพ`);
+  }
+  out.push(...UI.notices);
+  UI.notices = [];
+  return out.length ? out : ['เทิร์นนี้ไม่มีการรบหรือเหตุการณ์ที่เกี่ยวกับเรา'];
+}
+// แตะแผนที่ช่วงวางแผน: ทัพที่เลือก + วงเรืองแสง = เพิ่มช่องในคำสั่ง / แตะปลายลูกศรซ้ำ = ลบช่องสุดท้าย / อื่น ๆ = เลือกดินแดน/ทัพ
+function wegoTap(id) {
+  const O = myOrders(), sa = selArmy();
+  if (sa && !O.ready) {
+    const m = O.moves.find(x => x.army === sa.id);
+    if (m && m.path[m.path.length - 1] === id) {
+      m.path.pop();
+      if (!m.path.length) O.moves.splice(O.moves.indexOf(m), 1);
+      wegoPrune(0); UI.selNode = id; render(); return;
+    }
+    if (planTargets(0, sa, m ? m.path.length : 0, m).includes(id)) {
+      if (m) m.path.push(id); else O.moves.push({ army: sa.id, path: [id], strat: 'charge' });
+      wegoPrune(0); UI.selNode = id; UI.ghost = false; saveGame(); render(); return;
+    }
+  }
+  UI.selNode = id;
+  const a = armyAt(id);
+  UI.selArmy = a && a.fac === 0 ? a.id : null;
+  if (UI.selArmy != null) UI.ghost = false;
+  render();
+}
+const stratSeg = (attr, cur) => `<span class="wg-seg">${STRAT_KEYS.map(k => `<button ${attr}="${k}" class="${cur === k ? 'on' : ''}" title="${STRATEGIES[k].name}">${STRATEGIES[k].icon} ${STRATEGIES[k].name}</button>`).join('')}</span>`;
+function wegoArmyBox(a) {
+  const O = myOrders(), m = O.moves.find(x => x.army === a.id), D = defSetting(O, a.id);
+  let h = `<div class="wg-box"><div><b>${a.gen.icon} ${esc(a.gen.name)}</b> · ${sumU(a.units)} นาย · อยู่ที่ ${esc(S.nodes[a.node].name)}</div>`;
+  if (m) {
+    const legs = m.path.map(n => `${S.nodes[n].owner === 0 ? '🟢 เดิน' : '🔴 บุก'} ${esc(S.nodes[n].name)}`).join(' → ');
+    h += `<div>🧭 คำสั่ง: ${legs}</div>`;
+    const ai = m.path.findIndex(n => S.nodes[n].owner !== 0);
+    if (ai >= 0) {
+      const tgt = m.path[ai];
+      const est = ai === 0 ? ` · ประเมินตอนนี้: <b>${sumU(defSide(tgt).units) ? estimateText(estimateRatio(a, tgt)) : 'ไม่มีทหารป้องกัน'}</b>` : '';
+      h += `<div class="wg-row">กลยุทธ์บุก: ${stratSeg('data-wstrat', m.strat)}</div><div class="muted">ศัตรูไม่เห็นคำสั่งนี้${est}${ai > 0 ? ' · ช่องที่ 2 บุกได้เมื่อช่องแรกไปถึงโดยไม่ต้องรบ' : ''}${ai === 0 && m.path.length > 1 && wegoRush(a) ? ' · 🐎 ชนะศึกช่องแรกแล้วบุกช่องที่ 2 ต่อ (ทหารม้าต้องยังเหลือครึ่งหนึ่ง)' : ''}</div>`;
+    }
+    h += `<div class="wg-row"><button class="btn" data-wact="cancel">✖️ ยกเลิกคำสั่ง</button><span class="muted">หรือแตะปลายลูกศรซ้ำเพื่อลบช่องสุดท้าย${m.path.length < maxMoves(a) ? ' · แตะวงต่อเพื่อเดินช่องที่ 2' : ''}</span></div>`;
+  } else if (sumU(a.units) > 0) h += `<div class="muted">ยังไม่มีคำสั่ง (อยู่กับที่) — แตะวงที่เรืองแสงบนแผนที่ 🟢 เดิน / 🔴 บุก${maxMoves(a) > 1 ? ' · ทัพนี้เดินได้ 2 ช่อง' : ''}</div>`;
+  else h += `<div class="muted">ยังไม่มีทหาร — เกณฑ์ทหารก่อนจึงสั่งเดินได้</div>`;
+  const seen = skill(0, 'foresight') ? wegoIntelStrat(0, S.wego.orders)[a.node] : null;
+  if (seen) h += `<div class="reveal">🪶 ศัตรูจะบุกที่นี่ด้วย ${STRATEGIES[seen].icon} ${STRATEGIES[seen].name} — ตั้งรับด้วย ${STRATEGIES[counterStrat(seen)].icon} ${STRATEGIES[counterStrat(seen)].name} แก้ทาง</div>`;
+  h += `<div class="wg-row">🛡️ ถ้าถูกบุก: ${stratSeg('data-wdef', D.strat)}</div>
+    <label class="opt"><input type="checkbox" data-wret ${D.retreat ? 'checked' : ''} ${wwk(a.gen).noRetreat ? 'disabled' : ''}> 🏃 ถอนทัพอัตโนมัติถ้าเสียเปรียบมาก (ถอยเข้าดินแดนเราที่ปลอดภัยที่สุด)</label>
+    ${m ? '<div class="muted">ทัพที่มีคำสั่งเดินจะออกจากจุดเดิม ดินแดนเดิมเหลือแค่กองรักษาการณ์ป้องกัน</div>' : ''}</div>`;
+  return h;
+}
+function wegoInfoClick(e) {
+  if (!wegoPlanning() || myOrders().ready) return false;
+  const sa = selArmy(), O = myOrders();
+  const ck = e.target.closest('[data-wret]');
+  if (ck && sa) { O.def[sa.id] = { ...defSetting(O, sa.id), retreat: ck.checked }; saveGame(); render(); return true; }
+  const b = e.target.closest('button');
+  if (!b || !sa) return false;
+  const m = O.moves.find(x => x.army === sa.id);
+  if (b.dataset.wstrat && m) { m.strat = b.dataset.wstrat; saveGame(); render(); return true; }
+  if (b.dataset.wdef) { O.def[sa.id] = { ...defSetting(O, sa.id), strat: b.dataset.wdef }; saveGame(); render(); return true; }
+  if (b.dataset.wact === 'cancel' && m) { O.moves.splice(O.moves.indexOf(m), 1); wegoPrune(0); saveGame(); render(); return true; }
+  return false;
+}
+// การ์ดแผนเทิร์นนี้: เวลา · สถานะยืนยันของทุกฝ่าย · กลยุทธ์กองรักษาการณ์ · คำสั่งของทุกทัพ · ปุ่มยืนยัน
+function renderWego() {
+  const card = $('wegoCard');
+  card.classList.toggle('hidden', !isWego() || !!S.over || !!S.spectate);
+  if (!isWego() || S.over || S.spectate) return;
+  if (S.wego.phase !== 'plan' || S.phase !== 'player') { card.innerHTML = `<h3>⚙️ กำลังคำนวณผลเทิร์น ${S.turn}…</h3><div class="muted">ดูภาพบนแผนที่ · ปรับความเร็วได้ที่ปุ่ม ▶️ ด้านบน</div>`; return; }
+  const O = myOrders(), sa = selArmy(), mine = S.armies.filter(a => a.fac === 0);
+  const desc = a => {
+    const m = O.moves.find(x => x.army === a.id), D = defSetting(O, a.id);
+    if (m) return m.path.map(n => `${S.nodes[n].owner === 0 ? 'เดิน' : `บุก${STRATEGIES[m.strat].icon}`} ${esc(S.nodes[n].name)}`).join(' → ');
+    return `อยู่กับที่ · ตั้งรับ ${STRATEGIES[D.strat].icon}${D.retreat ? ' · ถอนอัตโนมัติ' : ''}`;
+  };
+  let intel = '';
+  if (skill(0, 'foresight')) {
+    const inc = wegoIntel(0, S.wego.orders), ist = wegoIntelStrat(0, S.wego.orders), ks = Object.keys(inc);
+    intel = `<div class="reveal" style="margin:6px 0">🪶 หยั่งรู้ฟ้าดิน: ${ks.length ? `ศัตรูเล็งดินแดนเรา ${ks.length} แห่ง (ลูกศรประ) — ${ks.map(n => `${esc(S.nodes[n].name)} ~${inc[n]} นาย ${STRATEGIES[ist[n]].icon}${STRATEGIES[ist[n]].name} (แก้ด้วย ${STRATEGIES[counterStrat(ist[n])].icon})`).join(', ')}` : 'ยังไม่เห็นศัตรูเล็งดินแดนเรา'}</div>`;
+  }
+  card.innerHTML = `<h3><span>⏱️ วางแผนเทิร์น ${S.turn}/${maxTurns()}</span><span class="wg-time">${wegoTimeText().replace(' · ', '') || '∞'}</span></h3>
+    <div class="wg-status">${S.factions.filter(F => F.alive).map(F => `<span>${facIcon(F.id)} ${F.human ? 'เรา' : esc(facName(F.id))} ${S.wego.orders[F.id] && S.wego.orders[F.id].ready ? '✅' : '⏳'}</span>`).join('')}</div>
+    ${intel}
+    <div class="wg-row">🏯 กองรักษาการณ์ทุกดินแดนตั้งรับด้วย: ${stratSeg('data-wgar', O.garrison)}</div>
+    <div class="wg-list">${mine.map(a => `<button class="wg-item ${sa && sa.id === a.id ? 'sel' : ''}" data-wsel="${a.id}"><span>${a.gen.icon}</span><span><b>${esc(a.gen.name)}</b> (${sumU(a.units)}) — ${desc(a)}</span></button>`).join('') || '<div class="hint">ไม่มีทัพ</div>'}</div>
+    <button class="btn primary" style="width:100%" data-wact="confirm" ${O.ready ? 'disabled' : ''}>${O.ready ? '✅ ยืนยันแล้ว รอฝ่ายอื่น…' : '✅ ยืนยันคำสั่ง'}</button>`;
+}
+function onWegoCardClick(e) {
+  const b = e.target.closest('button');
+  if (!b || !wegoPlanning()) return;
+  const O = myOrders();
+  if (b.dataset.wsel) { const a = armyById(+b.dataset.wsel); if (a) { UI.selArmy = a.id; UI.selNode = a.node; UI.ghost = false; render(); } return; }
+  if (O.ready) return;
+  if (b.dataset.wgar) { O.garrison = b.dataset.wgar; saveGame(); render(); return; }
+  if (b.dataset.wact === 'confirm') onEndTurnClick();
+}
+
+/* ---------- จบเทิร์นอัตโนมัติ (ทุกโหมด): ทุกทัพเดินไม่ได้/มีคำสั่งแล้ว และเงินไม่พอเกณฑ์ทหาร → นับ 3 วินาที ---------- */
+const AUTO_END_KEY = 'legendsWarlord.autoEnd';
+const AUTO = { off: false, t0: null, skip: null, ms: 3000 };
+function autoEndOn() { try { return localStorage.getItem(AUTO_END_KEY) !== '0'; } catch (e) { return true; } }
+function setAutoEndOn(on) { try { if (on) localStorage.removeItem(AUTO_END_KEY); else localStorage.setItem(AUTO_END_KEY, '0'); } catch (e) { /* ignore */ } }
+function autoEndCond() {
+  if (!S || S.over || S.spectate || UI.busy || UI.tut || UI.retreatPick || S.phase !== 'player' || !$('game').classList.contains('active')) return false;
+  if (!$('dialog').classList.contains('hidden') || !$('battle').classList.contains('hidden')) return false;
+  if (fac(0).gold >= Math.min(...UNIT_TYPES.map(t => UNITS[t].cost))) return false;
+  const mine = S.armies.filter(a => a.fac === 0);
+  if (isWego()) {
+    if (S.wego.phase !== 'plan' || myOrders().ready) return false;
+    return mine.every(a => myOrders().moves.some(m => m.army === a.id) || !planTargets(0, a, 0, null).length);
+  }
+  return mine.every(a => !moveTargets(a).length);
+}
+const autoKey = () => `${UI.gameNo || 0}:${S ? S.turn : 0}`;
+function autoEndTick() {
+  const bar = $('autoBar');
+  const go = !AUTO.off && autoEndOn() && autoEndCond() && AUTO.skip !== autoKey();
+  if (!go) { if (AUTO.t0 != null) { AUTO.t0 = null; bar.classList.add('hidden'); } return; }
+  if (AUTO.t0 == null) AUTO.t0 = performance.now();
+  const left = AUTO.ms - (performance.now() - AUTO.t0);
+  bar.innerHTML = `⏩ ทัพสั่งครบ เงินไม่พอเกณฑ์ — ${isWego() ? 'จะยืนยันคำสั่ง' : 'จะจบเทิร์น'}ใน ${Math.max(1, Math.ceil(left / 1000))} วินาที <button data-auto="no">ยังก่อน</button>`;
+  bar.classList.remove('hidden');
+  if (left <= 0) {
+    AUTO.t0 = null; bar.classList.add('hidden');
+    if (isWego()) uiWegoConfirm(); else endPlayerTurn();
+  }
+}
+// "ยังก่อน": ไม่ถามซ้ำในเทิร์นนั้น
+function autoEndSkip() { AUTO.skip = autoKey(); AUTO.t0 = null; $('autoBar').classList.add('hidden'); }
+
+/* ---------- ยืนยันก่อนเดินทัพ: แตะครั้งแรก = ดูเส้นทาง/ผลประเมิน, แตะซ้ำหรือกดยืนยัน = เดินจริง ---------- */
+const CONFIRM_KEY = 'legendsWarlord.confirmMove';
+function confirmOn() { try { return localStorage.getItem(CONFIRM_KEY) !== '0'; } catch (e) { return true; } }
+function setConfirmOn(on) { try { if (on) localStorage.removeItem(CONFIRM_KEY); else localStorage.setItem(CONFIRM_KEY, '0'); } catch (e) { /* ignore */ } }
+// เป้าที่เลือกไว้แต่ยังไม่ยืนยัน (ใช้ได้เฉพาะตอนทัพนั้นยังเลือกอยู่และยังเดินไปได้)
+function pendingMove() {
+  const P = UI.pending;
+  if (!P || !S || S.over || S.spectate || S.phase !== 'player' || UI.busy) return null;
+  const sa = selArmy();
+  return sa && sa.id === P.army && moveTargets(sa).includes(P.to) ? P : null;
+}
+
 async function onNodeClick(id) {
-  if (!S || S.over) return;
+  if (!S) return;
+  sheetFocus(id);
+  if (S.over || S.spectate) { UI.selNode = id; UI.selArmy = null; UI.pending = null; render(); return; } // จบเกม/โหมดผู้ชม: ดูข้อมูลได้ สั่งการไม่ได้
+  if (isWego()) { if (wegoPlanning()) wegoTap(id); else { UI.selNode = id; render(); } return; }
   const sa = selArmy();
   if (S.phase === 'player' && !UI.busy && sa && moveTargets(sa).includes(id)) {
+    const P = UI.pending;
+    if (confirmOn() && !(P && P.army === sa.id && P.to === id)) {
+      UI.pending = { army: sa.id, to: id }; UI.selNode = id; UI.ghost = false;
+      if (UI.tut === 'target') UI.tut = 'confirm';
+      render();
+      return;
+    }
+    return commitMove(sa, id);
+  }
+  UI.pending = null;
+  UI.selNode = id;
+  const a = armyAt(id);
+  UI.selArmy = a && a.fac === 0 ? a.id : null;
+  if (UI.selArmy != null && S.phase === 'player') UI.ghost = false; // เริ่มสั่งการ: ภาพตาศัตรูจาง ๆ หายไป
+  if (UI.tut === 'army' && UI.selArmy != null && canMove(a)) UI.tut = 'target';
+  else if ((UI.tut === 'target' || UI.tut === 'confirm') && UI.selArmy == null) UI.tut = 'army';
+  else if (UI.tut === 'confirm') UI.tut = 'target';
+  render();
+}
+async function commitMove(sa, id) {
+  if (UI.busy || !S || S.phase !== 'player' || S.over) return;
+  UI.pending = null;
+  {
     UI.busy = true; UI.ghost = false;
     pushUndo();
     try {
@@ -3115,26 +4103,20 @@ async function onNodeClick(id) {
         const alive = S.armies.includes(sa);
         UI.selNode = alive ? sa.node : id;
         UI.selArmy = alive && canMove(sa) ? sa.id : null;
-        if (UI.tut === 'target' || UI.tut === 'strat' || UI.tut === 'result') UI.tut = UI.selArmy != null ? 'target' : 'end';
-      } else if (UI.tut === 'strat') UI.tut = 'target';
+        if (['target', 'confirm', 'strat', 'result'].includes(UI.tut)) UI.tut = UI.selArmy != null ? 'target' : 'end';
+      } else if (UI.tut === 'strat' || UI.tut === 'confirm') UI.tut = 'target';
     } finally { UI.busy = false; }
     saveGame();
     render();
     if (S.over) Ctrl.gameOver();
-    return;
   }
-  UI.selNode = id;
-  const a = armyAt(id);
-  UI.selArmy = a && a.fac === 0 ? a.id : null;
-  if (UI.selArmy != null && S.phase === 'player') UI.ghost = false; // เริ่มสั่งการ: ภาพตาศัตรูจาง ๆ หายไป
-  if (UI.tut === 'army' && UI.selArmy != null && canMove(a)) UI.tut = 'target';
-  else if (UI.tut === 'target' && UI.selArmy == null) UI.tut = 'army';
-  render();
 }
 
 function onInfoClick(e) {
+  if (wegoInfoClick(e)) return;
   const b = e.target.closest('button');
-  if (!b || b.disabled || UI.busy || S.phase !== 'player' || S.over) return;
+  if (!b || b.disabled || UI.busy || S.phase !== 'player' || S.over || S.spectate) return;
+  if (b.dataset.act === 'confirmmove') { const P = pendingMove(); if (P) UI.moveTask = commitMove(selArmy(), P.to); return; }
   const id = UI.selNode, a = armyAt(id);
   pushUndo();
   let changed = false;
@@ -3263,7 +4245,7 @@ function uiAskStrategy(ctx, role) {
     };
     show(chooseHtml);
     $('battle').classList.remove('hidden');
-    if (UI.tut === 'target') UI.tut = 'strat';
+    if (UI.tut === 'target' || UI.tut === 'confirm') UI.tut = 'strat';
     coachUpdate();
     card.onclick = e => {
       const b = e.target.closest('button');
@@ -3406,6 +4388,10 @@ function helpHtml() {
     <h3>ในแต่ละเทิร์น</h3><ul><li>รับเงิน 💰 จากดินแดนที่ครอง (เมืองหลวง +${CAPITAL_BONUS})</li>
     <li>เกณฑ์ทหารที่เมืองหลวง หรือดินแดนที่มีทัพของเราอยู่ (ครั้งละ ${PACK} นาย)</li>
     <li>แต่ละทัพเดินไปดินแดนติดกันได้ 1 ช่อง — ทุกทัพต้องมีแม่ทัพ (แต่งตั้งเพิ่มที่เมืองหลวงได้ สูงสุด ${MAX_ARMIES} ทัพ)</li>
+    <li>ยืนยันก่อนเดินทัพ (เปิด/ปิดในเมนู ☰): แตะเป้าครั้งแรก = ดูเส้นทางและผลประเมิน แตะซ้ำหรือกด “ยืนยันบุก/ยืนยันเดินทัพ” = เดินจริง แตะดินแดนอื่น = เปลี่ยนเป้า</li>
+    <li>⏩ จบเทิร์นอัตโนมัติ (เปิด/ปิดในเมนู ☰): ทุกทัพเดินไม่ได้แล้ว (ศึกพร้อมกัน: มีคำสั่งครบ) และเงินไม่พอเกณฑ์ทหาร → นับ 3 วินาทีแล้วจบเทิร์น/ยืนยันคำสั่งให้ กด “ยังก่อน” เพื่อไม่ถามซ้ำในเทิร์นนั้น</li>
+    <li>📱 มือถือ: แผนที่เต็มจอ แผงข้อมูลเป็นแผ่นเลื่อนจากล่าง (ลาก/แตะที่จับ: พับ · ครึ่งจอ · เต็มจอ — แนวนอนครึ่งจอเป็นแผงด้านขวา) มีแท็บ ข้อมูล/ทัพของเรา/ตำนาน/บันทึกศึก · ปุ่มจบเทิร์นลอยมุมล่างขวา</li>
+    <li>เกมจบแล้วกด “ดูแผนที่” ได้ แถบด้านบนมีปุ่มกลับหน้าหลัก/ดูสรุปผล · แพ้ก่อนจบเกมกด “👁️ ดูบอทสู้กันต่อ” ได้ (หยุดชั่วคราวได้ ไม่นับผล ไม่บันทึกเซฟ)</li>
     <li>เส้น 🏔️ ประคือเทือกเขาปิดกั้น ผ่านไม่ได้ (ยกเว้นฮันนิบาล)</li>
     <li>ตัวเลขในกรอบมุมขวาบนของดินแดนคือกองรักษาการณ์ (อยู่กับที่ ช่วยตั้งรับ)</li>
     <li>ฝ่ายรับในเมืองหลวงของตัวเองได้กำแพงเมือง +${Math.round((CAPITAL_WALL - 1) * 100)}%</li></ul>
@@ -3416,6 +4402,12 @@ function helpHtml() {
     <li>เลือกปลายทางบนแผนที่: วงเรืองแสง + ลูกศรเขียว = ถอยเข้าดินแดนเรา, ส้ม = ตีฝ่าวงล้อม พร้อมป้ายประเมิน (🛡️/💪/⚖️/⚠️) แตะเพื่อเลือกแล้วกดยืนยัน</li>
     <li>🛡️ ถอยเข้าดินแดนเราที่ว่าง: จบแค่นั้น</li>
     <li>⚔️ ตีฝ่าวงล้อมเข้าดินแดนกลาง/ศัตรู: รบต่อทันที ทัพล้า -20% ชนะ = ยึด, แพ้ = ทัพแตกทั้งหมด</li></ul>
+    <h3>⏱️ ศึกพร้อมกัน (ปุ่มแยกในหน้าแรก)</h3><ul><li>หนึ่งเทิร์นมี 2 ช่วง: 🧭 วางแผน (จับเวลา 30/60/90 วินาที หรือไม่จับเวลา) ทุกฝ่ายสั่งการพร้อมกันโดยไม่เห็นคำสั่งของกัน → ⚙️ คำนวณผลพร้อมกัน</li>
+    <li>เกณฑ์ทหาร/แต่งตั้งแม่ทัพ/รวม-แบ่งทหาร มีผลทันที · แตะทัพแล้วแตะปลายทาง = ลูกศรคำสั่ง (🟢 เดิน 🔴 บุก) เลือกกลยุทธ์บุก · แตะปลายลูกศรซ้ำ = ยกเลิก · ห้ามสองทัพของเราไปดินแดนเดียวกัน</li>
+    <li>ตั้งล่วงหน้า: กลยุทธ์ตั้งรับของแต่ละทัพ + ถอนทัพอัตโนมัติถ้าเสียเปรียบมาก (ถอยเข้าดินแดนเราที่ปลอดภัยที่สุด) และกลยุทธ์ของกองรักษาการณ์</li>
+    <li>ลำดับคำนวณ: ทุกทัพออกพร้อมกัน (ดินแดนที่ทัพออกไปเหลือแค่กองรักษาการณ์) → เดินในดินแดนตัวเอง (เป็นขบวนได้) → บุกสวนกัน = ปะทะกลางทาง (ไม่มีภูมิประเทศ/กำแพง ผู้แพ้ถอยกลับ ผู้ชนะบุกต่อ) → การบุก (หลายฝ่ายบุกจุดเดียว ทหารม้าสัดส่วนมากบุกก่อน ผู้ยึดใหม่ตั้งรับด้วยกลยุทธ์ค่าเริ่มต้นของฝ่าย) → ทัพที่บุกไม่สำเร็จกลับจุดเดิม (จุดเดิมเสียไปแล้ว = ทัพแตก)</li>
+    <li>🪶 ขงเบ้งในโหมดนี้: เห็นลูกศรคำสั่งของศัตรูที่เล็งดินแดนเรา พร้อมกลยุทธ์บุก (จุดอ่อนตอนบุกยังอยู่) · 🐎 เจงกิสข่าน: ทัพม้าชนะศึกช่องแรกแล้วบุกช่องที่ 2 ต่อได้ · ⚜️ ธงแห่งศรัทธาของโจน: ไม่นับจากทัพที่กำลังเดินทาง</li>
+    <li>ไม่นับยศ/ปลดล็อก · ไม่มีปุ่มย้อน · เซฟแยก</li></ul>
     <h3>ดูตาศัตรูบนแผนที่</h3><ul><li>ระหว่างตาศัตรู: ลูกศรสีของฝ่ายนั้นวิ่งไปยังจุดที่เดินทัพ การรบแสดง 💥 และทหารที่เสียลอยขึ้น ดินแดนที่เปลี่ยนเจ้าของกะพริบ (รวมการรบระหว่าง AI ด้วยกัน)</li>
     <li>ถึงตาเรา: ลูกศรจาง ๆ ของรอบที่แล้วค้างไว้จนกว่าจะเริ่มสั่งการ — ⚔️ เขียว = บุกแล้วยึดได้ · ⚔️ แดง = ถูกตีกลับ · 🏃 ถอนทัพ · +N เกณฑ์ทหาร · 🎖️ แต่งตั้งแม่ทัพ · ✨ ได้ตำนาน</li>
     <li>🔁 ดูตาศัตรูอีกครั้ง · ปุ่มความเร็ว ▶️ ปกติ / ⏩ เร็ว / ⏭️ ข้าม (เกมจำค่าไว้)</li></ul>
@@ -3455,7 +4447,7 @@ function uiGameOver() {
     : o.reason === 'landless' ? `ไร้แผ่นดินครบ ${HOMELESS_TURNS} เทิร์นโดยไม่ได้เมืองหลวงใหม่`
     : o.win ? `ครบ ${maxTurns()} เทิร์น — เราครองดินแดนมากที่สุด` : `ครบ ${maxTurns()} เทิร์น — มีฝ่ายที่ครองดินแดนมากกว่าเรา`;
   let unlockMsg = '';
-  if (o.win && !saveDisabled && !S.progressDone) {
+  if (o.win && !saveDisabled && !S.progressDone && !isWego()) { // ศึกพร้อมกันไม่นับยศ/ปลดล็อก
     S.progressDone = true;
     const hadBoss = loadProgress().boss;
     const newly = isBoss() ? null : recordWin(S.level);
@@ -3463,12 +4455,44 @@ function uiGameOver() {
     if (!hadBoss && loadProgress().boss) unlockMsg += `<p class="center" style="font-weight:600;color:#9b1c1c">🩸 ปลดล็อกโหมด “ศึกชิงอิสรภาพ” แล้ว! (ปุ่มแยกในหน้าแรก)</p>`;
   }
   const rank = o.counts ? S.factions.filter(f => f.alive).map(f => `${facIcon(f.id)} ${facName(f.id)}: ${o.counts[f.id]} ดินแดน`).join('<br>') : '';
+  // แพ้ก่อนจบเกม: ดูบอทสู้กันต่อได้ (โหมดผู้ชม)
+  const watch = !o.win && !fac(0).alive && !S.specResult && !specDone() && S.turn <= maxTurns();
   openDialog(`<h2 class="res-title ${o.win ? 'win' : 'lose'}">${o.win ? '🏆 มีชัยในศึก!' : '💀 พ่ายแพ้'}</h2>
     <p class="center">${reason}</p>${unlockMsg}
-    <div class="end-stats"><div>ระดับ: <b>${isBoss() ? '🩸 ศึกชิงอิสรภาพ' : `${LEVELS[S.level].icon} ${LEVELS[S.level].name}`}</b></div><div>ย้อนไป: <b>${LEVELS[S.level].undo < 0 ? '—' : LEVELS[S.level].undo - S.undoLeft} ครั้ง</b></div><div>เทิร์น: <b>${S.turn}</b></div><div>ดินแดนของเรา: <b>${myNodes}</b></div>
+    <div class="end-stats"><div>ระดับ: <b>${isBoss() ? '🩸 ศึกชิงอิสรภาพ' : isWego() ? `⏱️ ศึกพร้อมกัน · บอท${LEVELS[S.level].name}` : `${LEVELS[S.level].icon} ${LEVELS[S.level].name}`}</b></div><div>ย้อนไป: <b>${LEVELS[S.level].undo < 0 || isWego() ? '—' : LEVELS[S.level].undo - S.undoLeft} ครั้ง</b></div><div>เทิร์น: <b>${o.atTurn || S.turn}</b></div><div>ดินแดนของเรา: <b>${myNodes}</b></div>
     <div>การรบ: <b>${S.stats.battles}</b></div><div>ชนะ: <b>${S.stats.won}</b></div></div>
     ${rank ? `<p class="center muted">${rank}</p>` : ''}
+    ${watch ? `<div class="center" style="margin-bottom:10px"><button class="btn green" data-act="spectate">👁️ ดูบอทสู้กันต่อ</button><div class="muted">เล่นต่อจนเหลือฝ่ายเดียวหรือครบเทิร์น · ไม่นับผลชนะ/ปลดล็อก ไม่บันทึกเซฟ</div></div>` : ''}
+    ${S.specResult ? `<div class="center" style="margin-bottom:10px"><button class="btn" data-act="specresult">🏁 อันดับสุดท้าย (โหมดผู้ชม)</button></div>` : ''}
     <div class="center"><button class="btn primary" data-act="title">เล่นอีกครั้ง</button> <button class="btn ghost" data-close>ดูแผนที่</button></div>`);
+}
+function specResultHtml() {
+  const R = S.specResult;
+  const why = R.reason === 'last' ? 'เหลือฝ่ายเดียว' : R.reason === 'still' ? 'ไม่มีฝ่ายไหนรบกันได้อีก' : `ครบ ${maxTurns()} เทิร์น`;
+  return `<h2>🏁 อันดับสุดท้าย</h2><p class="center">${why} (เทิร์น ${R.turn}) · โหมดผู้ชม ไม่นับผลชนะ/ปลดล็อก</p>
+    <ol class="rank">${R.rank.map(r => `<li class="${r.id === 0 ? 'me' : ''}">${facIcon(r.id)} ${esc(facName(r.id))}${r.id === 0 ? ' (เรา)' : ''} — ${r.alive ? `${r.nodes} ดินแดน · ทหาร ${r.troops} นาย` : r.freed ? `ถูกปลดปล่อยเทิร์น ${r.out}` : `พ่ายแพ้เทิร์น ${r.out}`}</li>`).join('')}</ol>
+    <div class="center"><button class="btn primary" data-act="title">กลับหน้าหลัก</button> <button class="btn ghost" data-close>ดูแผนที่</button></div>`;
+}
+async function startSpectate() {
+  if (!S || !S.over || S.spectate || UI.spec) return;
+  UI.spec = { paused: false, quit: false, onExit: null };
+  closeDialog();
+  render();
+  let res = null;
+  try { res = await spectateRun(); }
+  finally {
+    const exit = UI.spec.onExit;
+    UI.spec = null;
+    if (exit) exit();
+    else { render(); if (res) openDialog(specResultHtml()); }
+  }
+}
+const toTitle = () => { closeDialog(); $('battle').classList.add('hidden'); showScreen('title'); renderTitle(); };
+// กลับหน้าหลัก (ระหว่างโหมดผู้ชม: รอให้ตาที่ค้างจบก่อน ไม่ให้ซ้อนกับเกมใหม่)
+function leaveGame() {
+  closeDialog();
+  if (UI.spec) { UI.spec.quit = true; UI.spec.paused = false; UI.spec.onExit = toTitle; return; }
+  toTitle();
 }
 
 // เตือนก่อนจบเทิร์น ถ้ายังมีทัพที่เดินได้หรือเงินพอเกณฑ์ทหาร
@@ -3481,8 +4505,10 @@ function setEndWarnOff(off) {
 function endTurnWarnings() {
   const w = [];
   // ทัพที่ประจำอยู่ในเมืองหลวงถือว่าเฝ้าเมือง ไม่นับว่า "ยังเดินได้"
-  const movable = S.armies.filter(a => a.fac === 0 && a.node !== fac(0).capital && moveTargets(a).length > 0);
-  if (movable.length) w.push(`ยังมีทัพที่เดินได้ ${movable.length} ทัพ: ${movable.map(a => `${a.gen.icon} ${esc(a.gen.name)}`).join(', ')}`);
+  const movable = isWego()
+    ? S.armies.filter(a => a.fac === 0 && a.node !== fac(0).capital && !myOrders().moves.some(m => m.army === a.id) && planTargets(0, a, 0, null).length > 0)
+    : S.armies.filter(a => a.fac === 0 && a.node !== fac(0).capital && moveTargets(a).length > 0);
+  if (movable.length) w.push(`${isWego() ? 'ยังมีทัพที่ไม่มีคำสั่ง' : 'ยังมีทัพที่เดินได้'} ${movable.length} ทัพ: ${movable.map(a => `${a.gen.icon} ${esc(a.gen.name)}`).join(', ')}`);
   const g = fac(0).gold, minCost = Math.min(...UNIT_TYPES.map(t => UNITS[t].cost));
   if (g >= END_WARN_GOLD) {
     const hire = fac(0).capital != null && !hireBlock(0, fac(0).capital) ? ' หรือแต่งตั้งแม่ทัพใหม่' : '';
@@ -3492,6 +4518,15 @@ function endTurnWarnings() {
 }
 function onEndTurnClick() {
   if (!S || S.phase !== 'player' || UI.busy || S.over) return;
+  if (isWego()) {
+    if (S.wego.phase !== 'plan' || myOrders().ready) return;
+    const ww = endWarnOff() ? [] : endTurnWarnings();
+    if (!ww.length) { uiWegoConfirm(); return; }
+    openDialog(`<h2>⚠️ ยืนยันคำสั่งเลยไหม?</h2><ul class="outcome">${ww.map(x => `<li>${x}</li>`).join('')}</ul>
+      <label class="opt" style="justify-content:center;margin-bottom:10px"><input type="checkbox" id="optNoEndWarn"> ไม่ต้องเตือนอีก</label>
+      <div class="center"><button class="btn" data-act="back">↩️ กลับไปวางแผน</button> <button class="btn primary" data-act="wegoconfirm">✅ ยืนยันคำสั่งเลย</button></div>`);
+    return;
+  }
   const w = endWarnOff() ? [] : endTurnWarnings();
   if (!w.length) { endPlayerTurn(); return; }
   if (UI.tut) finishTutorial();
@@ -3505,6 +4540,8 @@ function menuHtml() {
   return `<h2>☰ เมนู</h2><p class="center muted">เกมบันทึกอัตโนมัติทุกครั้งที่สั่งการ</p>
     <div class="act-col"><button class="btn" data-act="title">🏠 กลับหน้าหลัก (เล่นต่อภายหลังได้)</button>
     <button class="btn" data-act="endwarn">${endWarnOff() ? '🔔 เปิดคำเตือนก่อนจบเทิร์น (ตอนนี้ปิดอยู่)' : '🔕 ปิดคำเตือนก่อนจบเทิร์น (ตอนนี้เปิดอยู่)'}</button>
+    <button class="btn" data-act="autoendtoggle">${autoEndOn() ? '⏩ จบเทิร์นอัตโนมัติ: เปิดอยู่ (แตะเพื่อปิด)' : '⏩ จบเทิร์นอัตโนมัติ: ปิดอยู่ (แตะเพื่อเปิด)'}</button>
+    <button class="btn" data-act="confirmtoggle">${confirmOn() ? '🧭 ยืนยันก่อนเดินทัพ: เปิดอยู่ (แตะเพื่อปิด — แตะครั้งเดียวเดินเลย)' : '🧭 ยืนยันก่อนเดินทัพ: ปิดอยู่ (แตะเพื่อเปิด)'}</button>
     <button class="btn" data-act="restart">🔄 ยอมแพ้และเริ่มใหม่</button>
     <button class="btn primary" data-close>ปิด</button></div>`;
 }
@@ -3522,6 +4559,7 @@ function bindUI() {
     renderTitle();
   });
   bindMapGestures();
+  bindSheet();
   $('aiSeg').addEventListener('click', e => {
     const b = e.target.closest('[data-ai]');
     if (b) { UI.setupAI = +b.dataset.ai; renderTitle(); }
@@ -3546,6 +4584,16 @@ function bindUI() {
     if (g) onNodeClick(+g.dataset.node);
   });
   $('info').addEventListener('click', onInfoClick);
+  $('wegoCard').addEventListener('click', onWegoCardClick);
+  $('btnWego').addEventListener('click', () => openDialog(wegoSetupHtml()));
+  $('autoBar').addEventListener('click', e => { if (e.target.closest('[data-auto="no"]')) autoEndSkip(); });
+  $('overBar').addEventListener('click', e => {
+    const b = e.target.closest('[data-ob]');
+    if (!b || !S) return;
+    if (b.dataset.ob === 'title') leaveGame();
+    else if (b.dataset.ob === 'summary') { if (S.over) uiGameOver(); }
+    else if (b.dataset.ob === 'pause' && UI.spec) { UI.spec.paused = !UI.spec.paused; renderTop(); }
+  });
   $('btnReplay').addEventListener('click', replayRound);
   $('btnSpeed').addEventListener('click', () => { const ks = Object.keys(AI_SPEEDS); setAiSpeed(ks[(ks.indexOf(UI.aiSpeed) + 1) % ks.length]); });
   $('coach').addEventListener('click', e => { if (e.target.closest('[data-tut]')) finishTutorial(); });
@@ -3565,6 +4613,7 @@ function bindUI() {
     const a = armyById(+b.dataset.army);
     if (a) {
       UI.selArmy = a.id; UI.selNode = a.node;
+      sheetFocus(a.node);
       if (S.phase === 'player') UI.ghost = false;
       if (UI.tut === 'army' && canMove(a)) UI.tut = 'target';
       render();
@@ -3574,13 +4623,23 @@ function bindUI() {
     if (e.target.id === 'dialog' || e.target.closest('[data-close]')) { closeDialog(); return; }
     const b = e.target.closest('[data-act]');
     if (!b) return;
-    if (b.dataset.act === 'title') { closeDialog(); showScreen('title'); renderTitle(); }
+    if (b.dataset.act === 'title') leaveGame();
+    if (b.dataset.act === 'spectate') UI.specTask = startSpectate();
+    if (b.dataset.act === 'specresult') openDialog(specResultHtml());
+    if (b.dataset.act === 'confirmtoggle') { setConfirmOn(!confirmOn()); UI.pending = null; openDialog(menuHtml()); if (S) render(); }
     if (b.dataset.act === 'endturn' || b.dataset.act === 'back') {
       const nw = $('optNoEndWarn');
       if (nw && nw.checked) setEndWarnOff(true);
     }
     if (b.dataset.act === 'endwarn') { setEndWarnOff(!endWarnOff()); openDialog(menuHtml()); }
     if (b.dataset.act === 'endturn') { closeDialog(); endPlayerTurn(); }
+    if (b.dataset.act === 'wegoconfirm') { const nw = $('optNoEndWarn'); if (nw && nw.checked) setEndWarnOff(true); closeDialog(); uiWegoConfirm(); }
+    if (b.dataset.act === 'wegostart') startWegoFromSetup();
+    if (b.dataset.act === 'wegocontinue') continueWego();
+    if (b.dataset.act === 'autoendtoggle') { setAutoEndOn(!autoEndOn()); openDialog(menuHtml()); }
+    if (b.dataset.wlvl != null) { UI.wegoLevel = +b.dataset.wlvl; try { localStorage.setItem(WEGO_LEVEL_KEY, UI.wegoLevel); } catch (err) { /* ignore */ } openDialog(wegoSetupHtml()); }
+    if (b.dataset.wtime != null) { UI.wegoTime = +b.dataset.wtime; try { localStorage.setItem(WEGO_TIME_KEY, UI.wegoTime); } catch (err) { /* ignore */ } openDialog(wegoSetupHtml()); }
+    if (b.dataset.act === 'back' && S && isWego()) { closeDialog(); render(); return; }
     if (b.dataset.act === 'back') {
       closeDialog();
       const movable = S.armies.filter(x => x.fac === 0 && moveTargets(x).length > 0);
@@ -3597,7 +4656,24 @@ function bindUI() {
    TEST — โหมดทดสอบอัตโนมัติ: ?sim=N (ตรรกะล้วน) / ?autotest=N (ผ่าน UI จริง)
    ===================================================================== */
 async function playAutoGame(legendId, numAI, seed, report, opt = {}) {
-  newGame(legendId, numAI, seed, opt.level == null ? 1 : opt.level, opt.size || 's', { boss: !!opt.boss, troy: !!opt.troy });
+  newGame(legendId, numAI, seed, opt.level == null ? 1 : opt.level, opt.size || 's', { boss: !!opt.boss, troy: !!opt.troy, wego: !!opt.wego, time: 0 });
+  if (opt.wego) {
+    // ศึกพร้อมกัน: ที่นั่งผู้เล่นวางแผนด้วยบอทระดับแม่ทัพ (ขงเบ้งวางแผนตอนท้ายด้วยข้อมูลหยั่งรู้)
+    let st = 0;
+    S.lead8 = undefined;
+    while (!S.over && st++ < 300) {
+      if (S.turn === 8 && S.lead8 === undefined) S.lead8 = leaderFac();
+      const O = S.wego.orders;
+      O[0] = skill(0, 'foresight') && !TUNE.noforesight ? { ...emptyOrders(), late: true, ready: true } : wegoPlanBot(0, null);
+      const r = await wegoRound(O);
+      if (r === 'timeup') endByTurns();
+      const errs = checkInvariants();
+      if (errs.length) { report.errors.push(`seed ${seed} t${S.turn} wego: ${errs.join('; ')} | ${S.log.slice(0, 12).map(l => l.text).join(' / ')}`); break; }
+    }
+    if (!S.over) report.errors.push(`seed ${seed}: game did not end`);
+    report.size = S.size;
+    return S.over;
+  }
   if (opt.noret === 'human') S.noRetreat = [0];
   else if (opt.noret === 'all') S.noRetreat = S.factions.map(f => f.id);
   let steps = 0;
@@ -3618,7 +4694,7 @@ async function playAutoGame(legendId, numAI, seed, report, opt = {}) {
 }
 
 async function runTests(mode, n, opt = {}) {
-  const report = { tune: Object.keys(TUNE).join(','), mode, level: opt.level == null ? 1 : opt.level, noret: opt.noret || 'none', games: 0, wins: 0, reasons: {}, turns: 0, errors: [], byLegend: {}, legendAll: {}, nodes: 0, battles: 0,
+  const report = { wego: !!opt.wego, tune: Object.keys(TUNE).join(','), mode, level: opt.level == null ? 1 : opt.level, noret: opt.noret || 'none', games: 0, wins: 0, reasons: {}, turns: 0, errors: [], byLegend: {}, legendAll: {}, nodes: 0, battles: 0,
     retreats: 0, retreatsByHuman: 0, breakWin: 0, breakLose: 0, coord: 0, capStrike: 0,
     give: SIMOPT.give || null, w: {}, lead8: 0, lead8Top: 0, wHeld: {} };
   saveDisabled = true;
@@ -4230,7 +5306,8 @@ async function runZoomTest() {
     $('optTut').checked = false;
     // แผนที่เล็ก: ไม่มีซูม
     startGame('napoleon', 2, 1, 's');
-    check('small map: no zoom buttons', !$('board').classList.contains('zoomable'));
+    // แผนที่เล็ก: คอมไม่มีซูม / มือถือซูม-เลื่อนได้ (แผ่นด้านล่างบังบางส่วน)
+    check(isMobile() ? 'small map on phone: zoomable' : 'small map: no zoom buttons', $('board').classList.contains('zoomable') === isMobile());
     for (const size of ['m', 'l']) {
       startGame('napoleon', 2, 1, size);
       await wait(30);
@@ -4244,9 +5321,9 @@ async function runZoomTest() {
       // แตะได้แม่น: วงแตะของดินแดน (รัศมี 66) ต้องใหญ่อย่างน้อย 22px บนจอ และ elementFromPoint ได้ดินแดนที่ถูก
       const hitR = 66 * sc;
       check(`${size}: tap target radius ≥ 22px`, hitR >= 22, `r=${hitR.toFixed(1)}px w=${mr.width}`);
-      const ctm = $('map').getScreenCTM(), br = document.querySelector('.map-btns').getBoundingClientRect();
-      // จุดที่อยู่ในพื้นที่แผนที่จริง (ไม่ทับปุ่มซูม ไม่ล้นขอบ)
-      const inMap = (x, y) => x > mr.left + 2 && x < mr.right - 2 && y > mr.top + 2 && y < mr.bottom - 2 && !(x > br.left - 2 && x < br.right + 2 && y > br.top - 2 && y < br.bottom + 2);
+      const ctm = $('map').getScreenCTM(), cover = ['.map-btns', '#btnEnd', '#panel'].map(sel => document.querySelector(sel).getBoundingClientRect()).filter(r => isMobile() || r.width < 200 || r.left > mr.right - 2);
+      // จุดที่อยู่ในพื้นที่แผนที่จริง (ไม่ทับปุ่มซูม/ปุ่มลอย/แผ่นด้านล่าง ไม่ล้นขอบ)
+      const inMap = (x, y) => x > mr.left + 2 && x < mr.right - 2 && y > mr.top + 2 && y < mr.bottom - 2 && !cover.some(br => x > br.left - 2 && x < br.right + 2 && y > br.top - 2 && y < br.bottom + 2);
       UI.selArmy = null; render();
       let hits = 0, tried = 0, miss = [];
       for (const n of S.nodes) {
@@ -4287,9 +5364,9 @@ async function runZoomTest() {
       const w0 = curView().w;
       $('map').dispatchEvent(new WheelEvent('wheel', { deltaY: -100, clientX: cx, clientY: cy, bubbles: true, cancelable: true }));
       check(`${size}: wheel zooms in`, curView().w < w0);
-      $('btnZoomOut').click(); $('btnZoomOut').click(); $('btnZoomOut').click(); $('btnZoomOut').click();
+      for (let i = 0, w = -1; i < 8 && Math.abs(curView().w - w) > 0.5; i++) { w = curView().w; $('btnZoomOut').click(); }
       const full = fitRatio(mapBounds());
-      check(`${size}: zoom out clamps to whole map`, Math.abs(curView().w - full.w) < 1);
+      check(`${size}: zoom out clamps to whole map`, Math.abs(curView().w - full.w) < 1, `cv=${JSON.stringify(curView())} full=${JSON.stringify(full)} ratio=${boardRatio().toFixed(3)}`);
       const w1 = curView().w;
       pe('pointerdown', cx - 20, cy, 1); pe('pointerdown', cx + 20, cy, 2); pe('pointermove', cx - 80, cy, 1); pe('pointermove', cx + 80, cy, 2); pe('pointerup', cx - 80, cy, 1); pe('pointerup', cx + 80, cy, 2);
       check(`${size}: pinch zooms in`, curView().w < w1 * 0.6);
@@ -4535,7 +5612,11 @@ async function runTutorialTest(stopAt) {
   await onNodeClick(fac(0).capital);
   check('step target', UI.tut === 'target' && !!document.querySelector('#map .tgt.tut'));
   if (stopAt <= 2) return done();
+  check('step target text: two taps', /แตะครั้งแรกยังไม่เดิน/.test($('coach').textContent) && /2\/4/.test($('coach').textContent));
   const tgt = +document.querySelector('#map .tgt.tut').closest('[data-node]').dataset.node;
+  await onNodeClick(tgt);
+  check('step confirm (first tap only previews)', UI.tut === 'confirm' && coachOn() && $('battle').classList.contains('hidden')
+    && !!document.querySelector('#info [data-act="confirmmove"]') && /ยืนยันบุก/.test($('coach').textContent) && !!document.querySelector('#map [data-pending]'));
   const p = onNodeClick(tgt);
   await wait(50);
   check('step strat', UI.tut === 'strat' && coachOn() && !!document.querySelector('#battleCard .strats'));
@@ -4605,6 +5686,379 @@ async function runTutorialTest(stopAt) {
   done();
 }
 
+// ?wegotest — ⏱️ ศึกพร้อมกัน: ตั้งสถานการณ์ตรวจกติกาการคำนวณผลทุกข้อ (เรียก resolveWego กับคำสั่งที่เขียนเป็นข้อมูลตรง ๆ)
+async function runWegoTest() {
+  saveDisabled = true; Ctrl.auto = true; TUNE.nowander = true; UI.aiSpeed = 'fast';
+  const res = [], check = (name, ok, extra) => res.push(`${ok ? 'PASS' : 'FAIL'} ${name}${extra ? ' ' + extra : ''}`);
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const U = (i, c = 0, a = 0) => ({ inf: i, cav: c, arc: a });
+  const gen = n => ({ name: n, icon: '🎖️', leader: false });
+  const logs = () => S.log.map(l => l.text);
+  const battles = () => FX.steps.flatMap(st => st.ev).filter(e => e.t === 'battle');
+  // เกมทดสอบ: ดินแดนที่ไม่ใช่เมืองหลวงเป็นดินแดนกลางว่าง ไม่มีตำนาน คำสั่งว่างทุกฝ่าย (ถอนอัตโนมัติปิด)
+  let sd = 6100;
+  const fresh = (legend = 'napoleon') => {
+    newGame(legend, 2, sd++, 1, 'm', { wego: true, time: 0 });
+    for (const F of S.factions) F.human = F.id === 0;
+    S.wild = []; S.wInGame = [];
+    for (const n of S.nodes) if (n.capitalOf === null) { n.owner = NEUTRAL; n.garrison = Z(); }
+    S.wego.orders = {};
+    for (const F of S.factions) { const O = emptyOrders(); O.autoRet = false; O.ready = true; S.wego.orders[F.id] = O; }
+    FX.rec = true; FX.steps = []; FX.cur = null; FX.played = 0;
+  };
+  const far = () => { const ds = S.factions.map(F => bfs(F.capital, NEUTRAL, () => true).dist); return S.nodes.filter(n => n.capitalOf === null && ds.every(d => (d[n.id] == null ? 99 : d[n.id]) >= 2)).map(n => n.id); };
+  const nbs = id => neighbors(id).filter(nb => !nb.mountain && S.nodes[nb.id].capitalOf === null).map(nb => nb.id);
+  const star = k => { for (let t = 0; t < 30; t++) { const x = far().find(id => nbs(id).length >= k); if (x != null) return [x, ...nbs(x)]; fresh(); } throw new Error('no star'); };
+  const own = (id, f, g = Z()) => { S.nodes[id].owner = f; S.nodes[id].garrison = { ...g }; };
+  const order = (f, a, path, strat = 'charge') => S.wego.orders[f].moves.push({ army: a.id, path, strat });
+  const resolve = async () => { await resolveWego(S.wego.orders); FX.rec = false; };
+  try {
+    // --- ช่วงวางแผนพื้นฐาน + ยืนยัน → คำนวณผล → เทิร์นถัดไป ---
+    newGame('napoleon', 2, 5151, 1, 'm', { wego: true, time: 60 });
+    const gold1 = fac(1).gold, goldB = S.factions.map(F => F.gold);
+    enterWego();
+    check('wego starts in planning, bots ready', isWego() && S.wego.phase === 'plan' && S.factions.every(F => F.human || S.wego.orders[F.id].ready));
+    const eb = S.factions.find(F => !F.human && !S.wego.orders[F.id].late).id;
+    check('bots plan on a copy: recruits hidden until resolution', fac(eb).gold === goldB[eb] && S.wego.orders[eb].acts.length > 0, `acts=${S.wego.orders[eb].acts.length}`);
+    check('no undo, no tutorial', $('btnUndo').classList.contains('hidden') && !UI.tut);
+    const lead = leaderArmy(0), t0 = planTargets(0, lead, 0, null)[0];
+    UI.selArmy = lead.id; wegoTap(t0);
+    check('tap target = order arrow', myOrders().moves.length === 1 && !!document.querySelector(`#map .wg-arrow[data-wto="${t0}"]`));
+    wegoTap(t0);
+    check('tap arrow end again = cancel', myOrders().moves.length === 0 && !document.querySelector('#map .wg-arrow'));
+    wegoTap(t0);
+    await uiWegoConfirm();
+    check('confirm → resolves → next planning', S.turn === 2 && S.wego.phase === 'plan' && !UI.busy && fac(1).gold !== gold1 + 0.5, `turn=${S.turn} errs=${window.__errs.join('|')}`);
+    check('bots recruited during resolution', S.log.some(l => l.turn === 1) && checkInvariants().length === 0, checkInvariants().join(';'));
+
+    // --- 1. ทัพออกแล้วโดนบุก: ดินแดนที่ทัพออกไปเหลือแค่กองรักษาการณ์ ---
+    fresh();
+    let [X, W, Y] = star(2);
+    own(X, 0, U(2)); own(W, 0); own(Y, 1);
+    let A = newArmy(0, X, gen('A'), U(20)), B = newArmy(1, Y, gen('B'), U(15));
+    order(0, A, [W]); order(1, B, [X]);
+    await resolve();
+    check('departed army: land defended by garrison only', A.node === W && sumU(A.units) === 20 && S.nodes[X].owner === 1 && B.node === X, `A@${A.node} X=${S.nodes[X].owner}`);
+
+    // --- 2. บุกสวนกัน = ปะทะกลางทาง ไม่มีภูมิประเทศ/กำแพง ---
+    fresh();
+    [X, Y] = star(1);
+    own(X, 0); own(Y, 1);
+    S.nodes[X].terrain = 'mountain'; S.nodes[Y].terrain = 'mountain';
+    A = newArmy(0, X, gen('A'), U(60)); B = newArmy(1, Y, gen('B'), U(12));
+    order(0, A, [Y], 'charge'); order(1, B, [X], 'charge');
+    await resolve();
+    const cl = battles().find(e => e.clash);
+    check('head-on attack → clash midway', !!cl && logs().some(t => /บุกสวนกัน/.test(t)), JSON.stringify(cl));
+    const sA = { fac: 0, units: U(10), gen: gen('a'), pos: X }, sB = { fac: 1, units: U(10), gen: gen('b'), pos: Y };
+    const fm = powerOf(sA, sB, X, 'atk', { field: true }).mods.map(m => m.label).join();
+    check('clash uses no terrain/wall', !/ชัยภูมิ|ข้ามแม่น้ำ|กำแพง/.test(fm), fm);
+    check('clash winner presses on to its target, loser never reached', A.node === Y && S.nodes[Y].owner === 0 && S.nodes[X].owner === 0, `A@${A.node}`);
+    fresh();
+    [X, Y] = star(1);
+    own(X, 0); own(Y, 1);
+    A = newArmy(0, X, gen('A'), U(14)); B = newArmy(1, Y, gen('B'), U(70));
+    order(0, A, [Y]); order(1, B, [X]);
+    await resolve();
+    check('clash loser falls back home, winner attacks it there', S.nodes[X].owner === 1 && B.node === X && (!S.armies.includes(A) || A.node !== Y), `A@${S.armies.includes(A) ? A.node : 'gone'}`);
+
+    // --- 3. หลายฝ่ายบุกจุดเดียว: ทหารม้าสัดส่วนมากบุกก่อน / ผู้ยึดใหม่ใช้กลยุทธ์ตั้งรับค่าเริ่มต้นของฝ่าย ---
+    fresh();
+    let N, P, Q;
+    [N, P, Q] = star(2);
+    own(N, NEUTRAL, U(1)); own(P, 0); own(Q, 2);
+    A = newArmy(0, P, gen('A'), U(0, 30)); B = newArmy(2, Q, gen('B'), U(40));
+    order(0, A, [N], 'charge'); order(2, B, [N], 'ambush');
+    S.wego.orders[0].garrison = 'ambush'; S.wego.orders[0].def[A.id] = { strat: 'charge', retreat: false };
+    await resolve();
+    const bt = battles().filter(e => e.node === N);
+    check('multi-attack: higher cavalry share attacks first', bt.length >= 2 && bt[0].atk === 0 && bt[1].atk === 2, JSON.stringify(bt.map(e => e.atk)));
+    check('new holder defends with faction default stance', bt[1] && bt[1].def === 0 && bt[1].ds === 'ambush', bt[1] && bt[1].ds);
+
+    // --- 4. เดินเป็นขบวน: A เข้าแทนที่ C ที่ออกไป ---
+    fresh();
+    let Zn;
+    for (let tr = 0; tr < 30; tr++) {
+      [X, Y] = star(1);
+      Zn = nbs(Y).find(id => id !== X);
+      if (Zn != null) break;
+      fresh();
+    }
+    own(X, 0); own(Y, 0); own(Zn, 0);
+    A = newArmy(0, X, gen('A'), U(10)); const C = newArmy(0, Y, gen('C'), U(10));
+    check('chain: occupied own land blocked until its army has an order', !planTargets(0, A, 0, null).includes(Y));
+    order(0, C, [Zn]);
+    check('chain: allowed once that army leaves', planTargets(0, A, 0, null).includes(Y) && !planTargets(0, A, 0, null).includes(Zn));
+    order(0, A, [Y]);
+    S.wego.orders[0].moves.splice(0, 1); wegoPrune(0);
+    check('cancelling the leader of a chain prunes the follower', S.wego.orders[0].moves.length === 0);
+    order(0, C, [Zn]); order(0, A, [Y]);
+    await resolve();
+    check('chain moves resolve together', A.node === Y && C.node === Zn, `A@${A.node} C@${C.node}`);
+
+    // --- 5. ถอนทัพอัตโนมัติ ---
+    const retreatCase = async (on, safe) => {
+      fresh();
+      const [x, w, y] = star(2);
+      own(x, 0); own(w, safe ? 0 : 2); own(y, 1);
+      for (const n of nbs(x)) if (n !== w && n !== y) own(n, 1);
+      const a = newArmy(0, x, gen('A'), U(5)), b = newArmy(1, y, gen('B'), U(60));
+      S.wego.orders[0].def[a.id] = { strat: 'defend', retreat: on };
+      order(1, b, [x]);
+      await resolve();
+      return { a, b, x, w, fought: battles().some(e => e.node === x) };
+    };
+    let rc = await retreatCase(true, true);
+    check('auto-retreat: badly outmatched → falls back to safe own land, no battle', rc.a.node === rc.w && S.nodes[rc.x].owner === 1 && !rc.fought && sumU(rc.b.units) === 60);
+    rc = await retreatCase(false, true);
+    check('auto-retreat off → fights', rc.fought);
+    rc = await retreatCase(true, false);
+    check('auto-retreat never breaks out', rc.fought && !logs().some(t => /ตีฝ่าวงล้อม/.test(t)));
+
+    // --- 6. ขงเบ้งเห็นลูกศรศัตรูที่เล็งดินแดนเรา พร้อมกลยุทธ์บุก ---
+    for (const legend of ['kongming', 'napoleon']) {
+      fresh(legend);
+      [X, Y] = star(1);
+      own(X, 0); own(Y, 1);
+      B = newArmy(1, Y, gen('B'), U(10));
+      const K = newArmy(0, X, gen('K'), U(5));
+      order(1, B, [X], 'ambush');
+      S.wego.orders[0].ready = false; S.phase = 'player'; S.wego.phase = 'plan';
+      showScreen('game'); UI.selArmy = K.id; UI.selNode = X; render();
+      const seen = !!document.querySelector(`#map .wg-intel[data-wintel="${X}"]`);
+      const ambushBadge = [...document.querySelectorAll('#map .wg-badge')].some(g => g.textContent.includes('🌙'));
+      if (legend === 'kongming') check('Kongming sees enemy arrows at our land + their attack strategy', seen && ambushBadge && /หยั่งรู้ฟ้าดิน/.test($('wegoCard').textContent) && $('wegoCard').textContent.includes(S.nodes[X].name)
+        && /ซุ่มโจมตี/.test($('wegoCard').textContent) && /ตั้งรับด้วย 🧱 ตั้งรับ แก้ทาง/.test($('info').textContent), $('info').textContent.slice(0, 200));
+      else check('others do not see enemy arrows or strategy', !seen && !ambushBadge && !/หยั่งรู้ฟ้าดิน|แก้ทาง/.test($('wegoCard').textContent + $('info').textContent));
+    }
+    fresh();
+    if (S.factions[1].legend !== 'kongming') { const k = S.factions.findIndex(F => F.legend === 'kongming'); if (k > 0) [S.factions[1].legend, S.factions[k].legend] = [S.factions[k].legend, S.factions[1].legend]; else S.factions[1].legend = 'kongming'; }
+    wegoBeginPlan();
+    [X, Y] = star(1);
+    own(X, 1); own(Y, 0);
+    A = newArmy(0, Y, gen('A'), U(12));
+    const intel = wegoIntel(1, { 0: { moves: [{ army: A.id, path: [X], strat: 'ambush' }] } });
+    check('bot Kongming plans last with the same intel', S.wego.orders[1].late && intel[X] === 12 && Object.keys(intel).length === 1);
+    const kOrd = { 0: { moves: [{ army: A.id, path: [X], strat: 'ambush' }] } }, ist = wegoIntelStrat(1, kOrd);
+    const KB = newArmy(1, X, gen('KB'), U(10));
+    const kPlan = wegoPlanBot(1, wegoIntel(1, kOrd), ist);
+    check('bot Kongming counters the seen attack strategy', ist[X] === 'ambush' && kPlan.def[KB.id].strat === 'defend' && kPlan.garrison === 'defend', JSON.stringify({ ist, d: kPlan.def[KB.id], g: kPlan.garrison }));
+
+    // --- 7. หมดเวลา = ใช้คำสั่งเท่าที่ตั้งไว้ ---
+    newGame('napoleon', 2, 5252, 1, 's', { wego: true, time: 1 });
+    enterWego();
+    const l7 = leaderArmy(0), t7 = planTargets(0, l7, 0, null).find(id => S.nodes[id].owner === NEUTRAL);
+    UI.selArmy = l7.id; wegoTap(t7);
+    for (let i = 0; i < 100 && (S.turn === 1 || UI.busy); i++) await wait(100);
+    check('time out → resolves with orders set so far', S.turn === 2 && logs().some(t => /หมดเวลาวางแผน/.test(t)) && (l7.node === t7 || S.log.some(l => l.turn === 1 && l.text.includes(S.nodes[t7].name))), `turn=${S.turn}`);
+
+    // --- ผลตายตัวจาก seed เดียวกัน (พร้อมสำหรับคำนวณที่เครื่องเจ้าห้อง) ---
+    newGame('genghis', 3, 5353, 2, 'm', { wego: true, time: 0 });
+    S.wego.orders[0] = wegoPlanBot(0, null);
+    const snap = JSON.stringify(S), ord = JSON.stringify(S.wego.orders);
+    const once = async () => { S = JSON.parse(snap); await resolveWego(JSON.parse(ord)); return JSON.stringify({ n: S.nodes, a: S.armies, f: S.factions, seed: S.seed }); };
+    const r1 = await once(), r2 = await once();
+    check('same state + orders → identical result', r1 === r2 && r1.length > 100);
+
+    // --- 2 ช่อง (เจงกิสข่าน): เดินในดินแดนเราแล้วบุกต่อ ---
+    fresh('genghis');
+    for (let tr = 0; tr < 30; tr++) { [X, Y] = star(1); Zn = nbs(Y).find(id => id !== X); if (Zn != null) break; fresh('genghis'); }
+    own(X, 0); own(Y, 0); own(Zn, 1, U(1));
+    A = newArmy(0, X, gen('A'), U(0, 30));
+    const m2 = { army: A.id, path: [Y], strat: 'charge' };
+    S.wego.orders[0].moves.push(m2);
+    check('2-move army can draw a second step', planTargets(0, A, 1, m2).includes(Zn));
+    m2.path.push(Zn);
+    await resolve();
+    check('2-step order: move then attack', A.node === Zn && S.nodes[Zn].owner === 0);
+    // เจงกิสข่าน (เฉพาะศึกพร้อมกัน): ชนะศึกช่องแรกแล้วบุกช่องที่ 2 ต่อ
+    fresh('genghis');
+    for (let tr = 0; tr < 30; tr++) { [X, Y] = star(1); Zn = nbs(Y).find(id => id !== X); if (Zn != null) break; fresh('genghis'); }
+    own(X, 0); own(Y, NEUTRAL, U(3)); own(Zn, NEUTRAL, U(1));
+    A = newArmy(0, X, gen('A'), U(0, 30));
+    order(0, A, [Y, Zn]);
+    await resolve();
+    check('Genghis: wins first battle then attacks 2nd step', battles().filter(e => e.atk === 0).length === 2 && A.node === Zn && S.nodes[Y].owner === 0 && S.nodes[Zn].owner === 0, `A@${A.node} Y=${S.nodes[Y].owner} Zn=${S.nodes[Zn].owner}`);
+    fresh('napoleon');
+    for (let tr = 0; tr < 30; tr++) { [X, Y] = star(1); Zn = nbs(Y).find(id => id !== X); if (Zn != null) break; fresh('napoleon'); }
+    own(X, 0); own(Y, NEUTRAL, U(3)); own(Zn, NEUTRAL, U(1));
+    A = newArmy(0, X, legendGen('wukong', null), U(0, 30)); S.wInGame = ['wukong'];
+    order(0, A, [Y, Zn]);
+    await resolve();
+    check('other 2-move armies still stop after a battle', A.node === Y && S.nodes[Zn].owner === NEUTRAL, `A@${A.node}`);
+    // โจน: ทัพที่กำลังเดินทางไม่ให้ธงแห่งศรัทธาแก่ทัพข้างเคียง (ทัพของโจนเองยังได้)
+    fresh();
+    [X, Y] = star(1);
+    own(X, 0); own(Y, 0);
+    const JN = newArmy(0, X, legendGen('joan', null), U(10)), JA = newArmy(0, Y, gen('JA'), U(10));
+    const auraOn = sd => powerOf(sd, { fac: 1, units: U(10), gen: null }, sd.pos, 'atk').mods.some(m => /ธงแห่งศรัทธา/.test(m.label));
+    const still = auraOn(atkSide(JA));
+    JN.transit = true;
+    check('Joan aura: none from a marching Joan, own army keeps it', still && !auraOn(atkSide(JA)) && auraOn(atkSide(JN)));
+    delete JN.transit;
+
+    // --- บุกไม่สำเร็จแล้วจุดเดิมถูกยึด = ทัพแตก ---
+    fresh();
+    for (let tr = 0; tr < 30; tr++) { [X, Y] = star(1); Zn = nbs(X).find(id => id !== Y); if (Zn != null) break; fresh(); }
+    own(X, 0); own(Y, 1, U(45)); own(Zn, 2); S.nodes[Y].terrain = 'mountain';
+    A = newArmy(0, X, gen('A'), U(30)); B = newArmy(2, Zn, gen('B'), U(10));
+    order(0, A, [Y]); order(2, B, [X]);
+    await resolve();
+    check('failed attacker whose home fell is broken', !S.armies.includes(A) && S.nodes[X].owner === 2 && logs().some(t => /กลับ .* ไม่ได้/.test(t)),
+      `inArmies=${S.armies.includes(A)} A@${A.node} Xown=${S.nodes[X].owner} B@${B.node} | ${logs().slice(0, 6).join(' / ')}`);
+
+    // --- สรุปผลหลังคำนวณ (เฉพาะเรื่องของเรา) ---
+    newGame('napoleon', 2, 5454, 1, 's', { wego: true, time: 0 });
+    enterWego();
+    const l8 = leaderArmy(0), t8 = planTargets(0, l8, 0, null).find(id => S.nodes[id].owner === NEUTRAL);
+    UI.selArmy = l8.id; wegoTap(t8);
+    Ctrl.auto = false;
+    await uiWegoConfirm();
+    check('turn summary shown (our events)', !$('dialog').classList.contains('hidden') && /ผลเทิร์น 1/.test($('dialogCard').textContent) && /บุก|ยึด/.test($('dialogCard').textContent));
+    closeDialog();
+    Ctrl.auto = true;
+
+    // --- เซฟแยก ---
+    saveDisabled = false;
+    try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(WEGO_SAVE_KEY); } catch (e) { /* ignore */ }
+    saveGame();
+    const sv = loadSave(WEGO_SAVE_KEY);
+    check('separate save: wego key only', !!sv && sv.mode === 'wego' && loadSave() === null);
+    showScreen('title'); continueWego();
+    check('continue wego save', isWego() && S.wego.phase === 'plan' && $('game').classList.contains('active'));
+    clearSave(); saveDisabled = true;
+
+    // --- จบเทิร์นอัตโนมัติในโหมดนี้ ---
+    AUTO.off = false;
+    newGame('napoleon', 2, 5555, 1, 's', { wego: true, time: 0 });
+    enterWego();
+    fac(0).gold = 0;
+    const l9 = leaderArmy(0);
+    UI.selArmy = l9.id; wegoTap(planTargets(0, l9, 0, null)[0]);
+    await wait(400);
+    check('auto-confirm bar when all armies ordered & no money', !$('autoBar').classList.contains('hidden') && /ยืนยันคำสั่ง/.test($('autoBar').textContent));
+    for (let i = 0; i < 60 && S.turn === 1; i++) await wait(100);
+    check('auto-confirm fires after 3 s', S.turn === 2);
+    AUTO.off = true;
+
+    // --- โหมดผู้ชมในศึกพร้อมกัน ---
+    newGame('napoleon', 2, 5656, 1, 's', { wego: true, time: 0 });
+    enterWego(); UI.aiSpeed = 'skip';
+    eliminate(0, 1, 'leader'); render(); uiGameOver();
+    const sb = document.querySelector('#dialogCard [data-act="spectate"]');
+    check('wego: lost early → watch bots', !!sb);
+    if (sb) { sb.click(); await UI.specTask; }
+    check('wego spectate plays to the end', !!S.specResult && !S.spectate && window.__errs.length === 0, `turn=${S.turn} ${S.specResult && S.specResult.reason}`);
+    closeDialog();
+  } catch (e) { res.push('EXC ' + (e && e.stack || e)); }
+  $('testOut').textContent = 'TESTDONE ' + JSON.stringify({ wego: res, errs: window.__errs });
+  $('testOut').classList.remove('hidden'); document.title = 'TESTDONE';
+}
+
+// ?mobiletest — หน้าจอมือถือ (รันในกรอบกว้าง 360/390/430 แนวตั้ง และแนวนอน): แตะแม่น ปุ่มไม่บังกัน ไม่ต้องเลื่อนหน้า
+async function runMobileTest() {
+  saveDisabled = true; Ctrl.auto = true;
+  const W = innerWidth, H = innerHeight, tag = `${W}x${H}`;
+  const res = [], check = (name, ok, extra) => res.push(`${ok ? 'PASS' : 'FAIL'} ${tag} ${name}${extra ? ' ' + extra : ''}`);
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  const R = el => el.getBoundingClientRect();
+  const vis = el => { const r = R(el); return r.width > 0 && r.height > 0 && r.left >= -1 && r.top >= -1 && r.right <= W + 1 && r.bottom <= H + 1; };
+  const hit = el => { const r = R(el), e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return !!e && (e === el || el.contains(e)); };
+  const noScroll = () => document.scrollingElement.scrollHeight <= H + 1 && document.scrollingElement.scrollWidth <= W + 1;
+  const scr = id => { const c = $('map').getScreenCTM(), n = S.nodes[id]; return { x: c.a * n.x + c.e, y: c.d * n.y + c.f }; };
+  const hitNode = id => { const p = scr(id), e = document.elementFromPoint(p.x, p.y), g = e && e.closest('[data-node]'); return !!g && +g.dataset.node === id; };
+  const tapNode = async id => { document.querySelector(`#map [data-node="${id}"]`).dispatchEvent(new MouseEvent('click', { bubbles: true })); await wait(280); };
+  const disjoint = (a, b) => a.right <= b.left || b.right <= a.left || a.bottom <= b.top || b.bottom <= a.top;
+  // ดินแดนไม่ถูกแผ่นบังและแตะโดนจริง
+  const freeOfSheet = id => { const p = scr(id), r = R($('panel')); return !(p.x >= r.left - 8 && p.x <= r.right + 8 && p.y >= r.top - 8 && p.y <= r.bottom + 8) && hitNode(id); };
+  try {
+    $('optTut').checked = false;
+    for (const size of ['s', 'm']) {
+      startGame('napoleon', 2, 1, size);
+      await wait(320);
+      check(`${size}: phone layout`, isMobile());
+      check(`${size}: no page scroll`, noScroll(), `${document.scrollingElement.scrollWidth}x${document.scrollingElement.scrollHeight}`);
+      const br = R($('board')), mr = R($('main'));
+      check(`${size}: map fills area under top bars`, Math.abs(br.bottom - H) <= 1 && Math.abs(br.top - mr.top) <= 1);
+      check(`${size}: faction chips one line`, R($('chips')).height <= 42 && R($('scorebar')).height <= 56, `${R($('chips')).height}`);
+      check(`${size}: sheet folded with title`, UI.sheet === 'peek' && R($('panel')).height <= 60 && $('sheetTitle').textContent.length > 3);
+      const be = $('btnEnd'), ber = R(be), zr = R(document.querySelector('.map-btns'));
+      check(`${size}: end button floats bottom-right`, ber.right >= W - 24 && ber.bottom >= H - 24 && hit(be));
+      check(`${size}: end button clear of zoom/replay buttons`, disjoint(ber, zr) && disjoint(ber, R($('btnReplay'))) && disjoint(R($('btnSpeed')), R($('btnUndo'))));
+      // แตะดินแดน → แผ่นครึ่งจอ ข้อมูล + ปุ่มสั่งการ โดยไม่ต้องเลื่อน
+      const cap = fac(0).capital;
+      UI.selArmy = null; UI.selNode = null; UI.view = null; render();
+      await tapNode(cap);
+      const pr = R($('panel'));
+      check(`${size}: tap land → half sheet, info tab`, UI.sheet === 'half' && $('info').classList.contains('tab-on') && $('info').textContent.includes(S.nodes[cap].name) && $('sheetTitle').textContent.includes(S.nodes[cap].name));
+      check(`${size}: tapped land stays visible beside the sheet`, freeOfSheet(cap), `xy=${scr(cap).x.toFixed(0)},${scr(cap).y.toFixed(0)} sheet=${pr.left.toFixed(0)},${pr.top.toFixed(0)}`);
+      const rb = document.querySelector('#info [data-recruit="inf"]');
+      check(`${size}: recruit buttons tappable without scrolling`, !!rb && vis(rb) && hit(rb) && R(rb).bottom <= pr.bottom && $('sheetBody').scrollTop === 0, rb ? `${R(rb).top.toFixed(0)}-${R(rb).bottom.toFixed(0)} sheet ${pr.top.toFixed(0)}` : 'none');
+      const g0 = fac(0).gold;
+      if (rb) rb.click();
+      check(`${size}: recruit from sheet works`, fac(0).gold === g0 - UNITS.inf.cost);
+      // ดินแดนล่างสุดของแผนที่ → เลื่อนให้อยู่เหนือแผ่น
+      const low = S.nodes.slice().sort((a, b) => b.y - a.y)[0].id;
+      UI.selArmy = null; await tapNode(low);
+      check(`${size}: lowest land scrolled clear of sheet`, freeOfSheet(low), `xy=${scr(low).x.toFixed(0)},${scr(low).y.toFixed(0)}`);
+      const right = S.nodes.slice().sort((a, b) => b.x - a.x)[0].id;
+      UI.selArmy = null; await tapNode(right);
+      check(`${size}: rightmost land scrolled clear of sheet`, freeOfSheet(right), `xy=${scr(right).x.toFixed(0)},${scr(right).y.toFixed(0)}`);
+      // ยืนยันบุกในแผ่น
+      const lead = leaderArmy(0);
+      await tapNode(lead.node);
+      const t = moveTargets(lead).find(id => S.nodes[id].owner !== 0);
+      await tapNode(t);
+      const cb = document.querySelector('#info [data-act="confirmmove"]');
+      check(`${size}: confirm-attack button tappable in sheet`, !!cb && vis(cb) && hit(cb) && R(cb).bottom <= R($('panel')).bottom && freeOfSheet(t), cb ? `${R(cb).top.toFixed(0)}-${R(cb).bottom.toFixed(0)}` : 'none');
+      // แท็บ
+      document.querySelector('#sheetTabs [data-tab="army"]').click();
+      check(`${size}: tabs switch cards`, $('armyCard').classList.contains('tab-on') && !$('info').classList.contains('tab-on') && vis($('armyCard').querySelector('.army-item')));
+      document.querySelector('#sheetTabs [data-tab="log"]').click();
+      check(`${size}: log tab`, $('logCard').classList.contains('tab-on'));
+      // ลากที่จับขึ้นสุด → เต็มจอ / แตะ → พับ
+      const hr = R($('sheetHead')), hx = hr.left + 30, hy = hr.top + 8;
+      const pe = (type, y) => $('sheetHead').dispatchEvent(new PointerEvent(type, { clientX: hx, clientY: y, pointerId: 7, bubbles: true }));
+      pe('pointerdown', hy); pe('pointermove', hy - 40); pe('pointermove', hy - H); pe('pointerup', hy - H);
+      await wait(280);
+      check(`${size}: drag handle up → full`, UI.sheet === 'full' && Math.abs(R($('panel')).top - R($('main')).top) <= 2, `sheet=${UI.sheet} top=${R($('panel')).top.toFixed(0)} main=${R($('main')).top.toFixed(0)} h=${R($('panel')).height.toFixed(0)}`);
+      const hy2 = R($('sheetHead')).top + 8;
+      pe('pointerdown', hy2); pe('pointerup', hy2);
+      await wait(280);
+      check(`${size}: tap handle cycles → folded`, UI.sheet === 'peek' && R($('panel')).height <= 60, `sheet=${UI.sheet} h=${R($('panel')).height.toFixed(0)}`);
+      check(`${size}: still no page scroll`, noScroll());
+    }
+    // บทสอนชี้ตำแหน่งใหม่
+    $('optTut').checked = true; Ctrl.auto = false;
+    startGame('kongming', 2, 1, 's');
+    await wait(320);
+    const arrowAt = sel => {
+      const el = document.querySelector(sel); if (!el || $('coachArrow').classList.contains('hidden')) return false;
+      const r = R(el), a = R($('coachArrow')), ax = a.left + a.width / 2, ay = a.top + a.height / 2;
+      return Math.hypot(Math.max(r.left - ax, 0, ax - r.right), Math.max(r.top - ay, 0, ay - r.bottom)) < 60 && vis($('coachArrow'));
+    };
+    check('tutorial: coach box on screen, arrow at our army', vis($('coach')) && arrowAt(TUT_STEPS.army.sel()));
+    await onNodeClick(fac(0).capital); await wait(280);
+    check('tutorial: target step points at map ring', UI.tut === 'target' && vis($('coach')) && arrowAt('#map .tgt.tut'), `tut=${UI.tut} coach=${JSON.stringify(R($('coach')))} ring=${document.querySelector('#map .tgt.tut') && JSON.stringify(R(document.querySelector('#map .tgt.tut')))} arrow=${JSON.stringify(R($('coachArrow')))}`);
+    const tt = +document.querySelector('#map .tgt.tut').closest('[data-node]').dataset.node;
+    await onNodeClick(tt); await wait(280);
+    const cbt = document.querySelector('#info [data-act="confirmmove"]');
+    check('tutorial: confirm step points into sheet, button free', UI.tut === 'confirm' && vis($('coach')) && arrowAt('#info [data-act="confirmmove"]') && !!cbt && hit(cbt) && disjoint(R($('coach')), R(cbt)),
+      `tut=${UI.tut} coach=${JSON.stringify(R($('coach')))} btn=${cbt && JSON.stringify(R(cbt))} arrow=${JSON.stringify(R($('coachArrow')))} vis=${vis($('coach'))} hit=${cbt && hit(cbt)}`);
+    finishTutorial(); Ctrl.auto = true;
+    // ศึกพร้อมกันบนมือถือ: ปุ่มยืนยัน + เวลาถอยหลังลอยมุมล่างขวา
+    newGame('napoleon', 2, 77, 1, 's', { wego: true, time: 60 });
+    enterWego(); await wait(300);
+    check('wego: floating confirm + countdown', /ยืนยันคำสั่ง · \d:\d\d/.test($('btnEnd').textContent) && hit($('btnEnd')) && R($('btnEnd')).bottom >= H - 24);
+    const wl = leaderArmy(0);
+    await tapNode(wl.node);
+    check('wego: plan card + army orders in info tab', $('wegoCard').classList.contains('tab-on') && !!document.querySelector('#info .wg-box'));
+    check('wego: no page scroll', noScroll());
+  } catch (e) { res.push('EXC ' + (e && e.stack || e)); }
+  $('testOut').textContent = 'TESTDONE ' + JSON.stringify({ mobile: res, errs: window.__errs });
+  document.title = 'TESTDONE';
+}
+
 // ?featuretest — ทดสอบถอนทัพ/ตีฝ่าวงล้อม ปุ่มย้อน ระดับ และปุ่ม "กลับไปสั่งการ" ผ่าน UI จริง
 async function runFeatureTest() {
   saveDisabled = true;
@@ -4656,14 +6110,46 @@ async function runFeatureTest() {
     S.nodes[own].owner = 0; S.nodes[own].garrison = Z(); render();
     UI.selArmy = lead.id;
     await onNodeClick(own);
-    check('peaceful move', lead.node === own && UI.undo.length === 1);
+    check('confirm: first tap shows path + info, no move', lead.node === fac(0).capital && UI.pending && UI.pending.to === own && UI.selNode === own
+      && /ยืนยันเดินทัพ/.test(q('#info [data-act="confirmmove"]').textContent) && !!q(`#map [data-pending="${own}"]`) && !!q('#map .pend-ring'));
+    await onNodeClick(own);
+    check('confirm: same node again → moves', lead.node === own && UI.undo.length === 1 && !UI.pending && !q('#map [data-pending]'));
     $('btnUndo').click();
     const lead2 = armyAt(fac(0).capital);
     check('undo move', !!lead2 && lead2.gen.leader);
     const tgt = moveTargets(lead2).find(id => S.nodes[id].owner === NEUTRAL && sumU(S.nodes[id].garrison) > 0);
     UI.selArmy = lead2.id;
     await onNodeClick(tgt);
+    check('confirm: first tap on enemy shows estimate, no battle', lead2.node === fac(0).capital && S.nodes[tgt].owner === NEUTRAL && S.stats.battles === 0
+      && /ยืนยันบุก/.test(q('#info [data-act="confirmmove"]').textContent) && /ประเมินกำลัง/.test(q('#info .pend-box').textContent));
+    const otherT = moveTargets(lead2).find(id => id !== tgt);
+    if (otherT != null) {
+      await onNodeClick(otherT);
+      check('confirm: tapping another target switches target', UI.pending.to === otherT && lead2.node === fac(0).capital && S.stats.battles === 0);
+      await onNodeClick(tgt);
+    }
+    const nonT = S.nodes.find(n => !moveTargets(lead2).includes(n.id) && n.id !== lead2.node).id;
+    await onNodeClick(nonT);
+    check('confirm: tapping a non-target just shows its info', !UI.pending && UI.selNode === nonT && lead2.node === fac(0).capital);
+    UI.selArmy = lead2.id; await onNodeClick(tgt);
+    q('#info [data-act="confirmmove"]').click();
+    await UI.moveTask;
+    check('confirm button → attacks', S.stats.battles === 1 && !UI.busy);
     check('battle clears undo', UI.undo.length === 0 && $('btnUndo').disabled);
+    // ปิดตัวเลือกในเมนู ☰ → แตะครั้งเดียวเดินเลย (จำค่าไว้)
+    $('btnMenu').click();
+    check('menu: confirm option shown (on by default)', /ยืนยันก่อนเดินทัพ: เปิดอยู่/.test($('dialogCard').textContent));
+    q('#dialogCard [data-act="confirmtoggle"]').click();
+    let cfv = null; try { cfv = localStorage.getItem(CONFIRM_KEY); } catch (e) { /* ignore */ }
+    check('menu: confirm off saved', !confirmOn() && cfv === '0' && /ปิดอยู่/.test($('dialogCard').textContent));
+    closeDialog();
+    startGame('napoleon', 2, 0);
+    const l3 = armyAt(fac(0).capital), own3 = neighbors(fac(0).capital).filter(nb => !nb.mountain).map(nb => nb.id).find(id => S.nodes[id].capitalOf === null);
+    S.nodes[own3].owner = 0; S.nodes[own3].garrison = Z(); UI.selArmy = l3.id; render();
+    await onNodeClick(own3);
+    check('confirm off: single tap moves', l3.node === own3 && !UI.pending);
+    $('btnMenu').click(); q('#dialogCard [data-act="confirmtoggle"]').click(); closeDialog();
+    check('confirm back on', confirmOn());
     Ctrl.auto = false;
 
     // --- ถอนทัพของผู้เล่น (ถอยเข้าดินแดนเรา) ---
@@ -4912,6 +6398,109 @@ async function runFeatureTest() {
     Ctrl.auto = false;
     check('invariants after fx rounds', checkInvariants().length === 0, checkInvariants().join(';'));
 
+    // --- หลังจบเกม: แถบค้างด้านบน ดูข้อมูลได้ สั่งการไม่ได้ ---
+    startGame('napoleon', 2, 1, 's');
+    Ctrl.auto = false;
+    endByTurns(); render(); uiGameOver();
+    check('game over dialog', !$('dialog').classList.contains('hidden') && !!q('#dialogCard .res-title'));
+    q('#dialogCard [data-close]').click();
+    check('after game: bar stays with home + summary', !$('overBar').classList.contains('hidden') && /เกมจบแล้ว/.test($('overBar').textContent)
+      && !!q('#overBar [data-ob="title"]') && !!q('#overBar [data-ob="summary"]'));
+    const capG = fac(0).capital, foeN = S.nodes.find(n => n.owner > 0).id;
+    await onNodeClick(foeN);
+    check('after game: tap shows land info', UI.selNode === foeN && $('info').textContent.includes(S.nodes[foeN].name));
+    await onNodeClick(capG);
+    const capArm = armyAt(capG), nb0 = capArm ? moveTargets(capArm)[0] : null;
+    if (capArm && nb0 != null) { UI.selArmy = capArm.id; await onNodeClick(nb0); }
+    check('after game: no commands', !q('#info [data-recruit]') && !q('#info [data-act="hire"]') && !UI.pending && (!capArm || capArm.node === capG) && $('btnEnd').disabled);
+    q('#overBar [data-ob="summary"]').click();
+    check('after game: summary reopens', !$('dialog').classList.contains('hidden') && !!q('#dialogCard .res-title'));
+    closeDialog();
+    q('#overBar [data-ob="title"]').click();
+    check('after game: bar → title screen', $('title').classList.contains('active'));
+
+    // --- โหมดผู้ชม: แพ้ก่อนจบเกม บอทสู้กันต่อ ---
+    const watchGame = async (boss, speed) => {
+      if (boss) startGame('kongming', 2, 3, 'l', true); else startGame('napoleon', 3, 2, 's');
+      closeDialog();
+      Ctrl.auto = true; setAiSpeed(speed);
+      eliminate(0, boss ? S.boss.ares : 1, 'leader'); render(); uiGameOver();
+      const btn = q('#dialogCard [data-act="spectate"]');
+      if (!btn) return { ok: false };
+      btn.click();
+      return { ok: true };
+    };
+    const prog0 = JSON.stringify(loadProgress());
+    saveDisabled = false; clearSave();
+    let wg = await watchGame(false, 'fast');
+    check('lost early → "watch bots" button', wg.ok);
+    await wait(40);
+    check('spectate: bar + pause, not counted', S.spectate && /โหมดผู้ชม/.test($('overBar').textContent) && !!q('#overBar [data-ob="pause"]') && /โหมดผู้ชม/.test($('btnEnd').textContent));
+    q('#overBar [data-ob="pause"]').click();
+    await wait(300);
+    const snapS = JSON.stringify(S);
+    await wait(600);
+    check('spectate: pause holds the game', UI.spec && UI.spec.paused && JSON.stringify(S) === snapS && /เล่นต่อ/.test($('overBar').textContent));
+    const anyA = S.armies.find(a => a.fac > 0);
+    if (anyA) { await onNodeClick(anyA.node); check('spectate: tap shows any faction army', UI.selNode === anyA.node && $('info').textContent.includes(anyA.gen.name)); }
+    q('#overBar [data-ob="pause"]').click();
+    await UI.specTask;
+    const alive1 = S.factions.filter(f => f.alive).length;
+    check('spectate: plays to the end (one side / turn limit)', !!S.specResult && (alive1 <= 1 || S.specResult.turn === maxTurns() || S.specResult.reason === 'still') && !S.spectate && S.over && !S.over.win,
+      `alive=${alive1} turn=${S.turn} ${S.specResult && S.specResult.reason}`);
+    check('spectate: final ranking shown', /อันดับสุดท้าย/.test($('dialogCard').textContent) && $('dialogCard').querySelectorAll('.rank li').length === S.factions.length);
+    check('spectate: no save, no win/unlock', loadSave() === null && JSON.stringify(loadProgress()) === prog0 && window.__errs.length === 0, window.__errs.join('|'));
+    check('spectate: invariants', checkInvariants().filter(e => !/faction 0/.test(e)).length === 0, checkInvariants().join(';'));
+    closeDialog();
+    check('spectate: after-game bar back, summary has ranking', /เกมจบแล้ว/.test($('overBar').textContent) && (q('#overBar [data-ob="summary"]').click(), !!q('#dialogCard [data-act="specresult"]')) && !q('#dialogCard [data-act="spectate"]'));
+    closeDialog();
+    wg = await watchGame(true, 'skip');
+    check('boss mode: watch bots too', wg.ok);
+    await UI.specTask;
+    check('boss spectate ends without error', !!S.specResult && !S.spectate && window.__errs.length === 0 && JSON.stringify(loadProgress()) === prog0, `turn=${S.turn} ${S.specResult && S.specResult.reason}`);
+    closeDialog();
+    // ออกกลางทางระหว่างดู
+    wg = await watchGame(false, 'normal');
+    await wait(50);
+    q('#overBar [data-ob="title"]').click();
+    await UI.specTask;
+    check('spectate: home mid-way waits then leaves cleanly', $('title').classList.contains('active') && !UI.spec && !UI.busy && !S.specResult);
+    saveDisabled = true; setAiSpeed('normal'); Ctrl.auto = false;
+
+    // --- จบเทิร์นอัตโนมัติ (โหมดผลัดตา) ---
+    AUTO.off = false;
+    const autoSetup = () => { startGame('napoleon', 2, 1, 's'); closeDialog(); fac(0).gold = 0; for (const a of S.armies) if (a.fac === 0) a.used = 99; render(); };
+    autoSetup();
+    await wait(400);
+    check('auto end: bar when no moves & no money', !$('autoBar').classList.contains('hidden') && /จะจบเทิร์นใน/.test($('autoBar').textContent));
+    q('#autoBar [data-auto="no"]').click();
+    await wait(3600);
+    check('auto end: "ยังก่อน" stops it for this turn', S.phase === 'player' && S.turn === 1 && $('autoBar').classList.contains('hidden'));
+    autoSetup();
+    openDialog(helpHtml());
+    await wait(3600);
+    check('auto end: not while a window is open', S.phase === 'player' && S.turn === 1 && $('autoBar').classList.contains('hidden'));
+    closeDialog();
+    UI.tut = 'end'; await wait(3600);
+    check('auto end: not during tutorial', S.turn === 1 && S.phase === 'player');
+    UI.tut = null;
+    fac(0).gold = UNITS.inf.cost; await wait(3600);
+    check('auto end: not while money can still recruit', S.turn === 1 && S.phase === 'player');
+    fac(0).gold = 0;
+    Ctrl.auto = true;
+    for (let i = 0; i < 80 && S.turn === 1; i++) await wait(100);
+    check('auto end: ends the turn after 3 s', S.turn === 2 || S.phase === 'ai' || !!S.over);
+    for (let i = 0; i < 100 && (UI.busy || S.phase !== 'player') && !S.over; i++) await wait(100);
+    $('btnMenu').click();
+    check('menu: auto end option (on by default)', /จบเทิร์นอัตโนมัติ: เปิดอยู่/.test($('dialogCard').textContent));
+    q('#dialogCard [data-act="autoendtoggle"]').click();
+    let aev = null; try { aev = localStorage.getItem(AUTO_END_KEY); } catch (e) { /* ignore */ }
+    check('menu: auto end off saved', !autoEndOn() && aev === '0' && /ปิดอยู่/.test($('dialogCard').textContent));
+    closeDialog();
+    autoSetup(); await wait(3600);
+    check('auto end off: nothing happens', S.turn === 1 && S.phase === 'player' && $('autoBar').classList.contains('hidden'));
+    setAutoEndOn(true); AUTO.off = true; Ctrl.auto = false;
+
     // --- ปุ่มกลับไปสั่งการเลือกทัพนอกเมืองหลวงก่อน ---
     startGame('napoleon', 2, 1);
     setEndWarnOff(false);
@@ -4940,9 +6529,19 @@ function boot() {
   UI.setupLevel = loadProgress().unlocked;
   try { const sz = localStorage.getItem(SIZE_KEY); if (MAP_SIZES[sz]) UI.setupSize = sz; } catch (e) { /* ignore */ }
   try { const sp = localStorage.getItem(SPEED_KEY); if (AI_SPEEDS[sp]) UI.aiSpeed = sp; } catch (e) { /* ignore */ }
+  UI.wegoLevel = 1; UI.wegoTime = 60;
+  try {
+    const wl = localStorage.getItem(WEGO_LEVEL_KEY), wt = localStorage.getItem(WEGO_TIME_KEY);
+    if (wl != null && LEVELS[+wl]) UI.wegoLevel = +wl;
+    if (wt != null && WEGO_TIMES.includes(+wt)) UI.wegoTime = +wt;
+  } catch (e) { /* ignore */ }
+  setInterval(autoEndTick, 200);
   renderSpeed();
   renderTitle();
   const q = new URLSearchParams(location.search);
+  // โหมดทดสอบ: ปิดจบเทิร์นอัตโนมัติ (เทสต์ที่ต้องใช้เปิดเอง) ไม่ให้แทรกจังหวะของเทสต์อื่น
+  if ([...q.keys()].some(k => /test|sim|duel|shot/.test(k))) AUTO.off = true;
+  if ([...q.keys()].some(k => /test/.test(k))) document.body.classList.add('test-mode'); // เทสต์วัดตำแหน่งสุดท้าย ไม่รอแอนิเมชันของแผ่น
   const errs = [];
   window.addEventListener('error', e => errs.push(String(e.message)));
   window.addEventListener('unhandledrejection', e => errs.push('rejection: ' + String(e.reason && e.reason.stack || e.reason)));
@@ -4953,12 +6552,15 @@ function boot() {
   if (q.has('boss')) topt.boss = true;
   if (q.has('troy')) topt.troy = true;
   if (q.get('from')) topt.from = +q.get('from');
+  if (q.has('wego')) topt.wego = true;
   if (q.has('sim')) {
     for (const k of (q.get('tune') || '').split(',')) if (k) TUNE[k] = true;
     runTests('sim', +q.get('sim') || 50, topt);
   }
   else if (q.has('autotest')) runTests('autotest', +q.get('autotest') || 3, topt);
   else if (q.has('featuretest')) runFeatureTest();
+  else if (q.has('wegotest')) runWegoTest();
+  else if (q.has('mobiletest')) runMobileTest();
   else if (q.has('legendtest')) runLegendTest();
   else if (q.has('capitaltest')) runCapitalTest();
   else if (q.has('zoomtest')) runZoomTest();
@@ -4974,6 +6576,14 @@ function boot() {
       showScreen('game'); render();
       if (q.get('shot') === 'bossintro') openDialog(bossIntroHtml());
       if (q.get('shot') === 'ending') { S.over = { win: true, reason: 'boss' }; uiGameOver(); }
+    } else if (/^wego/.test(q.get('shot'))) {
+      // ศึกพร้อมกัน: ช่วงวางแผน (มีลูกศรคำสั่ง) / &sum = หลังคำนวณผล 1 เทิร์น / wegointro = หน้าอธิบาย
+      newGame(q.get('legend') || 'kongming', 2, 42, 2, q.get('size') || 'm', { wego: true, time: 60 });
+      enterWego();
+      const lead = leaderArmy(0), t = planTargets(0, lead, 0, null).find(id => S.nodes[id].owner !== 0);
+      if (t != null) { UI.selArmy = lead.id; wegoTap(t); }
+      if (q.get('shot') === 'wegointro') openDialog(wegoIntroHtml());
+      if (q.has('sum')) { Ctrl.auto = false; uiWegoConfirm(); }
     } else if (q.get('shot') !== 'title') {
       newGame(UI.setupLegend, 2, 42, 1, q.get('size') || 's');
       UI.selNode = fac(0).capital; UI.selArmy = armyAt(fac(0).capital).id;
@@ -4998,6 +6608,9 @@ function boot() {
           document.title = 'SHOTREADY';
         })();
       }
+      if (q.get('shot') === 'pending') { const a = armyAt(fac(0).capital), t = moveTargets(a).find(id => S.nodes[id].owner === NEUTRAL); onNodeClick(t); }
+      if (q.get('shot') === 'over') { endByTurns(); render(); uiGameOver(); closeDialog(); }
+      if (q.get('shot') === 'spectate') { UI.aiSpeed = 'normal'; eliminate(0, 1, 'leader'); render(); startSpectate(); }  // ใช้คู่กับ virtual time
       if (q.get('shot') === 'aiturn') { UI.aiSpeed = 'normal'; UI.selArmy = null; endPlayerTurn(); }  // ภาพระหว่างตาศัตรู (ใช้คู่กับ virtual time)
       if (q.get('shot') === 'retreatpick') {
         // ศัตรูบุกทัพเรา แล้วกดถอนทัพ → เลือกปลายทางบนแผนที่
