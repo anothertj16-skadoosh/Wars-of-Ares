@@ -453,6 +453,7 @@ const START_GOLD = 30;
 const CAPITAL_BONUS = 5;
 const CAPITAL_WALL = 1.25;   // ฝ่ายรับในเมืองหลวงตัวเอง
 const HIRE_COST = 30;
+const HIRE_INF = 5;          // แต่งตั้งแม่ทัพได้ทหารราบ 5 นายมาด้วย
 const MAX_ARMIES = 3;
 const PACK = 5;            // เกณฑ์ทีละ 5 นาย
 const NEUTRAL = -1;
@@ -549,53 +550,54 @@ const WANDER_LOYAL = 3;      // ตำนานที่ถูกจับยั
 const WANDER_REST = 3;       // ไม่มีดินแดนกลางให้หนี = หายไปพัก 3 เทิร์น
 const CAPTURE_RATIO = 1.5;   // ชนะขาด = พลังรบมากกว่า 1.5 เท่า
 const TRAITOR_MOD = 0.8;     // ตำนานที่ถูกจับ รบกับเจ้าของเก่า -20%
+// follow = ผู้ติดตาม 10 นายที่มาด้วยเมื่อยึดดินแดนพเนจรได้ (ผสมตามคาแรกเตอร์)
 const WANDERERS = [
-  { id: 'hanuman', hist: false, name: 'หนุมาน', icon: '🐒', origin: 'รามเกียรติ์', value: 14,
+  { id: 'hanuman', hist: false, name: 'หนุมาน', icon: '🐒', origin: 'รามเกียรติ์', value: 14, follow: { inf: 8, cav: 0, arc: 2 },
     skillName: 'ลมพัดคืนชีพ', skillDesc: 'ทัพแตกครั้งแรก ทหาร 30% ฟื้นแล้วถอยไปดินแดนข้างเคียง · ข้ามแม่น้ำไม่โดนโทษ',
     skill: { revive: 0.3, riverWalk: true },
     weakName: 'ไม่ถนัดตั้งรับ', weakDesc: 'เลือก “ตั้งรับ” แล้วไม่ได้โบนัสแพ้ทางกลยุทธ์', weak: { noDefendBonus: true } },
-  { id: 'wukong', hist: false, name: 'ซุนหงอคง', icon: '🐵', origin: 'ไซอิ๋ว', value: 18,
+  { id: 'wukong', hist: false, name: 'ซุนหงอคง', icon: '🐵', origin: 'ไซอิ๋ว', value: 18, follow: { inf: 7, cav: 0, arc: 3 },
     skillName: 'ตีลังกาบนเมฆ', skillDesc: 'ทัพเดินได้ 2 ช่องเสมอ และข้ามเทือกเขาได้',
     skill: { moves2: true, crossMountain: true },
     weakName: 'ใจร้อน', weakDesc: 'ถ้าศัตรูเลือก “ตั้งรับ” พลังรบ -25%', weak: { foeDefend: 0.75 } },
-  { id: 'musashi', hist: true, name: 'มิยาโมโตะ มูซาชิ', icon: '🥋', origin: 'ญี่ปุ่น ยุคเอโดะ', value: 12,
+  { id: 'musashi', hist: true, name: 'มิยาโมโตะ มูซาชิ', icon: '🥋', origin: 'ญี่ปุ่น ยุคเอโดะ', value: 12, follow: { inf: 10, cav: 0, arc: 0 },
     skillName: 'ดาบคู่ไร้พ่าย', skillDesc: 'ชนะการรบแล้วเสียทหารแค่ครึ่งของปกติ',
     skill: { winLossHalf: true },
     weakName: 'นักดาบเดียวดาย', weakDesc: 'ทัพเกิน 40 นาย พลังรบ -20%', weak: { bigArmy: 40, mod: 0.8 } },
-  { id: 'achilles', hist: false, name: 'อคิลลิส', icon: '🏛️', origin: 'อีเลียด (กรีก)', value: 14,
+  { id: 'achilles', hist: false, name: 'อคิลลิส', icon: '🏛️', origin: 'อีเลียด (กรีก)', value: 14, follow: { inf: 8, cav: 2, arc: 0 },
     skillName: 'นักรบไร้เทียมทาน', skillDesc: 'ตอนบุก พลังรบ +30%',
     skill: { atkBonus: 1.3 },
     weakName: 'ส้นเท้าอคิลลิส', weakDesc: 'ถ้าศัตรูมีทหารธนู 30% ขึ้นไป พลังรบ -30%', weak: { foeArcher: 0.3, mod: 0.7 } },
-  { id: 'robin', hist: false, name: 'โรบินฮู้ด', icon: '🎯', origin: 'ตำนานอังกฤษ', value: 12,
+  { id: 'robin', hist: false, name: 'โรบินฮู้ด', icon: '🎯', origin: 'ตำนานอังกฤษ', value: 12, follow: { inf: 2, cav: 0, arc: 8 },
     skillName: 'พรานแห่งเชอร์วูด', skillDesc: 'ทหารธนู +25% · ยึดดินแดนของฝ่ายศัตรูได้เงิน 10 💰',
     skill: { arcBonus: 1.25, loot: 10 },
     weakName: 'ไร้ป่ากำบัง', weakDesc: 'รบในที่ราบ พลังรบ -15%', weak: { terrain: 'plain', mod: 0.85 } },
-  { id: 'joan', hist: true, name: 'โจนออฟอาร์ค', icon: '⚜️', origin: 'ฝรั่งเศส สงครามร้อยปี', value: 12,
+  { id: 'joan', hist: true, name: 'โจนออฟอาร์ค', icon: '⚜️', origin: 'ฝรั่งเศส สงครามร้อยปี', value: 12, follow: { inf: 5, cav: 5, arc: 0 },
     skillName: 'ธงแห่งศรัทธา', skillDesc: 'ทัพของโจนและทัพเราที่อยู่ติดกับโจน +10% เมื่อรบ',
     skill: { aura: 1.1 },
     weakName: 'หนึ่งเดียวไม่หวนคืน', weakDesc: 'ถ้าทัพแตก หายไปจากเกมถาวร (ไม่ถูกจับ ไม่กลับไปพเนจร)', weak: { perish: true } },
-  { id: 'pichai', hist: true, name: 'พระยาพิชัยดาบหัก', icon: '🗡️', origin: 'กรุงธนบุรี', value: 11,
+  { id: 'pichai', hist: true, name: 'พระยาพิชัยดาบหัก', icon: '🗡️', origin: 'กรุงธนบุรี', value: 11, follow: { inf: 8, cav: 2, arc: 0 },
     skillName: 'สู้ทั้งดาบหัก', skillDesc: 'ถ้าทหารน้อยกว่าศัตรู พลังรบ +25%',
     skill: { underdog: 1.25 },
     weakName: 'ไม่รู้จักถอย', weakDesc: 'ถอนทัพหรือตีฝ่าวงล้อมไม่ได้', weak: { noRetreat: true } },
-  { id: 'khunphaen', hist: false, name: 'ขุนแผน', icon: '🪄', origin: 'ขุนช้างขุนแผน', value: 16,
+  { id: 'khunphaen', hist: false, name: 'ขุนแผน', icon: '🪄', origin: 'ขุนช้างขุนแผน', value: 16, follow: { inf: 6, cav: 0, arc: 4 },
     skillName: 'เสกหุ่นพยนต์', skillDesc: 'ต้นเทิร์นได้ทหารราบฟรี 3 นาย',
     skill: { freeInf: 3 },
     weakName: 'ของขลังเสื่อมในน้ำ', weakDesc: 'รบในดินแดนแม่น้ำ พลังรบ -20%', weak: { terrain: 'river', mod: 0.8 } },
-  { id: 'liubei', hist: true, name: 'เล่าปี่', icon: '🍑', origin: 'สามก๊ก', value: 9,
+  { id: 'liubei', hist: true, name: 'เล่าปี่', icon: '🍑', origin: 'สามก๊ก', value: 9, follow: { inf: 4, cav: 3, arc: 3 },
     skillName: 'คุณธรรมผูกใจคน', skillDesc: 'ตำนานที่ฝ่ายนี้จับมาได้ภักดีทันที และไม่โดนโทษตอนรบกับเจ้าของเก่า',
     skill: { benevolence: true },
     weakName: 'อ่อนการศึก', weakDesc: 'ทัพที่เล่าปี่นำ พลังรบ -10%', weak: { self: 0.9 } },
   // ชุดสงครามทรอย (set: 'troy') — เข้ากองสุ่มหลังชนะโหมดศึกชิงอิสรภาพ
-  { id: 'odysseus', hist: false, set: 'troy', name: 'โอดิสซีอุส', icon: '🐴', origin: 'โอดิสซีย์ (กรีก)', value: 12,
+  { id: 'odysseus', hist: false, set: 'troy', name: 'โอดิสซีอุส', icon: '🐴', origin: 'โอดิสซีย์ (กรีก)', value: 12, follow: { inf: 5, cav: 0, arc: 5 },
     skillName: 'ม้าไม้เมืองทรอย', skillDesc: 'บุกเมืองหลวงศัตรูโดยไม่โดนกำแพงเมือง',
     skill: { trojanHorse: true },
     weakName: 'เล่ห์ ไม่ใช่กำลัง', weakDesc: 'เลือก “บุกตรง” พลังรบ -15%', weak: { chargeMod: 0.85 } },
-  { id: 'patroclus', hist: false, set: 'troy', name: 'ปาโตรคลัส', icon: '⚱️', origin: 'อีเลียด (กรีก)', value: 10,
+  { id: 'patroclus', hist: false, set: 'troy', name: 'ปาโตรคลัส', icon: '⚱️', origin: 'อีเลียด (กรีก)', value: 10, follow: { inf: 8, cav: 2, arc: 0 },
     skillName: 'สหายรัก', skillDesc: 'ถ้าอคิลลิสอยู่ฝ่ายเดียวกัน พลังรบ +20%',
     skill: { comrade: 1.2 },
     weakName: 'ความตายที่ปลุกโทสะ', weakDesc: 'ทัพแตกแล้วหายถาวร (ไม่ถูกจับ ไม่กลับไปพเนจร) และอคิลลิสที่อยู่ฝ่ายเดียวกันตอนนั้นได้ +30% ถาวร', weak: { perish: true, wrath: 1.3 } },
-  { id: 'diomedes', hist: false, set: 'troy', name: 'ไดโอมีดีส', icon: '🦅', origin: 'อีเลียด (กรีก)', value: 12,
+  { id: 'diomedes', hist: false, set: 'troy', name: 'ไดโอมีดีส', icon: '🦅', origin: 'อีเลียด (กรีก)', value: 12, follow: { inf: 4, cav: 6, arc: 0 },
     skillName: 'ผู้ทำร้ายเทพ', skillDesc: 'สู้กับอวตารของ Ares +40% และสู้กับทัพที่ตำนานนำ +15%',
     skill: { godSlayer: 1.4, vsLegend: 1.15 },
     weakName: 'ใจกล้าเกินตัว', weakDesc: 'ตอนตั้งรับ พลังรบ -15%', weak: { defMod: 0.85 } },
@@ -780,11 +782,14 @@ function placeWanderers() {
   }
   used.forEach((node, i) => { if (picked[i]) { S.wInGame.push(picked[i]); putWild(picked[i], node); } });
 }
-function putWild(wid, node) {
+// bare = กลับมาพเนจรอีกครั้ง (หนีหรือพักครบ) จึงไม่มีผู้ติดตาม
+function putWild(wid, node, bare = false) {
   const g = S.nodes[node].garrison;
   for (let i = 0; i < WANDER_GUARD; i++) g[pick(UNIT_TYPES)]++;
-  S.wild.push({ wid, node });
+  S.wild.push(bare ? { wid, node, bare } : { wid, node });
 }
+const followers = wid => ({ ...WMAP[wid].follow });
+const followText = u => `ผู้ติดตาม ${sumU(u)} นาย (${UNIT_TYPES.filter(t => u[t]).map(t => `${UNITS[t].icon}${u[t]}`).join(' ')})`;
 const wildAt = nodeId => S.wild.find(w => w.node === nodeId);
 
 /* ---------- Map generation ---------- */
@@ -965,8 +970,20 @@ function pathTo(prev, s, g) {
 
 function nodeIncome(n) { return TERRAINS[n.terrain].income + (n.capitalOf !== null ? CAPITAL_BONUS : 0); }
 function income(f) { return S.nodes.filter(n => n.owner === f).reduce((s, n) => s + nodeIncome(n), 0); }
+// ?sim: บันทึกเศรษฐกิจของที่นั่งผู้เล่นต่อเกม (null นอก sim — ไม่ใช้ rng ไม่เปลี่ยนผล)
+let ECON = null;
+function econTick(inc) {
+  const E = ECON, F = fac(0), mine = S.armies.filter(a => a.fac === 0);
+  if (S.turn > 1) E.left.push(F.gold);
+  E.broke.push(F.gold + inc < Math.min(...UNIT_TYPES.map(t => UNITS[t].cost)) ? 1 : 0);
+  for (const n of S.nodes) if (n.owner === 0) { E[n.terrain === 'river' ? 'river' : 'other'] += TERRAINS[n.terrain].income; if (n.capitalOf !== null) E.capBonus += CAPITAL_BONUS; }
+  if ([5, 10, 15].includes(S.turn)) E['inc' + S.turn] = inc;
+  if ([10, 15].includes(S.turn) && mine.length) E['per' + S.turn] = mine.reduce((s, a) => s + sumU(a.units), 0) / mine.length;
+  if (E.full == null && mine.length >= MAX_ARMIES) E.full = S.turn;
+}
 function startFactionTurn(f) {
   const inc = income(f);
+  if (ECON && f === 0 && fac(0).alive) econTick(inc);
   fac(f).gold += inc;
   for (const a of S.armies) if (a.fac === f) {
     a.used = 0;
@@ -1027,12 +1044,12 @@ function hireGeneral(f) {
   if (SIMOPT.give && f === 0 && !S.simGiven) {
     // โหมดจำลองวัดพลังตำนาน: แม่ทัพคนแรกของที่นั่งผู้เล่นเป็นตำนาน (ภักดีแล้ว)
     S.simGiven = true; S.wInGame.push(SIMOPT.give);
-    const a = newArmy(f, cap, legendGen(SIMOPT.give, null), Z());
+    const a = newArmy(f, cap, legendGen(SIMOPT.give, null), { ...Z(), inf: HIRE_INF });
     log(`${facName(f)} แต่งตั้ง ${a.gen.name}`);
     return a;
   }
-  const a = newArmy(f, cap, { name, icon: '🎖️', leader: false }, Z());
-  log(`${facName(f)} แต่งตั้ง ${name}`);
+  const a = newArmy(f, cap, { name, icon: '🎖️', leader: false }, { ...Z(), inf: HIRE_INF });
+  log(`${facName(f)} แต่งตั้ง ${name} พร้อมทหารราบ ${HIRE_INF} นาย`);
   if (WG.rec && WG.rec.fac === f) WG.rec.acts.push({ t: 'hire', id: a.id });
   emitFx({ t: 'hire', fac: f, node: cap });
   return a;
@@ -1265,7 +1282,7 @@ function capture(a, node, prevOwner, preGarrison) {
   const w = wildAt(node.id);
   if (w) {
     S.wild = S.wild.filter(x => x !== w);
-    S.joins.push({ wid: w.wid, fac: a.fac, army: a.id, from: null });
+    S.joins.push({ wid: w.wid, fac: a.fac, army: a.id, from: null, follow: !w.bare });
     S.wstats.wild++;
   }
 }
@@ -1444,7 +1461,7 @@ function wanderAway(wid, fromNode) {
   const opts = S.nodes.filter(n => n.owner === NEUTRAL && n.id !== fromNode && !wildAt(n.id));
   if (opts.length) {
     const n = pick(opts);
-    putWild(wid, n.id);
+    putWild(wid, n.id, true);
     S.wstats.fled++;
     log(`🌫️ วิญญาณของ ${W.name} หนีกลับไปพเนจรที่ ${n.name}`);
     return `${W.name} หนีกลับไปพเนจรที่ ${n.name}`;
@@ -1468,7 +1485,7 @@ function wanderReturn() {
     const n = pick(opts), prev = n.owner;
     S.resting = S.resting.filter(x => x !== r);
     n.owner = NEUTRAL;
-    putWild(r.wid, n.id);
+    putWild(r.wid, n.id, true);
     emitFx({ t: 'legend', fac: NEUTRAL, node: n.id, wid: r.wid });
     log(`✨ วิญญาณของ ${WMAP[r.wid].name} ปรากฏที่ ${n.name}${prev !== NEUTRAL ? ` — กองกำลังท้องถิ่นลุกขึ้นแยกตัวจาก ${facName(prev)}` : ''}`);
   }
@@ -1556,32 +1573,37 @@ async function processJoins() {
     const gen = j.gen || legendGen(j.wid, j.from);
     if (fweak(j.fac).greedy && !j.gen) gen.loyalAt = S.turn + WANDER_LOYAL; // ราชาผู้โลภ
     const a = j.army != null ? armyById(j.army) : null;
+    // ยึดดินแดนพเนจรได้ = มาพร้อมผู้ติดตาม · ถูกจับ / เชิดวิญญาณ / กลับมาพเนจรอีกครั้ง = มาตัวเปล่า
+    const fol = j.from == null && !j.gen && j.follow ? followers(j.wid) : null;
+    const folTxt = fol ? ` + ${followText(fol)}` : '';
     let text;
     if (j.from == null && !j.gen && a && a.fac === j.fac && !a.gen.leader && !a.gen.wid) {
-      // ยึดดินแดนตำนานพเนจรด้วยแม่ทัพธรรมดา: ตำนานนำทัพนั้นแทน ทหารอยู่ครบ
-      text = `${W.name} เข้าร่วม ${facName(j.fac)} นำทัพแทน ${a.gen.name} (ทหารอยู่ครบ ${sumU(a.units)} นาย)`;
+      // ยึดดินแดนตำนานพเนจรด้วยแม่ทัพธรรมดา: ตำนานนำทัพนั้นแทน ทหารอยู่ครบ ผู้ติดตามเข้าร่วมเพิ่ม
+      text = `${W.name} เข้าร่วม ${facName(j.fac)} นำทัพแทน ${a.gen.name} (ทหารเดิม ${sumU(a.units)} นาย${folTxt})`;
       a.gen = gen;
+      if (fol) a.units = addU(a.units, fol);
     } else {
       const mine = S.armies.filter(x => x.fac === j.fac);
       const spot = mine.length < maxArmies(j.fac) ? legendSpot(j.fac) : null;
       if (spot != null) {
-        const na = newArmy(j.fac, spot, gen, Z());
+        const na = newArmy(j.fac, spot, gen, fol || Z());
         na.used = 99;
         if (!isHumanFac(j.fac) && spot === F.capital) absorbGarrison(na, 6);
-        text = `${W.name} เข้าร่วม ${facName(j.fac)} ตั้งทัพใหม่ที่ ${S.nodes[spot].name}${j.from != null ? ' (มาตัวเปล่า)' : ''}`;
+        text = `${W.name} เข้าร่วม ${facName(j.fac)} ตั้งทัพใหม่ที่ ${S.nodes[spot].name} ${fol ? `พร้อม${followText(fol)}` : '(มาตัวเปล่า)'}`;
       } else {
         const cands = mine.filter(x => !x.gen.leader && !x.gen.wid);
         const fewest = () => cands.slice().sort((p, q) => sumU(p.units) - sumU(q.units))[0];
         const out = !cands.length ? null : isHumanFac(j.fac) && !isWego() ? await Ctrl.askDismiss(j, gen, cands) : fewest();
         if (!out) { log(`${facName(j.fac)} ไม่มีที่ให้ ${W.name} ตั้งทัพ`); wanderAway(j.wid, null); continue; }
         S.wstats.dismiss++;
-        text = `${facName(j.fac)} ปลด ${out.gen.name} — ${W.name} รับช่วงนำทัพที่ ${S.nodes[out.node].name} (${sumU(out.units)} นาย)`;
+        text = `${facName(j.fac)} ปลด ${out.gen.name} — ${W.name} รับช่วงนำทัพที่ ${S.nodes[out.node].name} (ทหารเดิม ${sumU(out.units)} นาย${folTxt})`;
         out.gen = gen;
+        if (fol) out.units = addU(out.units, fol);
       }
     }
     log(`✨ ${text}`);
     const at = S.armies.find(x => x.gen === gen);
-    if (at) emitFx({ t: 'legend', fac: j.fac, node: at.node, wid: j.wid });
+    if (at) emitFx({ t: 'legend', fac: j.fac, node: at.node, wid: j.wid, fol: fol ? sumU(fol) : 0 });
     if (isHumanFac(j.fac) && !isWego()) await Ctrl.showJoin(gen, text);
   }
 }
@@ -3073,7 +3095,10 @@ function legendBoxHtml(wid, g, f) {
   h += `<div class="lg-w">⚠️ <b>${esc(W.weakName)}</b>: ${esc(W.weakDesc)}</div>`;
   if (g && !isLoyal(g, f)) h += `<div class="lg-x">⏳ ยังไม่ภักดี อีก ${loyalLeft(g)} เทิร์น: สกิลใช้ไม่ได้ ถ้าแพ้การรบจะทิ้งทัพหนีไป</div>`;
   if (g && g.from != null) h += `<div class="lg-x">${traitorPenalty(g, f, g.from) ? `⚠️ รบกับ ${esc(facName(g.from))} (เจ้าของเก่า) พลังรบ -20%` : `🍑 เล่าปี่อยู่ฝ่ายนี้: ไม่โดนโทษตอนรบกับ ${esc(facName(g.from))}`}</div>`;
-  if (!g) h += `<div class="lg-x">ยึดดินแดนนี้ = ได้ ${esc(W.name)} เป็นแม่ทัพ</div>`;
+  if (!g) {
+    const w = S.wild.find(x => x.wid === wid);
+    h += `<div class="lg-x">ยึดดินแดนนี้ = ได้ ${esc(W.name)} เป็นแม่ทัพ ${w && w.bare ? '(กลับมาพเนจรอีกครั้ง: มาตัวเปล่า)' : `พร้อม${esc(followText(W.follow))}`}</div>`;
+  }
   return h + `</div>`;
 }
 // ตำแหน่ง/สถานะของตำนานแต่ละตัว สำหรับรายการในแผงข้าง
@@ -3316,7 +3341,7 @@ function renderInfo() {
     h += `<div class="act-col">`;
     if (fac(0).capital === id) {
       const why = hireBlock(0, id);
-      h += `<button class="btn" data-act="hire" ${why ? 'disabled' : ''}>🎖️ แต่งตั้งแม่ทัพใหม่ (${HIRE_COST} 💰)</button>`;
+      h += `<button class="btn" data-act="hire" ${why ? 'disabled' : ''}>🎖️ แต่งตั้งแม่ทัพใหม่ (${HIRE_COST} 💰 · ได้ทหารราบ ${HIRE_INF} นาย)</button>`;
       if (why) h += `<div class="warn">⚠️ ${esc(why)}</div>`;
     }
     if (a && a.fac === 0) {
@@ -3929,7 +3954,7 @@ function wegoSummary(steps) {
     } else if (e.t === 'own' && !fought.has(e.node) && (e.to === 0 || e.from === 0)) {
       out.push(e.to === 0 ? `🚩 ยึด ${name(e.node)} ได้โดยไม่ต้องรบ` : `🏳️ เสีย ${name(e.node)} ให้ ${facName(e.to)}`);
     } else if (e.t === 'retreat' && e.fac === 0) out.push(`🏃 ทัพของเราถอยจาก ${name(e.from)} ไป ${name(e.to)}`);
-    else if (e.t === 'legend' && e.fac === 0) out.push(`✨ ได้ ${WMAP[e.wid].name} มาเป็นแม่ทัพ`);
+    else if (e.t === 'legend' && e.fac === 0) out.push(`✨ ได้ ${WMAP[e.wid].name} มาเป็นแม่ทัพ${e.fol ? ` พร้อมผู้ติดตาม ${e.fol} นาย` : ''}`);
   }
   out.push(...UI.notices);
   UI.notices = [];
@@ -4395,7 +4420,7 @@ function helpHtml() {
     <li>ถ้าไม่มีเมืองหลวงสำรอง = ⛺ ไร้แผ่นดิน: ไม่มีรายได้เมืองหลวง แต่งตั้งแม่ทัพไม่ได้ ต้องยึดเมืองหลวงแห่งใดก็ได้ภายใน ${HOMELESS_TURNS} เทิร์น ไม่งั้นแพ้ (ดินแดนกลายเป็นดินแดนกลาง) และถ้าทัพจอมทัพแตกระหว่างนั้น = แพ้ทันที (ดินแดนตกเป็นของผู้ตีทัพแตก)</li></ul>
     <h3>ในแต่ละเทิร์น</h3><ul><li>รับเงิน 💰 จากดินแดนที่ครอง (เมืองหลวง +${CAPITAL_BONUS})</li>
     <li>เกณฑ์ทหารที่เมืองหลวง หรือดินแดนที่มีทัพของเราอยู่ (ครั้งละ ${PACK} นาย)</li>
-    <li>แต่ละทัพเดินไปดินแดนติดกันได้ 1 ช่อง — ทุกทัพต้องมีแม่ทัพ (แต่งตั้งเพิ่มที่เมืองหลวงได้ สูงสุด ${MAX_ARMIES} ทัพ)</li>
+    <li>แต่ละทัพเดินไปดินแดนติดกันได้ 1 ช่อง — ทุกทัพต้องมีแม่ทัพ (แต่งตั้งเพิ่มที่เมืองหลวงได้ ${HIRE_COST} 💰 ได้ทหารราบ ${HIRE_INF} นายมาด้วย สูงสุด ${MAX_ARMIES} ทัพ)</li>
     <li>ยืนยันก่อนเดินทัพ (เปิด/ปิดในเมนู ☰): แตะเป้าครั้งแรก = ดูเส้นทางและผลประเมิน แตะซ้ำหรือกด “ยืนยันบุก/ยืนยันเดินทัพ” = เดินจริง แตะดินแดนอื่น = เปลี่ยนเป้า</li>
     <li>⏩ จบเทิร์นอัตโนมัติ (เปิด/ปิดในเมนู ☰): ทุกทัพเดินไม่ได้แล้ว (ศึกพร้อมกัน: มีคำสั่งครบ) และเงินไม่พอเกณฑ์ทหาร → นับ 3 วินาทีแล้วจบเทิร์น/ยืนยันคำสั่งให้ กด “ยังก่อน” เพื่อไม่ถามซ้ำในเทิร์นนั้น</li>
     <li>📱 มือถือ: แผนที่เต็มจอ แผงข้อมูลเป็นแผ่นเลื่อนจากล่าง (ลาก/แตะที่จับ: พับ · ครึ่งจอ · เต็มจอ — แนวนอนครึ่งจอเป็นแผงด้านขวา) มีแท็บ ข้อมูล/ทัพของเรา/ตำนาน/บันทึกศึก · ปุ่มจบเทิร์นลอยมุมล่างขวา</li>
@@ -4424,10 +4449,10 @@ function helpHtml() {
     <li>AI ไม่ได้ชอบตีเราเป็นพิเศษ (ยกเว้นระดับตำนานตอนเราครองดินแดนมากที่สุด): ทุกฝ่ายแค้นฝ่ายที่เพิ่งบุกตัวเองราว 4 เทิร์น ฉวยโอกาสตีฝ่ายที่ไร้แผ่นดินหรือทหารน้อย และตั้งแต่จอมพลจะรุมฝ่ายที่ครองดินแดนนำห่าง — ใช้กับเราและ AI เหมือนกัน</li>
     <li>ย้อนได้เฉพาะการเดินทัพที่ไม่มีการรบ เกณฑ์ทหาร แต่งตั้งแม่ทัพ รวม/แบ่งทหาร ในเทิร์นเดียวกัน — เกิดการรบแล้วย้อนกลับไปก่อนหน้านั้นไม่ได้</li></ul>
     <h3>✨ ตำนานพเนจร</h3><ul><li>วิญญาณที่ Ares เพิ่งลักพามา ยังไม่มีฝ่าย — มีตั้งแต่ระดับแม่ทัพขึ้นไป (ระดับนายกองไม่มี) สุ่มมาตามขนาดแผนที่ (เล็ก 2–3 / กลาง 3 / ใหญ่ 3–4 ตัว) อยู่ในดินแดนกลางที่มีกองกำลังเฝ้า +${WANDER_GUARD} นาย</li>
-    <li>ยึดดินแดนนั้นได้ = ตำนานนำทัพนั้นแทนแม่ทัพธรรมดา (ทหารอยู่ครบ) · ถ้าจอมทัพหรือตำนานนำทัพอยู่ ตำนานไปตั้งทัพใหม่ที่เมืองหลวง/ดินแดนว่างที่ใกล้ที่สุด · ทัพครบ ${MAX_ARMIES} หรือไม่มีที่ว่าง = เลือกปลดแม่ทัพธรรมดาหนึ่งคน</li>
+    <li>ยึดดินแดนนั้นได้ = ตำนานมาพร้อมผู้ติดตาม 10 นาย (ผสมตามคาแรกเตอร์ ดูรายชื่อด้านล่าง) · นำทัพนั้นแทนแม่ทัพธรรมดา (ทหารอยู่ครบ + ผู้ติดตามเข้าร่วม) · ถ้าจอมทัพหรือตำนานนำทัพอยู่ ตำนานตั้งทัพใหม่พร้อมผู้ติดตามที่เมืองหลวง/ดินแดนว่างที่ใกล้ที่สุด · ทัพครบ ${MAX_ARMIES} หรือไม่มีที่ว่าง = เลือกปลดแม่ทัพธรรมดาหนึ่งคน (ผู้ติดตามเข้าร่วมทัพนั้น)</li>
     <li>ตีทัพของตำนานฝ่ายอื่นแตกแบบชนะขาด (พลังรบเกิน ${CAPTURE_RATIO} เท่า) = จับตัวได้ ไม่งั้นตำนานหนีกลับไปพเนจร (ไม่มีดินแดนกลาง = พัก ${WANDER_REST} เทิร์น แล้วโผล่ในดินแดนที่ไม่มีทัพ ไม่มีกองรักษาการณ์ และไม่ใช่เมืองหลวง/อดีตเมืองหลวง · ${WANDER_LATE} เทิร์นสุดท้ายไม่โผล่)</li>
-    <li>ตำนานที่ถูกจับ: มาตัวเปล่า · ${WANDER_LOYAL} เทิร์นแรกยังไม่ภักดี (สกิลใช้ไม่ได้ แพ้การรบ = ทิ้งทัพหนีไป) · รบกับเจ้าของเก่า -20% ตลอดเกม</li>
-    ${WANDERERS.map(w => `<li>${w.icon} <b>${w.name}</b> (${w.origin}) — ✨ ${w.skillName}: ${w.skillDesc} · ⚠️ ${w.weakName}: ${w.weakDesc}</li>`).join('')}</ul>
+    <li>ตำนานที่ถูกจับ / ถูก Ares เชิดวิญญาณ / กลับมาพเนจรอีกครั้ง (หนีหรือพักครบ): มาตัวเปล่า ไม่มีผู้ติดตาม · ตำนานที่ถูกจับ: ${WANDER_LOYAL} เทิร์นแรกยังไม่ภักดี (สกิลใช้ไม่ได้ แพ้การรบ = ทิ้งทัพหนีไป) · รบกับเจ้าของเก่า -20% ตลอดเกม</li>
+    ${WANDERERS.map(w => `<li>${w.icon} <b>${w.name}</b> (${w.origin}) — ✨ ${w.skillName}: ${w.skillDesc} · ⚠️ ${w.weakName}: ${w.weakDesc} · 👥 ${followText(w.follow)}</li>`).join('')}</ul>
     <h3>🩸 ศึกชิงอิสรภาพ (ปลดล็อกหลังชนะระดับตำนาน)</h3><ul><li>แผนที่ใหญ่ AI ระดับตำนาน บัลลังก์แห่ง Ares อยู่กลางแผนที่ ล้อมด้วยเมืองหลวงหุ่นเชิด 🎭 ที่ช่วยกันรุมเราและไม่รบกันเอง</li>
     <li>ยึดเมืองหลวงหุ่นเชิด = ปลดปล่อย: จอมทัพนั้นมาเป็นแม่ทัพของเรา (ใช้สกิลจอมทัพของเขากับทัพนั้น) ดินแดนทั้งหมดเป็นของเรา</li>
     <li>เกจโลหิต: ทุกการรบเติม 1 ช่อง ครบ ${BLOOD_MAX} ช่อง Ares ปล่อยพลัง 🔥 โลหิตเดือด (ทัพ Ares/หุ่นเชิด +25% 2 เทิร์น) หรือ 👻 เชิดวิญญาณ (ดึงตำนานพเนจร หรือตำนานที่ยังไม่ภักดีของเรา) · ทุก 5 เทิร์นภูมิประเทศ 3 แห่งเปลี่ยน</li>
@@ -4670,6 +4695,7 @@ function bindUI() {
    TEST — โหมดทดสอบอัตโนมัติ: ?sim=N (ตรรกะล้วน) / ?autotest=N (ผ่าน UI จริง)
    ===================================================================== */
 async function playAutoGame(legendId, numAI, seed, report, opt = {}) {
+  if (report.mode === 'sim') ECON = { left: [], broke: [], river: 0, other: 0, capBonus: 0, full: null };
   newGame(legendId, numAI, seed, opt.level == null ? 1 : opt.level, opt.size || 's', { boss: !!opt.boss, troy: !!opt.troy, wego: !!opt.wego, time: 0 });
   if (opt.wego) {
     // ศึกพร้อมกัน: ที่นั่งผู้เล่นวางแผนด้วยบอทระดับแม่ทัพ (ขงเบ้งวางแผนตอนท้ายด้วยข้อมูลหยั่งรู้)
@@ -4767,6 +4793,15 @@ async function runTests(mode, n, opt = {}) {
         h[0]++; if (S.over && S.over.win) h[1]++;
       }
       report.battles += S.stats.battles;
+      if (ECON) {
+        const R = report.econ = report.econ || { games: 0, left: [0, 0], broke: [0, 0], river: 0, other: 0, capBonus: 0, full: [0, 0], inc5: [0, 0], inc10: [0, 0], inc15: [0, 0], per10: [0, 0], per15: [0, 0] };
+        R.games++;
+        R.left[0] += ECON.left.reduce((a, b) => a + b, 0); R.left[1] += ECON.left.length;
+        R.broke[0] += ECON.broke.reduce((a, b) => a + b, 0); R.broke[1] += ECON.broke.length;
+        for (const k of ['river', 'other', 'capBonus']) R[k] += ECON[k];
+        if (ECON.full != null) { R.full[0] += ECON.full; R.full[1]++; }
+        for (const k of ['inc5', 'inc10', 'inc15', 'per10', 'per15']) if (ECON[k] != null) { R[k][0] += ECON[k]; R[k][1]++; }
+      }
       const TS = report.target = report.target || { onP: 0, onAI: 0, bP: 0, bAI: 0 };
       for (const k in TS) TS[k] += S.tstats[k];
       if (over) {
@@ -4792,6 +4827,13 @@ async function runTests(mode, n, opt = {}) {
   report.uiErrors = window.__errs || [];
   // สัดส่วนการบุกของ AI ที่ลงที่ผู้เล่น เทียบกับสัดส่วนดินแดนผู้เล่นในพรมแดนของ AI (ควรใกล้กัน)
   if (report.target) { const T = report.target; T.atkOnPlayerPct = Math.round(100 * T.onP / Math.max(1, T.onP + T.onAI)); T.borderPlayerPct = Math.round(100 * T.bP / Math.max(1, T.bP + T.bAI)); }
+  if (report.econ) {
+    const R = report.econ, avg = ([a, b]) => b ? +(a / b).toFixed(1) : null, tot = R.river + R.other + R.capBonus;
+    report.econSum = { inc5: avg(R.inc5), inc10: avg(R.inc10), inc15: avg(R.inc15), leftGold: avg(R.left), brokePct: Math.round(100 * R.broke[0] / Math.max(1, R.broke[1])),
+      perArmy10: avg(R.per10), perArmy15: avg(R.per15), fullTurn: avg(R.full), fullPct: Math.round(100 * R.full[1] / R.games),
+      riverPct: Math.round(100 * R.river / tot), otherPct: Math.round(100 * R.other / tot), capPct: Math.round(100 * R.capBonus / tot) };
+    delete report.econ;
+  }
   report.seatWinPct = {};
   for (const k in report.byLegend) report.seatWinPct[k] = Math.round(100 * report.byLegend[k][1] / report.byLegend[k][0]);
   for (const k in report.legendAll) { const x = report.legendAll[k]; x.alivePct = Math.round(100 * x.alive / x.games); x.sharePct = Math.round(100 * x.share / x.games); delete x.share; }
@@ -5047,7 +5089,7 @@ async function runLegendTest() {
     fac(0).gold = 100;
     let g = newArmy(0, A.id, { name: 'แม่ทัพทดสอบ', icon: '🎖️', leader: false }, { inf: 10, cav: 0, arc: 10 });
     await moveArmy(g, B.id);
-    check('wild + normal general → legend leads, troops kept', g.gen.wid === 'robin' && sumU(g.units) === 20 && g.node === B.id && !wildAt(B.id), inv());
+    check('wild + normal general → legend leads, troops kept + followers', g.gen.wid === 'robin' && sumU(g.units) === 30 && g.units.inf === 12 && g.units.arc === 18 && g.node === B.id && !wildAt(B.id), inv());
 
     // --- ยึดด้วยจอมทัพ: ตำนานตั้งทัพใหม่ที่เมืองหลวง (มาตัวเปล่า) ---
     fresh();
@@ -5057,7 +5099,7 @@ async function runLegendTest() {
     S.nodes[C].owner = NEUTRAL; S.nodes[C].garrison = Z();
     await moveArmy(lead, C);
     const wa = S.armies.find(a => a.gen.wid === 'wukong');
-    check('wild + leader → new army at capital', !!wa && wa.node === fac(0).capital && wa.fac === 0 && sumU(wa.units) === 0 && wa.used === 99, inv());
+    check('wild + leader → new army at capital with followers 7/0/3', !!wa && wa.node === fac(0).capital && wa.fac === 0 && JSON.stringify(wa.units) === JSON.stringify({ inf: 7, cav: 0, arc: 3 }) && wa.used === 99, inv());
     check('wukong moves 2 & loyal', maxMoves(wa) === 2 && isLoyal(wa.gen, 0));
 
     // --- ทัพครบ 3: ผู้เล่นเลือกปลดแม่ทัพธรรมดา ---
@@ -5077,11 +5119,62 @@ async function runLegendTest() {
     check('dismiss dialog shown', !$('battle').classList.contains('hidden') && document.querySelectorAll('#battleCard [data-dismiss]').length === 3);
     q(`#battleCard [data-dismiss="${h2.id}"]`).click();
     await new Promise(r => setTimeout(r, 30));
-    check('join notice shown', !!$('btContinue') && /ได้ตำนาน/.test($('battleCard').textContent));
+    check('join notice shown (with followers)', !!$('btContinue') && /ได้ตำนาน/.test($('battleCard').textContent) && /ผู้ติดตาม 10 นาย/.test($('battleCard').textContent));
     $('btContinue').click();
     await pm;
     Ctrl.auto = true;
-    check('dismissed general replaced by legend', h2.gen.wid === 'pichai' && sumU(h2.units) === 9 && S.armies.filter(a => a.fac === 0).length === 3, inv());
+    check('dismissed general replaced by legend (+followers 8/2/0)', h2.gen.wid === 'pichai' && sumU(h2.units) === 19 && h2.units.inf === 17 && h2.units.cav === 2 && S.armies.filter(a => a.fac === 0).length === 3, inv());
+
+    // --- ผู้ติดตาม: ตารางครบ / มาตัวเปล่าเมื่อถูกจับ กลับมาพเนจรอีกครั้ง / ฝ่าย AI ได้เท่ากัน / แต่งตั้งแม่ทัพได้ทหารราบ 5 ---
+    const FOLLOW = { hanuman: [8, 0, 2], wukong: [7, 0, 3], musashi: [10, 0, 0], achilles: [8, 2, 0], robin: [2, 0, 8], joan: [5, 5, 0], pichai: [8, 2, 0], khunphaen: [6, 0, 4], liubei: [4, 3, 3], odysseus: [5, 0, 5], patroclus: [8, 2, 0], diomedes: [4, 6, 0] };
+    check('followers table: 10 each, mix per spec', WANDERERS.every(w => FOLLOW[w.id] && sumU(w.follow) === 10 && UNIT_TYPES.every((t, i) => w.follow[t] === FOLLOW[w.id][i])));
+    fresh();
+    const lf = armyAt(fac(0).capital), D = moveTargets(lf).find(id => S.nodes[id].capitalOf === null);
+    S.wild = [{ wid: 'musashi', node: D, bare: true }]; S.wInGame = ['musashi'];
+    S.nodes[D].owner = NEUTRAL; S.nodes[D].garrison = Z();
+    await moveArmy(lf, D);
+    const mu = S.armies.find(a => a.gen.wid === 'musashi');
+    check('returned wanderer (bare) → no followers', !!mu && sumU(mu.units) === 0, inv());
+    S.armies = S.armies.filter(a => a !== mu);
+    wanderAway('musashi', null);
+    const back = S.wild.find(w => w.wid === 'musashi') || null;
+    check('fled wanderer is marked bare', back ? back.bare === true : S.resting.some(r => r.wid === 'musashi'));
+    S.wild = []; S.resting = [{ wid: 'hanuman', back: S.turn }]; S.wInGame.push('hanuman');
+    { const sp = S.nodes.find(n => n.capitalOf === null && !armyAt(n.id)); sp.garrison = Z(); } // ที่ว่างให้โผล่
+    wanderReturn();
+    const hb = S.wild.find(w => w.wid === 'hanuman');
+    check('rested wanderer returns bare', !!hb && hb.bare === true);
+    if (hb) { UI.selNode = hb.node; UI.selArmy = null; render(); check('info: bare wanderer shows no followers', /มาตัวเปล่า/.test($('info').textContent)); }
+    S.joins.push({ wid: 'joan', fac: 0, army: null, from: 1 }); S.wInGame.push('joan');
+    await processJoins();
+    const jo = S.armies.find(a => a.gen.wid === 'joan');
+    check('captured from other faction → no followers', !!jo && sumU(jo.units) === 0);
+    // ฝ่าย AI ยึดดินแดนพเนจรด้วยจอมทัพ → ตั้งทัพใหม่พร้อมผู้ติดตาม (AI ที่เมืองหลวงดูดกองรักษาการณ์เพิ่มตามเดิม)
+    fresh();
+    const la1 = leaderArmy(1), E = moveTargets(la1).find(id => S.nodes[id].capitalOf === null && !armyAt(id));
+    S.wild = [{ wid: 'diomedes', node: E }]; S.wInGame = ['diomedes'];
+    S.nodes[E].owner = NEUTRAL; S.nodes[E].garrison = Z(); S.nodes[fac(1).capital].garrison = Z();
+    await moveArmy(la1, E); await processJoins();
+    const di = S.armies.find(a => a.gen.wid === 'diomedes');
+    check('AI gets the same followers', !!di && di.fac === 1 && JSON.stringify(di.units) === JSON.stringify({ inf: 4, cav: 6, arc: 0 }), inv());
+    // ข้อมูลตำนานพเนจรบอกจำนวนผู้ติดตาม
+    fresh();
+    UI.selNode = S.wild[0].node; render();
+    check('info: wild legend shows followers', new RegExp(`ผู้ติดตาม 10 นาย`).test($('info').textContent));
+    // แต่งตั้งแม่ทัพ: ได้ทหารราบ 5 นาย (ผู้เล่นและ AI) + ปุ่มบอกจำนวน
+    fresh();
+    const capA = armyAt(fac(0).capital), free0 = moveTargets(capA).find(id => S.nodes[id].owner === NEUTRAL);
+    capA.node = free0; S.nodes[free0].owner = 0; fac(0).gold = 100;
+    UI.selNode = fac(0).capital; UI.selArmy = null; render();
+    const hb0 = q('#info [data-act="hire"]');
+    check('hire button shows +5 infantry', !!hb0 && /ทหารราบ 5 นาย/.test(hb0.textContent));
+    hb0.click();
+    const hired = armyAt(fac(0).capital);
+    check('hire (player): 5 infantry, -30 gold', !!hired && !hired.gen.leader && JSON.stringify(hired.units) === JSON.stringify({ inf: 5, cav: 0, arc: 0 }) && fac(0).gold === 100 - HIRE_COST);
+    const la2 = leaderArmy(1), free1 = moveTargets(la2).find(id => !armyAt(id));
+    la2.node = free1; S.nodes[free1].owner = 1; fac(1).gold = 100;
+    const ha = hireGeneral(1);
+    check('hire (AI): 5 infantry', !!ha && JSON.stringify(ha.units) === JSON.stringify({ inf: 5, cav: 0, arc: 0 }));
     check('pichai cannot retreat', retreatOptions(h2, h2.node, lead3).length === 0);
 
     // --- จับตำนานศัตรูแบบชนะขาด ---
@@ -5754,6 +5847,21 @@ async function runWegoTest() {
     await resolve();
     check('departed army: land defended by garrison only', A.node === W && sumU(A.units) === 20 && S.nodes[X].owner === 1 && B.node === X, `A@${A.node} X=${S.nodes[X].owner}`);
 
+    // --- ผู้ติดตามของตำนานพเนจร + แต่งตั้งแม่ทัพได้ทหารราบ 5 (การกระทำของบอทมีผลตอนคำนวณ) ---
+    fresh();
+    [X, W] = star(1);
+    own(X, 0); own(W, NEUTRAL);
+    S.wild = [{ wid: 'achilles', node: W }]; S.wInGame = ['achilles'];
+    A = newArmy(0, X, gen('A'), U(12));
+    order(0, A, [W]);
+    const lead1 = leaderArmy(1), cap1 = fac(1).capital, nb1 = neighbors(cap1).map(nb => nb.id).find(id => !armyAt(id) && id !== W && id !== X);
+    lead1.node = nb1; own(nb1, 1); fac(1).gold = 100;
+    S.wego.orders[1].acts = [{ t: 'hire', id: 777 }];
+    await resolve();
+    check('wego: wild + general → legend leads, +followers 8/2/0', A.gen.wid === 'achilles' && JSON.stringify(A.units) === JSON.stringify({ inf: 20, cav: 2, arc: 0 }), JSON.stringify(A.units));
+    const h1 = S.armies.find(a => a.fac === 1 && !a.gen.leader && !a.gen.wid);
+    check('wego: bot hire (acts) → 5 infantry', !!h1 && h1.node === cap1 && sumU(h1.units) === HIRE_INF, h1 ? JSON.stringify(h1.units) : 'none');
+
     // --- 2. บุกสวนกัน = ปะทะกลางทาง ไม่มีภูมิประเทศ/กำแพง ---
     fresh();
     [X, Y] = star(1);
@@ -6181,7 +6289,8 @@ async function runFeatureTest() {
     $('btnUndo').click();
     const lead2 = armyAt(fac(0).capital);
     check('undo move', !!lead2 && lead2.gen.leader);
-    const tgt = moveTargets(lead2).find(id => S.nodes[id].owner === NEUTRAL && sumU(S.nodes[id].garrison) > 0);
+    let tgt = moveTargets(lead2).find(id => S.nodes[id].owner === NEUTRAL && sumU(S.nodes[id].garrison) > 0);
+    if (tgt == null) { tgt = moveTargets(lead2).find(id => S.nodes[id].owner === NEUTRAL); S.nodes[tgt].garrison = { ...Z(), inf: 3 }; } // เกมสุ่ม seed: บางแผนที่ไม่มีดินแดนกลางที่มีกองกำลังติดเมืองหลวง
     UI.selArmy = lead2.id;
     await onNodeClick(tgt);
     check('confirm: first tap on enemy shows estimate, no battle', lead2.node === fac(0).capital && S.nodes[tgt].owner === NEUTRAL && S.stats.battles === 0
