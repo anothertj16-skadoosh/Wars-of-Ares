@@ -205,6 +205,8 @@ button{font:inherit;color:inherit}
 .opt{display:flex;gap:8px;align-items:center;cursor:pointer}
 .opt input{width:18px;height:18px}
 .seg button:disabled{opacity:.5;cursor:not-allowed}
+.wego-setup .seg{flex-wrap:wrap;justify-content:center;max-width:100%}
+.wego-setup .seg button{min-height:40px}
 .lvl-info{max-width:600px;text-align:center;font-size:14px;color:var(--muted);margin:0 0 14px}
 .ret-row{display:flex;flex-direction:column;gap:6px;margin-top:10px}
 .btn.ret{text-align:left;font-family:'Sarabun',sans-serif;font-weight:400;font-size:14px;line-height:1.4;padding:8px 12px}
@@ -1996,7 +1998,7 @@ async function spectateRun() {
    (ค) หน้าจอวางแผน/นับเวลา/สรุปผล อยู่ในส่วน UI
    ===================================================================== */
 const isWego = () => !!(S && S.mode === 'wego');
-const WEGO_TIMES = [30, 60, 90, 0];
+const WEGO_TIMES = ['auto', 60, 90, 120, 0]; // 'auto' = 30 วินาที + 15 ต่อทัพ (สูงสุด 120) · 0 = ไม่จับเวลา
 // rec = บันทึกการกระทำทันทีของบอทตอนวางแผน / claim = เป้าที่ทัพอื่นของฝ่ายเดียวกันจองแล้ว / orders = คำสั่งระหว่างคำนวณผล
 const WG = { rec: null, claim: null, orders: null };
 const FIELD = { name: 'กลางทาง', unitMod: {}, defMod: 1, atkMod: 1 }; // ปะทะกลางทาง: ไม่มีโบนัสภูมิประเทศ/กำแพง
@@ -3804,21 +3806,26 @@ function continueGame() {
 
 /* ---------- ⏱️ ศึกพร้อมกัน: หน้าตั้งค่า / วางแผน / นับเวลา / สรุปผล (ส่วน ค) ---------- */
 const WEGO_LEVEL_KEY = 'legendsWarlord.wegoLevel', WEGO_TIME_KEY = 'legendsWarlord.wegoTime', WEGO_INTRO_KEY = 'legendsWarlord.wegoIntro';
-const wegoTimeName = t => t ? `${t} วินาที` : 'ไม่จับเวลา';
+const wegoTimeName = t => t === 'auto' ? 'อัตโนมัติ' : t ? `${t} วินาที` : 'ไม่จับเวลา';
+const parseWegoTime = v => v === 'auto' ? 'auto' : WEGO_TIMES.includes(+v) ? +v : null;
+// วินาทีของช่วงวางแผนนี้ — อัตโนมัติคิดจากจำนวนทัพของเราตอนเริ่มช่วง
+const wegoPlanSecs = (t = S.wego.time) => t === 'auto' ? Math.min(120, 30 + 15 * S.armies.filter(a => a.fac === 0).length) : (t || 0);
 function wegoSetupHtml() {
   const L = UI.setupLegend && LEGENDS.find(l => l.id === UI.setupLegend), sv = loadSave(WEGO_SAVE_KEY);
-  return `<h2>⏱️ ศึกพร้อมกัน</h2>
+  const lv = LEVELS[UI.wegoLevel];
+  return `<div class="wego-setup"><h2>⏱️ ศึกพร้อมกัน</h2>
     <p class="center muted">ทุกฝ่ายวางแผนพร้อมกันโดยไม่เห็นคำสั่งของกัน แล้วคำนวณผลพร้อมกัน · ไม่นับยศ/ปลดล็อก · ไม่มีปุ่มย้อน</p>
     <p class="center">${L ? `${L.icon} <b>${esc(L.name)}</b>` : '⚠️ เลือกจอมทัพในหน้าแรกก่อน'} · ศัตรู ${UI.setupAI} ฝ่าย · แผนที่${MAP_SIZES[UI.setupSize].name} (${MAP_SIZES[UI.setupSize].turns} เทิร์น)</p>
-    <div class="setup-row"><span class="kanit">ระดับบอท:</span><div class="seg">${LEVELS.map(l => `<button data-wlvl="${l.id}" class="${UI.wegoLevel === l.id ? 'on' : ''}">${l.icon} ${l.name}</button>`).join('')}</div></div>
-    <div class="setup-row" style="margin-top:0"><span class="kanit">เวลาวางแผน:</span><div class="seg">${WEGO_TIMES.map(t => `<button data-wtime="${t}" class="${UI.wegoTime === t ? 'on' : ''}">${wegoTimeName(t)}</button>`).join('')}</div></div>
+    <div class="setup-row"><span class="kanit">ระดับบอท:</span><div class="seg" id="wegoLvlSeg">${LEVELS.map(l => `<button data-wlvl="${l.id}" class="${UI.wegoLevel === l.id ? 'on' : ''}" aria-pressed="${UI.wegoLevel === l.id}">${l.icon} ${l.name}</button>`).join('')}</div></div>
+    <div class="setup-row" style="margin-top:0"><span class="kanit">เวลาวางแผน:</span><div class="seg" id="wegoTimeSeg">${WEGO_TIMES.map(t => `<button data-wtime="${t}" class="${UI.wegoTime === t ? 'on' : ''}" aria-pressed="${UI.wegoTime === t}">${wegoTimeName(t)}</button>`).join('')}</div></div>
+    <p class="lvl-info" id="wegoPick">เลือกอยู่: <b>${lv.icon} ${lv.name}</b> · <b>⏱️ ${wegoTimeName(UI.wegoTime)}</b>${UI.wegoTime === 'auto' ? ' (30 วินาที + 15 วินาทีต่อทัพ สูงสุด 120)' : ''}</p>
     <div class="center" style="margin-top:12px"><button class="btn primary" data-act="wegostart" ${L ? '' : 'disabled'}>เริ่มศึกพร้อมกัน ⚔️</button>
       ${sv ? ` <button class="btn green" data-act="wegocontinue">▶ เล่นต่อ (${esc(LEGENDS.find(l => l.id === sv.factions[0].legend).name)} · เทิร์น ${sv.turn}/${sv.maxTurns})</button>` : ''}
-      <button class="btn ghost" data-close>ปิด</button></div>`;
+      <button class="btn ghost" data-close>ปิด</button></div></div>`;
 }
 function wegoIntroHtml() {
   return `<div class="story"><h2>⏱️ ศึกพร้อมกัน: หนึ่งเทิร์นมี 2 ช่วง</h2>
-    <p><b>1. 🧭 ช่วงวางแผน</b>${S.wego.time ? ` (${S.wego.time} วินาที)` : ''} — ทุกฝ่ายสั่งการพร้อมกัน ไม่เห็นคำสั่งของกัน<br>
+    <p><b>1. 🧭 ช่วงวางแผน</b>${S.wego.time ? ` (${S.wego.time === 'auto' ? `อัตโนมัติ: เทิร์นนี้ ${wegoPlanSecs()} วินาที` : `${S.wego.time} วินาที`})` : ''} — ทุกฝ่ายสั่งการพร้อมกัน ไม่เห็นคำสั่งของกัน<br>
     • เกณฑ์ทหาร แต่งตั้งแม่ทัพ รวม/แบ่งทหาร มีผลทันที<br>
     • แตะทัพ แล้วแตะปลายทาง = ลูกศรคำสั่ง (🟢 เดินในดินแดนเรา · 🔴 บุก) เลือกกลยุทธ์บุกในแผงข้อมูล · ทัพที่เดินได้ 2 ช่องวาดต่อได้อีกช่อง · แตะปลายลูกศรซ้ำเพื่อยกเลิก<br>
     • ตั้งกลยุทธ์ตั้งรับและ “ถอนทัพอัตโนมัติถ้าเสียเปรียบมาก” ของแต่ละทัพ และกลยุทธ์ของกองรักษาการณ์ไว้ล่วงหน้า<br>
@@ -3854,7 +3861,8 @@ function enterWego() {
 // นับเวลาถอยหลัง (หยุดนับระหว่างมีหน้าต่างเปิด) — หมดเวลา = ยืนยันคำสั่งเท่าที่ตั้งไว้ (ไม่มีผลต่อการคำนวณ)
 function startPlanTimer() {
   if (UI.wTimerId) clearInterval(UI.wTimerId);
-  UI.wTimer = { left: (S.wego.time || 0) * 1000, last: performance.now(), on: S.wego.time > 0 };
+  const secs = wegoPlanSecs();
+  UI.wTimer = { left: secs * 1000, last: performance.now(), on: secs > 0, secs };
   UI.wTimerId = setInterval(planTick, 200);
   planTick();
 }
@@ -4621,6 +4629,14 @@ function bindUI() {
   });
   $('dialog').addEventListener('click', e => {
     if (e.target.id === 'dialog' || e.target.closest('[data-close]')) { closeDialog(); return; }
+    // ปุ่มตัวเลือกศึกพร้อมกันไม่มี data-act — ต้องเช็กก่อน (เดิมถูก return ทิ้งจึงกดไม่ได้)
+    const w = e.target.closest('[data-wlvl],[data-wtime]');
+    if (w) {
+      if (w.dataset.wlvl != null) { UI.wegoLevel = +w.dataset.wlvl; try { localStorage.setItem(WEGO_LEVEL_KEY, UI.wegoLevel); } catch (err) { /* ignore */ } }
+      else { UI.wegoTime = parseWegoTime(w.dataset.wtime); try { localStorage.setItem(WEGO_TIME_KEY, UI.wegoTime); } catch (err) { /* ignore */ } }
+      openDialog(wegoSetupHtml());
+      return;
+    }
     const b = e.target.closest('[data-act]');
     if (!b) return;
     if (b.dataset.act === 'title') leaveGame();
@@ -4637,8 +4653,6 @@ function bindUI() {
     if (b.dataset.act === 'wegostart') startWegoFromSetup();
     if (b.dataset.act === 'wegocontinue') continueWego();
     if (b.dataset.act === 'autoendtoggle') { setAutoEndOn(!autoEndOn()); openDialog(menuHtml()); }
-    if (b.dataset.wlvl != null) { UI.wegoLevel = +b.dataset.wlvl; try { localStorage.setItem(WEGO_LEVEL_KEY, UI.wegoLevel); } catch (err) { /* ignore */ } openDialog(wegoSetupHtml()); }
-    if (b.dataset.wtime != null) { UI.wegoTime = +b.dataset.wtime; try { localStorage.setItem(WEGO_TIME_KEY, UI.wegoTime); } catch (err) { /* ignore */ } openDialog(wegoSetupHtml()); }
     if (b.dataset.act === 'back' && S && isWego()) { closeDialog(); render(); return; }
     if (b.dataset.act === 'back') {
       closeDialog();
@@ -5918,6 +5932,56 @@ async function runWegoTest() {
     closeDialog();
     Ctrl.auto = true;
 
+    // --- หน้าตั้งค่า: กดเลือกระดับบอท/เวลาวางแผนได้จริง (ไม่ผูกยศ) และเกมที่เริ่มใช้ค่าที่เลือก ---
+    {
+      const keep = [WEGO_LEVEL_KEY, WEGO_TIME_KEY, WEGO_INTRO_KEY, WEGO_SAVE_KEY].map(k => { try { return localStorage.getItem(k); } catch (e) { return null; } });
+      const keepSetup = [UI.setupLegend, UI.setupLevel, UI.wegoLevel, UI.wegoTime];
+      const prog0 = JSON.stringify(loadProgress());
+      try { localStorage.setItem(WEGO_INTRO_KEY, '1'); } catch (e) { /* ignore */ }
+      const stored = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
+      // ปุ่มกดถึงได้จริง: จุดกลางปุ่มไม่ถูกอะไรบัง
+      const reachable = b => { const r = b.getBoundingClientRect(), el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return r.width > 0 && !!el && b.contains(el); };
+      const openSetup = () => { S = null; showScreen('title'); UI.setupLegend = 'napoleon'; UI.setupLevel = 0; $('btnWego').click(); };
+      openSetup();
+      check('wego setup: 4 level buttons, none disabled (not tied to rank)', document.querySelectorAll('#wegoLvlSeg button').length === LEVELS.length && ![...document.querySelectorAll('#wegoLvlSeg button')].some(b => b.disabled));
+      check('wego setup: time options', [...document.querySelectorAll('#wegoTimeSeg button')].map(b => b.dataset.wtime).join() === 'auto,60,90,120,0');
+      for (const l of LEVELS) {
+        const b = document.querySelector(`#wegoLvlSeg [data-wlvl="${l.id}"]`);
+        const ok = reachable(b); b.click();
+        const on = document.querySelector('#wegoLvlSeg .on');
+        check(`wego setup: pick level ${l.id}`, ok && UI.wegoLevel === l.id && on && on.dataset.wlvl === String(l.id) && $('wegoPick').textContent.includes(l.name) && stored(WEGO_LEVEL_KEY) === String(l.id));
+      }
+      for (const t of WEGO_TIMES) {
+        const b = document.querySelector(`#wegoTimeSeg [data-wtime="${t}"]`);
+        const ok = reachable(b); b.click();
+        const on = document.querySelector('#wegoTimeSeg .on');
+        check(`wego setup: pick time ${t}`, ok && UI.wegoTime === t && on && on.dataset.wtime === String(t) && $('wegoPick').textContent.includes(wegoTimeName(t)) && stored(WEGO_TIME_KEY) === String(t));
+      }
+      check('wego setup: turn-based rank untouched', UI.setupLevel === 0);
+      // เริ่มเกมจริงจากปุ่มด้วยทุกคู่ค่า แล้วดูว่าเกมใช้ค่าที่เลือก
+      for (const [lvl, t] of [[3, 'auto'], [0, 60], [2, 90], [1, 120], [3, 0]]) {
+        openSetup();
+        document.querySelector(`#wegoLvlSeg [data-wlvl="${lvl}"]`).click();
+        document.querySelector(`#wegoTimeSeg [data-wtime="${t}"]`).click();
+        document.querySelector('#dialogCard [data-act="wegostart"]').click();
+        const secs = t === 'auto' ? Math.min(120, 30 + 15 * S.armies.filter(a => a.fac === 0).length) : t;
+        check(`wego start uses level ${lvl} + time ${t}`, isWego() && S.level === lvl && S.wego.time === t && UI.wTimer.on === (secs > 0) && UI.wTimer.secs === secs
+          && (secs ? new RegExp(`${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}`).test($('btnEnd').textContent) : !/\d:\d\d/.test($('btnEnd').textContent)), `secs=${UI.wTimer.secs}`);
+      }
+      // อัตโนมัติ: นับทัพใหม่ทุกช่วงวางแผน และไม่เกิน 120
+      for (let i = 0; i < 8; i++) S.armies.push({ ...leaderArmy(0), id: 9000 + i, gen: gen('x'+i) });
+      S.wego.time = 'auto'; startPlanTimer();
+      check('auto time capped at 120 s', UI.wTimer.secs === 120);
+      S.armies = S.armies.filter(a => a.id < 9000);
+      // ค่าที่จำไว้โหลดกลับตอนเปิดเกมใหม่
+      UI.wegoLevel = 1; UI.wegoTime = 'auto';
+      try { const wl = stored(WEGO_LEVEL_KEY), wt = stored(WEGO_TIME_KEY); if (wl != null && LEVELS[+wl]) UI.wegoLevel = +wl; if (parseWegoTime(wt) != null) UI.wegoTime = parseWegoTime(wt); } catch (e) { /* ignore */ }
+      check('wego choices remembered separately', UI.wegoLevel === 3 && UI.wegoTime === 0 && JSON.stringify(loadProgress()) === prog0);
+      [WEGO_LEVEL_KEY, WEGO_TIME_KEY, WEGO_INTRO_KEY, WEGO_SAVE_KEY].forEach((k, i) => { try { keep[i] == null ? localStorage.removeItem(k) : localStorage.setItem(k, keep[i]); } catch (e) { /* ignore */ } });
+      [UI.setupLegend, UI.setupLevel, UI.wegoLevel, UI.wegoTime] = keepSetup;
+      closeDialog();
+    }
+
     // --- เซฟแยก ---
     saveDisabled = false;
     try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(WEGO_SAVE_KEY); } catch (e) { /* ignore */ }
@@ -6529,11 +6593,11 @@ function boot() {
   UI.setupLevel = loadProgress().unlocked;
   try { const sz = localStorage.getItem(SIZE_KEY); if (MAP_SIZES[sz]) UI.setupSize = sz; } catch (e) { /* ignore */ }
   try { const sp = localStorage.getItem(SPEED_KEY); if (AI_SPEEDS[sp]) UI.aiSpeed = sp; } catch (e) { /* ignore */ }
-  UI.wegoLevel = 1; UI.wegoTime = 60;
+  UI.wegoLevel = 1; UI.wegoTime = 'auto';
   try {
     const wl = localStorage.getItem(WEGO_LEVEL_KEY), wt = localStorage.getItem(WEGO_TIME_KEY);
     if (wl != null && LEVELS[+wl]) UI.wegoLevel = +wl;
-    if (wt != null && WEGO_TIMES.includes(+wt)) UI.wegoTime = +wt;
+    if (wt != null && parseWegoTime(wt) != null) UI.wegoTime = parseWegoTime(wt);
   } catch (e) { /* ignore */ }
   setInterval(autoEndTick, 200);
   renderSpeed();
