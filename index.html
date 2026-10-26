@@ -797,7 +797,8 @@ function newGame(legendId, numAI, seed, level = 1, size = 's', opts = {}) {
   if (opts.boss) {
     const ares = S.factions.length - 1;
     S.boss = { ares, throne: fac(ares).capital, gauge: 0, rage: 0, siege: 0, jar: false, pending: false, spLine: false,
-      power: { rage: 0, puppet: 0 }, weak: { athena: 0, net: 0, jar: 0, mortal: 0 }, freed: 0, throneTaken: 0 };
+      power: { rage: 0, puppet: 0 }, weak: { athena: 0, net: 0, jar: 0, mortal: 0 }, freed: 0, throneTaken: 0,
+      frenzy: false, throneTurn: null, finals: 0, finalWin: 0 };
   }
   delete S.bossSetup;
   if (opts.heir) {
@@ -1063,7 +1064,7 @@ function startFactionTurn(f) {
   const inc = income(f);
   if (ECON && f === 0 && fac(0).alive) econTick(inc);
   fac(f).gold += inc;
-  if (skill(f, 'dread')) dreadTick(f);
+  if (skill(f, 'dread') && !isWego()) dreadTick(f); // ศึกพร้อมกัน: ตอนเริ่มคำนวณผล (resolveWego)
   for (const a of S.armies) if (a.fac === f) {
     a.used = 0;
     const free = wsk(a.gen, f).freeInf;
@@ -1237,6 +1238,7 @@ function powerOf(side, other, nodeId, role, opts = {}) {
   // ศึกชิงอิสรภาพ
   if (isBoss() && side.fac > 0 && S.boss.rage > 0) push('🩸 โลหิตเดือด', 1.25);
   if (isBoss() && isAres(side.fac) && S.boss.jar) push('🏺 ไหทองแดง', 0.7);
+  if (aresFrenzy() && isAres(side.fac)) push('💢 บัลลังก์แตก — Ares คลั่ง', ARES_FRENZY);
   if (isBoss() && isAres(other.fac) && historical(g, side.fac)) push('⚔️ บาดเจ็บจากมนุษย์ (บุคคลจริงสู้ Ares)', 1.1);
   if (traitorPenalty(g, side.fac, other.fac)) push(`⚠️ รบกับเจ้าของเก่า (${facName(g.from)})`, TRAITOR_MOD);
   if (opts.tired) push('ทัพล้า (ตีฝ่าวงล้อม)', RETREAT_TIRED);
@@ -1366,7 +1368,8 @@ function capture(a, node, prevOwner, preGarrison) {
     if (sumU(node.garrison)) log(`🦢 รวบรวมแผ่นดิน: กองรักษาการณ์ ${sumU(node.garrison)} นายที่ ${node.name} เข้าร่วม ${facName(a.fac)}`);
   }
   // ไร้แผ่นดินยึดเมืองหลวง (ของฝ่ายใดก็ได้) = เมืองหลวงใหม่
-  if (fac(a.fac).capital == null && node.capitalOf !== null) {
+  if (fac(a.fac).capital == null && node.capitalOf !== null && !(isAres(a.fac) && node.id !== S.boss.throne)) {
+    if (isAres(a.fac)) aresRetakeThrone();
     fac(a.fac).capital = node.id; fac(a.fac).homeless = null; S.rstats.regain = (S.rstats.regain || 0) + 1;
     log(`🏰 ${facName(a.fac)} ยึด ${node.name} เป็นเมืองหลวงใหม่ — พ้นสภาพไร้แผ่นดิน`);
     if (isHumanFac(a.fac)) UI.notices.push(`🏰 เรายึด ${node.name} เป็นเมืองหลวงใหม่แล้ว! พ้นสภาพไร้แผ่นดิน`);
@@ -1418,8 +1421,92 @@ function liberatePuppet(p, capNode) {
   UI.notices.push(text);
 }
 // เกจโลหิต: ทุกการรบเติม 1 ช่อง (ยกเว้นตาข่ายของเฮไฟสตัสทำงาน) ครบแล้วปล่อยพลังหลังจบการเดินทัพ
-const throneNet = () => isBoss() && fac(S.boss.ares).alive && S.boss.throne != null
-  && neighbors(S.boss.throne).every(nb => S.nodes[nb.id].owner === 0);
+// บัลลังก์แตก — Ares คลั่ง: เสียบัลลังก์แล้วไม่นับถอยหลัง ไม่หาเมืองหลวงใหม่ ทุกทัพของ Ares +40% จนกว่าจะยึดบัลลังก์คืน
+const ARES_FRENZY = 1.4;
+const ARES_LAST_LINE = 'จะขังข้าไว้งั้นหรือ… มาสิ ใครแข็งแกร่งที่สุดในหมู่พวกเจ้า';
+const aresFrenzy = () => isBoss() && !!S.boss.frenzy && fac(S.boss.ares).alive;
+// จุดที่ตาข่าย/ไหทองแดงล้อม: บัลลังก์ (ก่อนเสียบัลลังก์) / ทัพจอมทัพของ Ares (หลังเสีย)
+function aresCore() {
+  const B = S.boss;
+  if (!B.frenzy) return B.throne;
+  const L = leaderArmy(B.ares);
+  return L ? L.node : null;
+}
+function aresLoseThrone(by) {
+  const B = S.boss, A = fac(B.ares);
+  A.capital = null; A.homeless = { left: null, fresh: false }; // ไร้แผ่นดินแบบไม่นับถอยหลัง
+  B.frenzy = true; B.siege = 0; B.jar = false;
+  if (by === 0 && B.throneTurn == null) B.throneTurn = S.turn;
+  const text = `💢 บัลลังก์แตก — Ares คลั่ง! ${facName(by)} ยึด${S.nodes[B.throne].name}ได้ ทุกทัพของ Ares พลังรบ +40% และจะบุกหาเราไม่หยุด จนกว่าจะยึดบัลลังก์คืน`;
+  log(text); UI.notices.push(text);
+}
+function aresRetakeThrone() {
+  const B = S.boss;
+  B.frenzy = false; B.siege = 0; B.jar = false;
+  const text = '🩸 Ares ยึดบัลลังก์คืนได้ — ความคลั่งหายไป';
+  log(text); UI.notices.push(text);
+}
+// ชนะบทที่ 1: หุ่นเชิดที่เหลือถูกปลดปล่อยพร้อมกัน (ดินแดนของพวกเขามาเป็นของเรา)
+function bossVictory(why) {
+  for (const P of S.factions) {
+    if (P.id === 0 || isAres(P.id) || !P.alive) continue;
+    for (const a of S.armies.filter(a => a.fac === P.id && a.gen.wid)) {
+      if (WMAP[a.gen.wid].weak.perish) { S.wgone.push(a.gen.wid); S.wstats.gone++; } else wanderAway(a.gen.wid, null);
+    }
+    for (const a of S.armies.filter(a => a.fac === P.id)) { const g = S.nodes[a.node].garrison; for (const t of UNIT_TYPES) g[t] += a.units[t]; }
+    S.armies = S.armies.filter(a => a.fac !== P.id);
+    for (const n of S.nodes) if (n.owner === P.id) n.owner = 0;
+    P.alive = false; P.capital = null; P.homeless = null; P.freed = true; P.outTurn = S.turn;
+    S.boss.freed++;
+    log(`⛓️‍💥 ${facName(P.id)} หลุดพ้นจากการควบคุมของ Ares`);
+  }
+  S.over = { win: true, reason: 'boss', why };
+}
+// ศึกสุดท้ายของเทพสงคราม: ตาของ Ares หลังเสียบัลลังก์ ทัพจอมทัพจนมุม (ไม่มีดินแดนของ Ares ข้างเคียงให้เดินไป)
+// → บังคับบุกทัพของเราที่ติดกันและแข็งที่สุด (ไม่มี = ดินแดนของเราที่ติดกันและมีทหารป้องกันมากที่สุด) · ผู้เล่นถอนไม่ได้
+// Ares แพ้ (แม้ทัพยังไม่แตก) = เราชนะ · Ares ชนะ = ยึดตามปกติ เกมดำเนินต่อ
+function aresLastStandTarget(L) {
+  const ts = moveTargets(L);
+  if (!ts.length || ts.some(id => S.nodes[id].owner === L.fac)) return null;
+  const armies = ts.filter(id => armyAt(id) && armyAt(id).fac === 0);
+  if (armies.length) return armies.reduce((b, id) => powerOf(defSide(id), atkSide(L), id, 'def').power > powerOf(defSide(b), atkSide(L), b, 'def').power ? id : b);
+  const lands = ts.filter(id => S.nodes[id].owner === 0);
+  return lands.length ? lands.reduce((b, id) => sumU(defSide(id).units) > sumU(defSide(b).units) ? id : b) : null;
+}
+async function aresLastStand(f) {
+  const L = leaderArmy(f);
+  if (!L || !canMove(L)) return;
+  const to = aresLastStandTarget(L);
+  if (to == null) return;
+  S.boss.finals = (S.boss.finals || 0) + 1;
+  log(`⚔️ ศึกสุดท้ายของเทพสงคราม — Ares: “${ARES_LAST_LINE}”`);
+  const res = await aiMove(L, to, { final: true });
+  if (S.over) return;
+  if (res.type === 'battle' && !res.ctx.atkWin) {
+    S.boss.finalWin = (S.boss.finalWin || 0) + 1;
+    log('🏆 Ares ถูกตีกลับในศึกสุดท้าย — เทพสงครามยอมรับความพ่ายแพ้');
+    bossVictory('final');
+  }
+}
+// AI ของ Ares ตอนคลั่ง: บุกทัพ/ดินแดนของเราที่ใกล้ที่สุด ไม่หลบ (ไม่ใช้ตรรกะระวังตัวของฝ่ายไร้แผ่นดิน)
+function aresFrenzyMove(a) {
+  const ts = moveTargets(a);
+  if (!ts.length) return null;
+  const mine = ts.filter(id => S.nodes[id].owner === 0);
+  if (mine.length) {
+    const sc = id => (armyAt(id) ? 1.5 : 1) * (id === S.boss.throne ? 3 : 1) * Math.min(estimateRatio(a, id), 3);
+    return mine.reduce((b, id) => sc(id) > sc(b) ? id : b);
+  }
+  const { dist, prev } = bfs(a.node, a.fac, v => S.nodes[v].owner !== 0 && !allied(a.fac, S.nodes[v].owner));
+  let goal = null;
+  for (const k in dist) if (S.nodes[k].owner === 0 && (goal == null || dist[k] < dist[goal])) goal = +k;
+  if (goal == null) return null;
+  const p = pathTo(prev, a.node, goal), step = p && p[1];
+  return step != null && ts.includes(step) ? step : null;
+}
+// ตาข่ายของเฮไฟสตัส: เรายึดทุกช่องรอบบัลลังก์ (ก่อนเสียบัลลังก์) / รอบทัพจอมทัพของ Ares (หลังเสีย)
+const throneNet = () => isBoss() && fac(S.boss.ares).alive && aresCore() != null
+  && neighbors(aresCore()).every(nb => S.nodes[nb.id].owner === 0);
 function bloodTick() {
   const B = S.boss;
   if (!B || !fac(B.ares).alive) return;
@@ -1488,7 +1575,11 @@ function bossRound() {
   if (B.rage > 0) B.rage--;
   if (throneNet()) B.siege++; else B.siege = 0;
   const jar = B.siege >= 3 && !TUNE.nojar;
-  if (jar && !B.jar) { log('🏺 ไหทองแดง! บัลลังก์ถูกล้อมครบ 3 เทิร์น — ทัพของ Ares -30% และบัลลังก์ไม่มีกำแพงเมือง'); UI.notices.push('🏺 ไหทองแดง: ล้อมบัลลังก์ครบ 3 เทิร์นแล้ว ทัพของ Ares -30% และบัลลังก์ไม่มีกำแพงเมือง!'); }
+  if (jar && !B.jar) {
+    const text = B.frenzy ? '🏺 ไหทองแดง! ทัพจอมทัพของ Ares ถูกล้อมครบ 3 เทิร์น — ทุกทัพของ Ares -30% (รวมกับความคลั่ง +40%)'
+      : '🏺 ไหทองแดง! บัลลังก์ถูกล้อมครบ 3 เทิร์น — ทัพของ Ares -30% และบัลลังก์ไม่มีกำแพงเมือง';
+    log(text); UI.notices.push(text);
+  }
   B.jar = jar;
   if (S.turn % 5 === 0) {
     const pickN = shuffle(S.nodes.filter(n => n.capitalOf === null)).slice(0, 3);
@@ -1506,6 +1597,7 @@ function sayOnce(key, who, text, node) {
   if (said[key]) return false;
   said[key] = S.turn;
   log(`${who === 'Ares' ? '🩸' : '💬'} ${who}: “${text}”`);
+  if (isWego()) UI.notices.push(`${who === 'Ares' ? '🩸' : '💬'} ${who}: “${text}”`); // สรุปผลเทิร์น
   if (node != null) S.tag = { node, text: `${who}: “${text}”`, turn: S.turn };
   return true;
 }
@@ -1594,6 +1686,7 @@ function heirRound() {
       H.blessLog.push({ turn: S.turn, fac: best.id, legend: best.legend });
       const text = `🩸 พรของ Ares ตกเป็นของ ${facName(best.id)} (โปรดปราน ${H.favor[best.id]}) — พลังรบ +15% เป็นเวลา ${HEIR_CFG.blessTurns} เทิร์น`;
       log(text); UI.notices.push(best.human ? `🩸 Ares โปรดปรานเรา! ทุกทัพของเราพลังรบ +15% เป็นเวลา ${HEIR_CFG.blessTurns} เทิร์น` : text);
+      if (isWego()) H.blessAt = S.turn; // ศึกพร้อมกัน: มอบตอนเริ่มช่วงวางแผน ทุกฝ่ายเห็นก่อนสั่งการ
       emitFx({ t: 'ares', fac: best.id, node: homeNode(best.id), kind: 'bless' });
     }
     for (const k in H.favor) H.favor[k] = 0;
@@ -1604,6 +1697,7 @@ const nextBlessTurn = () => S.turn + HEIR_CFG.blessEvery - (S.turn - 1) % HEIR_C
 /* ---------- เมืองหลวงแตก / ไร้แผ่นดิน ---------- */
 // เมืองหลวงแตก: ย้ายไปอดีตเมืองหลวงของฝ่ายอื่นที่ยังครองอยู่ (ใกล้ทัพจอมทัพที่สุด) ไม่งั้นกลายเป็นไร้แผ่นดิน
 function loseSeat(f, by) {
+  if (isBoss() && isAres(f)) { aresLoseThrone(by); return; }
   const F = fac(f), old = S.nodes[F.capital];
   if (S.heir) S.heir.seatTaker[f] = by;
   const lead = leaderArmy(f);
@@ -1855,7 +1949,7 @@ function eliminate(loser, winner, why) {
   if (L.human) {
     S.over = { win: false, reason: why, by: winner };
   } else if (isAres(loser) && fac(0).alive) {
-    S.over = { win: true, reason: 'boss' };
+    bossVictory('leader');
   } else if (!isBoss() && S.factions.every(f => f.human || !f.alive) && fac(0).alive) {
     S.over = { win: true, reason: 'conquest' };
   }
@@ -1970,7 +2064,8 @@ async function battle(a, node, opts = {}) {
   const commit = () => { if (ctx.alps) { ctx.alpsLost = payAlps(a, a.node, node.id); ctx.atk.units = { ...a.units }; ctx.atk.armyN = sumU(a.units); } };
   const preD = d ? { ...d.units } : null, preG = { ...node.garrison };
   let preA = { ...a.units };
-  ctx.retreatOpts = ctx.breakout ? [] : retreatOptions(d, node.id, a);
+  ctx.final = !!opts.final; // ศึกสุดท้ายของเทพสงคราม: ผู้เล่นถอนทัพไม่ได้
+  ctx.retreatOpts = ctx.breakout || ctx.final ? [] : retreatOptions(d, node.id, a);
   // AI ฝ่ายรับตัดสินใจถอนทัพก่อนที่ใครจะเลือกกลยุทธ์ (ผู้เล่นเลือกถอนทัพในหน้าต่างรบ — ทุกโหมด)
   if (ctx.retreatOpts.length && !isHumanFac(d.fac)) {
     const opt = aiRetreatChoice(ctx);
@@ -2408,6 +2503,7 @@ async function wegoClash(o1, o2) {
   else if (defectRoll(L)) ctx.outcome.push(defect(L, W.fac, W.units));
   else ctx.outcome.push(`${L.gen.name} ถอยกลับ ${home.name}`);
   if (ctx.libText) ctx.outcome.push(ctx.libText);
+  if (S.heir) { ctx.decisive = r < 1 / CAPTURE_RATIO; favor(W.fac, HEIR_CFG.fWin); heirBattle({ ...ctx, atkWin: false, atk: sL, def: sW }); }
   if (human) await Ctrl.showBattle(ctx, human);
   if (S.joins.length) await processJoins();
   fxEnd(st, false);
@@ -2427,6 +2523,12 @@ async function resolveWego(orders, answers) {
   S.current = -2;
   const list = [];
   try {
+    // บทที่ 2: ไดมอสทำให้กองรักษาการณ์หนีก่อนทัพเคลื่อน · "ตั้งรับอยู่กับที่" = เทิร์นนี้ไม่มีคำสั่งบุก
+    if (S.heir) for (const F of S.factions) {
+      if (F.alive && skill(F.id, 'dread')) dreadTick(F.id);
+      const O = orders[F.id];
+      if (F.alive && O && O.moves.some(m => m.path.some(n => S.nodes[n].owner !== F.id))) S.heir.lastAtk[F.id] = S.turn;
+    }
     for (const F of S.factions) if (F.alive && orders[F.id]) wegoApplyActs(F.id, orders[F.id]);
     const seen = new Set();
     for (const F of S.factions) {
@@ -2437,6 +2539,7 @@ async function resolveWego(orders, answers) {
         if (!a || a.fac !== F.id || seen.has(a.id) || !m.path.length || sumU(a.units) === 0) continue;
         seen.add(a.id);
         list.push({ a, path: m.path.slice(0, 2), ok: true, r: 0, mad: !!m.mad });
+        if (m.mad && S.heir) { S.heir.stats.madness++; log(`😵 ความคลั่งจากเฮรา: ${a.gen.name} บุก ${S.nodes[m.path[0]].name} โดยไม่ยั้งคิด (+30%)`); }
       }
     }
     for (const a of S.armies) a.used = 0;
@@ -2620,6 +2723,7 @@ function aiPickStrategy(role, ctx, side) {
 
 // ถอนทัพ: คืนทางเลือกที่จะใช้ หรือ null = สู้ (นายกองไม่ถอน)
 function aiRetreatChoice(ctx, lvl = aiLevel(ctx.def.fac)) {
+  if (isAres(ctx.def.fac) && aresFrenzy()) return null; // Ares คลั่ง: ไม่ถอยทัพ
   if (lvl === 0 || !ctx.retreatOpts.length) return null;
   const fight = 1 / estimateSides(ctx.atk, ctx.def, ctx.node);
   const basic = lvl === 1 || (TUNE.ret1 && !isHumanFac(ctx.def.fac));
@@ -2693,7 +2797,7 @@ function nodeValue(f, n) {
   let v = (n.owner === NEUTRAL ? 9 : 13) + TERRAINS[n.terrain].income * 1.5;
   if (isSeat(n)) v += 50;
   else if (n.capitalOf !== null) v += 10;                         // อดีตเมืองหลวง: เมืองหลวงสำรอง
-  if (fac(f).capital == null && n.capitalOf !== null) v += 100;  // ไร้แผ่นดิน: ต้องรีบหาเมืองหลวง
+  if (fac(f).capital == null && n.capitalOf !== null && !isAres(f)) v += 100;  // ไร้แผ่นดิน: ต้องรีบหาเมืองหลวง (Ares ไม่ต้องหา)
   // ทัพจอมทัพของฝ่ายที่ไร้แผ่นดิน: ตีแตก = ฝ่ายนั้นแพ้ และได้ดินแดนทั้งหมดของมัน
   const hx = armyAt(n.id);
   if (!TUNE.nohunt && hx && hx.gen.leader && hx.fac !== f && fac(hx.fac).capital == null) v += 40 + 4 * S.nodes.filter(m => m.owner === hx.fac).length;
@@ -2813,6 +2917,7 @@ function aiRecruit(f) {
 }
 
 function aiChooseMove(a) {
+  if (isAres(a.fac) && aresFrenzy()) return aresFrenzyMove(a);
   const f = a.fac, cap = fac(f).capital, lvl = aiLevel(f), thr = TUNE.thr12 && lvl >= 2 ? 1.2 : LEVELS[lvl].atkThr;
   const targets = moveTargets(a);
   if (!targets.length) return null;
@@ -2965,10 +3070,10 @@ async function aiCoordinatedStrike(f) {
 }
 
 // เดินทัพของ AI พร้อมแสดงบนแผนที่: ลูกศรวิ่งไปก่อน แล้วค่อยแสดงผล (💥 ทหารที่เสีย ดินแดนเปลี่ยนเจ้าของ)
-async function aiMove(a, to) {
+async function aiMove(a, to, opts) {
   const st = fxBegin(a.fac, a.node, to, S.nodes[to].owner === a.fac ? 'move' : 'atk');
   if (st) await Ctrl.aiArrow(st);
-  const res = await moveArmy(a, to);
+  const res = await moveArmy(a, to, opts);
   fxEnd(st, res.type === 'invalid' || res.type === 'cancel');
   Ctrl.render();
   await Ctrl.aiCatchUp();
@@ -2977,6 +3082,7 @@ async function aiMove(a, to) {
 }
 
 async function aiTakeActions(fid) {
+  if (isAres(fid) && aresFrenzy()) { await aresLastStand(fid); if (S.over || !fac(fid).alive) return; }
   if (!S.focus) S.focus = {};
   S.focus[fid] = aiLevel(fid) >= 2 && !TUNE.nocoord ? aiFocusTarget(fid) : null;
   if (S.focus[fid]) S.rstats.focus++;
@@ -3070,7 +3176,7 @@ function renderTop() {
   $('tbGold').textContent = `💰 ${me.gold} (+${income(0)})`;
   const LV = LEVELS[S.level];
   const B = S.boss;
-  const blood = B ? `<span class="chip blood ${B.gauge >= BLOOD_MAX - 1 ? 'full' : ''}" title="เกจโลหิตของ Ares: ครบ ${BLOOD_MAX} ช่องจะปล่อยพลัง">🩸 ${'▮'.repeat(B.gauge)}${'▯'.repeat(BLOOD_MAX - B.gauge)}${B.rage ? ` 🔥${B.rage}` : ''}${throneNet() ? ' 🕸️' : ''}${B.jar ? ' 🏺' : B.siege ? ` 🏺${B.siege}/3` : ''}</span>` : '';
+  const blood = B ? `<span class="chip blood ${B.gauge >= BLOOD_MAX - 1 ? 'full' : ''}" title="เกจโลหิตของ Ares: ครบ ${BLOOD_MAX} ช่องจะปล่อยพลัง">🩸 ${'▮'.repeat(B.gauge)}${'▯'.repeat(BLOOD_MAX - B.gauge)}${B.rage ? ` 🔥${B.rage}` : ''}${throneNet() ? ' 🕸️' : ''}${B.jar ? ' 🏺' : B.siege ? ` 🏺${B.siege}/3` : ''}${aresFrenzy() ? ' 💢+40%' : ''}</span>` : '';
   $('chips').innerHTML = `<span class="chip" style="--c:#3b2a1d" title="ระดับความยาก">${B ? '🩸 บทที่ 1: ศึกชิงอิสรภาพ' : isHeir() ? '👑 บทที่ 2: ศึกชิงทายาท' : isWego() ? `⏱️ ${LV.icon} ${LV.name}` : `${LV.icon} ${LV.name}`}</span>` + blood + S.factions.map(f => {
     const n = S.nodes.filter(x => x.owner === f.id).length;
     const cur = S.phase === 'ai' && S.current === f.id;
@@ -3162,6 +3268,7 @@ function renderMap() {
     if (a) {
       const ready = a.fac === 0 && S.phase === 'player' && canMove(a);
       const lg = a.gen.wid ? `<title>${esc(legendTip(a.gen.wid))}</title>` : '';
+      if (aresFrenzy() && isAres(a.fac)) s += `<g class="frenzy" transform="translate(-50,-30)"><title>บัลลังก์แตก — Ares คลั่ง +40%</title><circle r="20" fill="#9b1c1c" stroke="#ffd36b" stroke-width="3"/><text class="gh-ico">💢</text></g>`;
       s += `<g transform="translate(0,26)" class="${ready ? 'ready' : ''}" data-armybadge="${a.id}">${lg}<rect x="-46" y="-18" width="92" height="36" rx="18" fill="${facColor(a.fac)}" stroke="${a.gen.wid ? '#f3c74a' : '#fff'}" stroke-width="${a.gen.wid ? 6 : 3}"/><text class="badge-t">${a.gen.icon}${sumU(a.units)}</text></g>`;
     }
     const w = wildAt(n.id);
@@ -3324,22 +3431,24 @@ function renderBoss() {
   card.classList.toggle('hidden', !B && !isHeir());
   if (isHeir()) { renderHeir(); return; }
   if (!B) return;
-  const A = fac(B.ares), net = throneNet();
-  const throne = S.nodes[B.throne];
+  const A = fac(B.ares), net = throneNet(), fr = aresFrenzy();
+  const throne = S.nodes[B.throne], L = leaderArmy(B.ares);
+  const core = fr ? (L ? `ทัพจอมทัพของ Ares (${esc(S.nodes[L.node].name)})` : 'ทัพจอมทัพของ Ares') : `บัลลังก์ (${esc(throne.name)})`;
   card.innerHTML = `<div class="boss-head">${aresSvg(52)}<div><h3 style="margin:0">อวตารของ Ares ${A.alive ? '' : '— พ่ายแพ้'}</h3>
-      <div class="muted">${A.alive ? (A.capital != null ? `ครองบัลลังก์ที่ ${esc(S.nodes[A.capital].name)}` : `⛺ ไร้แผ่นดิน เหลือ ${A.homeless.left} เทิร์น`) : ''}</div></div></div>
+      <div class="muted">${!A.alive ? '' : fr ? `ไม่มีบัลลังก์ — ทัพจอมทัพอยู่ที่ ${L ? esc(S.nodes[L.node].name) : '?'}` : `ครองบัลลังก์ที่ ${esc(throne.name)}`}</div></div></div>
+    ${fr ? `<div class="warn">💢 <b>บัลลังก์แตก — Ares คลั่ง</b>: ทุกทัพของ Ares พลังรบ +40% บุกหาเราไม่หยุด ไม่ถอยทัพ · ไม่นับถอยหลัง จนกว่า Ares จะยึด${esc(throne.name)}คืน<br>ล้มได้ 2 ทาง: ตีทัพจอมทัพของ Ares ให้แตก หรือชนะ <b>ศึกสุดท้ายของเทพสงคราม</b> (ทัพจอมทัพจนมุม ไม่มีดินแดนของ Ares ข้างเคียง → Ares บุกทัพที่แข็งที่สุดของเรา ถอนไม่ได้ ตีกลับได้ = ชนะ)</div>` : ''}
     <div><b>เกจโลหิต ${B.gauge}/${BLOOD_MAX}</b> ${net ? '— 🕸️ หยุดเติม (ตาข่ายของเฮไฟสตัส)' : '— ทุกการรบเติม 1 ช่อง'}</div>
     <div class="gauge">${[...Array(BLOOD_MAX)].map((_, i) => `<i class="${i < B.gauge ? 'on' : ''}"></i>`).join('')}</div>
     ${B.rage ? `<div class="warn">🔥 โลหิตเดือด: ทัพ Ares และหุ่นเชิด +25% อีก ${B.rage} เทิร์น</div>` : ''}
     <div class="muted" style="margin-top:6px">ครบเกจปล่อยพลัง: 🔥 โลหิตเดือด หรือ 👻 เชิดวิญญาณ (ดึงตำนานพเนจร/ตำนานที่ยังไม่ภักดีของเรา) · ทุก 5 เทิร์นภูมิประเทศ 3 แห่งเปลี่ยน (ถัดไปเทิร์น ${Math.ceil((S.turn + 1) / 5) * 5})</div>
-    <div style="margin-top:6px"><b>จุดอ่อนแห่งเทพนิยาย</b></div>
+    <div style="margin-top:6px"><b>จุดอ่อนแห่งเทพนิยาย</b> <span class="muted">(${fr ? 'ช่วงหลังเสียบัลลังก์' : 'ช่วงก่อนเสียบัลลังก์'})</span></div>
     <ul class="boss-weak" style="margin:2px 0;padding-left:18px;font-size:13px">
       <li>🦉 แพ้อาเธน่า: Ares บ้าคลั่ง เลือก “บุกตรง” บ่อย (ใช้ “ซุ่มโจมตี” แก้ทาง)</li>
-      <li class="${net ? 'on' : ''}">🕸️ ตาข่ายของเฮไฟสตัส: ยึดดินแดนทุกช่องที่ติดบัลลังก์ = เกจหยุดเติม ${net ? '(ทำงานอยู่)' : ''}</li>
-      <li class="${B.jar ? 'on' : ''}">🏺 ไหทองแดง: ล้อมบัลลังก์ครบ 3 เทิร์นติด = ทัพ Ares -30% บัลลังก์ไม่มีกำแพง (${B.jar ? 'ทำงานอยู่' : `ล้อมแล้ว ${B.siege}/3`})</li>
+      <li class="${net ? 'on' : ''}">🕸️ ตาข่ายของเฮไฟสตัส: ยึดดินแดนทุกช่องรอบ${core} = เกจหยุดเติม ${net ? '(ทำงานอยู่)' : ''}</li>
+      <li class="${B.jar ? 'on' : ''}">🏺 ไหทองแดง: ล้อม${core}ครบ 3 เทิร์นติด = ${fr ? 'ทุกทัพของ Ares -30% (ใช้ร่วมกับความคลั่ง +40%)' : 'ทัพ Ares -30% บัลลังก์ไม่มีกำแพง'} (${B.jar ? 'ทำงานอยู่' : `ล้อมแล้ว ${B.siege}/3`})</li>
       <li>⚔️ บาดเจ็บจากมนุษย์: ทัพที่บุคคลในประวัติศาสตร์จริงนำ สู้กับ Ares +10%</li>
     </ul>
-    <div class="muted">หุ่นเชิด 🎭 ยึดเมืองหลวงของมันได้ = ปลดปล่อยจอมทัพนั้นมาเป็นแม่ทัพของเรา · ยึด ${throne ? esc(throne.name) : 'บัลลังก์'} แล้ว Ares จะไร้แผ่นดิน</div>`;
+    <div class="muted">หุ่นเชิด 🎭 ยึดเมืองหลวงของมันได้ = ปลดปล่อยจอมทัพนั้นมาเป็นแม่ทัพของเรา${fr ? '' : ` · ยึด ${esc(throne.name)} แล้ว Ares จะคลั่ง (ไม่นับถอยหลัง)`}</div>`;
 }
 
 function renderLegends() {
@@ -3977,7 +4086,7 @@ function renderTitle() {
   const hb = $('btnHeir');
   hb.disabled = !progT.bossWon || !UI.setupLegend;
   hb.textContent = !progT.bossWon ? '🔒 บทที่ 2: ศึกชิงทายาท — ชนะบทที่ 1 เพื่อปลดล็อก'
-    : !UI.setupLegend ? '👑 บทที่ 2: ศึกชิงทายาท (เลือกจอมทัพก่อน)' : `👑 บทที่ 2: ศึกชิงทายาทกับ ${LEGENDS.find(l => l.id === UI.setupLegend).name}${progT.heirWon ? ' ✓' : ''}`;
+    : !UI.setupLegend ? '👑 บทที่ 2: ศึกชิงทายาท (เลือกจอมทัพก่อน)' : `👑 บทที่ 2: ศึกชิงทายาทกับ ${LEGENDS.find(l => l.id === UI.setupLegend).name} · ⏱️ ศึกพร้อมกัน${progT.heirWon ? ' ✓' : ''}`;
   const sb = $('btnStart');
   sb.disabled = !UI.setupLegend;
   sb.textContent = UI.setupLegend ? `เริ่มศึกกับ ${LEGENDS.find(l => l.id === UI.setupLegend).name} ⚔️` : 'เลือกจอมทัพก่อน';
@@ -4021,27 +4130,44 @@ function bossIntroHtml() {
     <p>กลางสนามรบนิรันดร์คือ <b>บัลลังก์แห่ง Ares</b> เทพนักรบหมวกเกราะสีแดง ชุดเกราะทองแดง อวตารของเทพสงครามนั่งรออยู่ที่นั่น</p>
     <p>จอมทัพ ${esc(puppets)} ถูก Ares ควบคุมจิตใจเป็น <b>หุ่นเชิด 🎭</b> ช่วยกันรุมเรา และไม่รบกันเอง — ยึดเมืองหลวงของมันได้ จอมทัพนั้นจะเป็นอิสระและมาเข้าร่วมกับเรา</p>
     <p>ทุกการรบเติม <b>เกจโลหิต</b> ครบ ${BLOOD_MAX} ช่อง Ares ปล่อยพลัง · ตำนานกรีกเล่าว่าเทพสงครามมีจุดอ่อน — ดูได้ที่การ์ด Ares ในแผงข้าง</p>
-    <p>ยึดบัลลังก์ให้ได้ แล้วล้มทัพของ Ares ก่อนครบ ${maxTurns()} เทิร์น เพื่อชิงอิสรภาพ</p>
+    <p>ยึดบัลลังก์ได้ = <b>บัลลังก์แตก — Ares คลั่ง</b> (ทุกทัพ +40% บุกหาเราไม่หยุด) · ล้มทัพจอมทัพของ Ares หรือชนะ <b>ศึกสุดท้ายของเทพสงคราม</b> ก่อนครบ ${maxTurns()} เทิร์น เพื่อชิงอิสรภาพ</p>
+    <p class="reveal" style="text-align:left">🧭 คำแนะนำ: ① ปลดปล่อยหุ่นเชิด (ยึดเมืองหลวงของมัน) → ② ล้อมบัลลังก์ (ตาข่าย/ไหทองแดง) → ③ ยึดบัลลังก์ → ④ ตั้งรับ Ares ที่คลั่ง แล้วต้อนทัพจอมทัพให้จนมุม</p>
     <div class="center"><button class="btn primary" data-close>เข้าสู่ศึกสุดท้าย ⚔️</button></div></div>`;
 }
+// บทที่ 2 เล่นแบบศึกพร้อมกันเท่านั้น: หน้าบทนำ (เลือกเวลาวางแผนได้) → เริ่ม · เซฟแบบผลัดตาเดิมยังเล่นต่อได้ทาง "เล่นต่อ" ในหน้าแรก
 function startHeir() {
   const p = loadProgress();
   if (!UI.setupLegend || !p.bossWon || !legendUnlocked(LEGENDS.find(l => l.id === UI.setupLegend), p)) return;
-  startGame(UI.setupLegend, 4, LEVELS.length - 1, 'l', false, true);
-  openDialog(heirIntroHtml());
+  openDialog(heirSetupHtml());
+}
+function startHeirGame() {
+  const p = loadProgress();
+  if (!UI.setupLegend || !p.bossWon) return;
+  closeDialog();
+  newGame(UI.setupLegend, 4, undefined, LEVELS.length - 1, 'l', { heir: true, wego: true, time: UI.wegoTime, troy: true, heirs: p.heirWon });
+  enterWego();
 }
 const heirSkillLine = L => `${L.icon} <b>${esc(L.name)}</b> (${esc(L.origin)}) — ✨ ${esc(L.skillName)}: ${esc(L.skillDesc)} · ⚠️ ${esc(L.weakName)}: ${esc(L.weakDesc)}`;
-function heirIntroHtml() {
-  const ch = S.factions.filter(F => F.id > 0).map(F => `<li>${heirSkillLine(legendOf(F.id))}</li>`).join('');
-  return `<div class="story"><h2>👑 บทที่ 2: ศึกชิงทายาท</h2><div class="center">${aresSvg(84)}</div>
+const heirRivals = me => ['phobos', 'deimos', 'heracles', me === 'lubu' ? 'enyo' : 'lubu'].map(LEG);
+function heirSetupHtml() {
+  const me = UI.setupLegend, sv = loadSave(WEGO_SAVE_KEY);
+  return `<div class="story heir-setup"><h2>👑 บทที่ 2: ศึกชิงทายาท</h2><div class="center">${aresSvg(84)}</div>
     <p>เสียงหัวเราะของ Ares ก้องไปทั่วสนามรบนิรันดร์ “ข้าจะเลือก <b>ทายาทเทพแห่งสงคราม</b> — ผู้ที่ยืนอยู่คนสุดท้ายจะได้ครองพลังของข้า”</p>
     <p>ลูกชายฝาแฝดของเขา โฟบอสกับไดมอส วีรบุรุษเฮราคลีส และนักรบที่ไม่เคยภักดีต่อใคร ต่างลุกขึ้นท้าชิง — แต่ Ares ไม่ได้อยากได้ทายาทจริง ๆ เขาแค่อยากดูลูก ๆ กับวีรบุรุษฆ่ากันเอง</p>
-    <ul class="heir-list">${ch}</ul>
-    <p>🩸 <b>ความโปรดปรานของ Ares</b>: บุกแล้วชนะ ชนะขาด ยึดเมืองหลวง ชนะทั้งที่ทหารน้อยกว่า = เพิ่ม · ถอนทัพ หรือไม่บุกเลย ${HEIR_CFG.idleTurns} เทิร์นขึ้นไป = ลด · ทุก ${HEIR_CFG.blessEvery} เทิร์น ฝ่ายที่โปรดปรานสูงสุดได้ <b>พรของ Ares</b> พลังรบ +15% ${HEIR_CFG.blessTurns} เทิร์น (แล้วเริ่มนับใหม่)</p>
+    <ul class="heir-list">${heirRivals(me).map(L => `<li>${heirSkillLine(L)}</li>`).join('')}</ul>
+    <div class="reveal" style="text-align:left"><b>⏱️ บทนี้เป็นศึกพร้อมกัน</b> — หนึ่งเทิร์นมี 2 ช่วง<br>
+      ① 🧭 <b>วางแผน</b>: ทุกฝ่ายสั่งการพร้อมกันโดยไม่เห็นคำสั่งของกัน — เกณฑ์ทหาร (⚡ เกณฑ์ด่วน) แต่งตั้งแม่ทัพ แตะทัพแล้วแตะปลายทางเพื่อวาดลูกศร แล้วกดยืนยัน (+30 วินาทีได้เทิร์นละครั้ง)<br>
+      ② ⚙️ <b>คำนวณผล</b>: ทุกทัพออกพร้อมกัน — รบเมื่อไหร่ที่เราเกี่ยวข้อง ภาพหยุดให้เลือกกลยุทธ์ตอนนั้น ถูกบุกเลือกถอนทัพได้</div>
+    <div class="setup-row"><span class="kanit">เวลาวางแผน:</span><div class="seg" id="heirTimeSeg">${WEGO_TIMES.map(t => `<button data-wtime="${t}" class="${UI.wegoTime === t ? 'on' : ''}" aria-pressed="${UI.wegoTime === t}">${wegoTimeName(t)}</button>`).join('')}</div></div>
+    <p class="lvl-info">เลือกอยู่: <b>⏱️ ${wegoTimeName(UI.wegoTime)}</b>${UI.wegoTime === 'auto' ? ' (20 วินาที + 10 วินาทีต่อทัพ สูงสุด 90)' : ''} — ใช้ค่าเดียวกับโหมดศึกพร้อมกัน</p>
+    <p>🩸 <b>ความโปรดปรานของ Ares</b>: บุกแล้วชนะ ชนะขาด ยึดเมืองหลวง ชนะทั้งที่ทหารน้อยกว่า = เพิ่ม · ถอนทัพ หรือไม่สั่งบุกเลย ${HEIR_CFG.idleTurns} เทิร์นขึ้นไป = ลด · ทุก ${HEIR_CFG.blessEvery} เทิร์น ฝ่ายที่โปรดปรานสูงสุดได้ <b>พรของ Ares</b> พลังรบ +15% ${HEIR_CFG.blessTurns} เทิร์น (มอบตอนเริ่มช่วงวางแผน)</p>
     <p>👥 กติกาแฝด: โฟบอสกับไดมอสไม่ตีกันเองขณะยังมีฝ่ายอื่นเหลือ ถ้าคนหนึ่งพ่าย อีกคนจะแค้น +20% ถาวรและเล็งฝ่ายที่ล้มแฝด</p>
-    <p>ชนะ = ฝ่ายอื่นพ่ายทั้งหมด หรือครองดินแดนมากที่สุดเมื่อครบ ${maxTurns()} เทิร์น · ไม่นับยศ</p>
-    <div class="center"><button class="btn primary" data-close>ลงสนามชิงทายาท ⚔️</button></div></div>`;
+    <p class="muted">แผนที่ใหญ่ ${MAP_SIZES.l.turns} เทิร์น · บอทระดับตำนาน · ชนะ = ฝ่ายอื่นพ่ายทั้งหมด หรือครองดินแดนมากที่สุดเมื่อครบเทิร์น · ไม่นับยศ</p>
+    <div class="center"><button class="btn primary" data-act="heirstart">ลงสนามชิงทายาท ⚔️</button>
+      ${sv && sv.heir ? ` <button class="btn green" data-act="wegocontinue">▶ เล่นต่อ (${esc(LEGENDS.find(l => l.id === sv.factions[0].legend).name)} · เทิร์น ${sv.turn}/${sv.maxTurns})</button>` : ''}
+      <button class="btn ghost" data-close>ปิด</button></div></div>`;
 }
+const heirIntroHtml = () => heirSetupHtml();
 // ฉากจบเมื่อผู้เล่นชนะบทที่ 2 (แสดงทีละบรรทัด)
 function heirEndingLines() {
   const lubu = S.factions.find(F => F.id > 0 && F.legend === 'lubu');
@@ -4116,7 +4242,7 @@ function wegoSetupHtml() {
     <div class="setup-row" style="margin-top:0"><span class="kanit">เวลาวางแผน:</span><div class="seg" id="wegoTimeSeg">${WEGO_TIMES.map(t => `<button data-wtime="${t}" class="${UI.wegoTime === t ? 'on' : ''}" aria-pressed="${UI.wegoTime === t}">${wegoTimeName(t)}</button>`).join('')}</div></div>
     <p class="lvl-info" id="wegoPick">เลือกอยู่: <b>${lv.icon} ${lv.name}</b> · <b>⏱️ ${wegoTimeName(UI.wegoTime)}</b>${UI.wegoTime === 'auto' ? ' (20 วินาที + 10 วินาทีต่อทัพ สูงสุด 90)' : ''}</p>
     <div class="center" style="margin-top:12px"><button class="btn primary" data-act="wegostart" ${L ? '' : 'disabled'}>เริ่มศึกพร้อมกัน ⚔️</button>
-      ${sv ? ` <button class="btn green" data-act="wegocontinue">▶ เล่นต่อ (${esc(LEGENDS.find(l => l.id === sv.factions[0].legend).name)} · เทิร์น ${sv.turn}/${sv.maxTurns})</button>` : ''}
+      ${sv ? ` <button class="btn green" data-act="wegocontinue">▶ เล่นต่อ (${sv.heir ? '👑 บทที่ 2 · ' : ''}${esc(LEGENDS.find(l => l.id === sv.factions[0].legend).name)} · เทิร์น ${sv.turn}/${sv.maxTurns})</button>` : ''}
       <button class="btn ghost" data-close>ปิด</button></div></div>`;
 }
 function wegoIntroHtml() {
@@ -4491,7 +4617,8 @@ function uiAskStrategy(ctx, role) {
       : estimateSides(atkE, ctx.def, ctx.node, { tired: ctx.breakout });
     const mine = role === 'atk' ? r : 1 / r;
     const canRetreat = role === 'def' && ctx.retreatOpts && ctx.retreatOpts.length > 0;
-    let h = `<h2>${ctx.clash ? '⚔️ ปะทะกลางทาง!' : role === 'def' ? '🚨 ถูกโจมตี!' : ctx.breakout ? '🏃 ตีฝ่าวงล้อม!' : '⚔️ เตรียมปะทะ'}</h2>`;
+    let h = `<h2>${ctx.final ? '⚔️ ศึกสุดท้ายของเทพสงคราม' : ctx.clash ? '⚔️ ปะทะกลางทาง!' : role === 'def' ? '🚨 ถูกโจมตี!' : ctx.breakout ? '🏃 ตีฝ่าวงล้อม!' : '⚔️ เตรียมปะทะ'}</h2>`;
+    if (ctx.final) h += `<div class="reveal" style="border-color:#9b1c1c;background:#fbe9e4;font-size:16px">${aresSvg(40)} Ares: “${ARES_LAST_LINE}”<br><span class="muted">ถอนทัพไม่ได้ · ตีกลับได้ (แม้ทัพ Ares ยังไม่แตก) = ชนะบทที่ 1 · Ares ชนะ = ยึดดินแดนนี้ เกมดำเนินต่อ</span></div>`;
     h += ctx.clash ? `<div class="bt-place">🛣️ บุกสวนกันระหว่าง ${esc(S.nodes[ctx.from].name)}–${esc(node.name)} · กลางทาง: ไม่มีชัยภูมิ/กำแพง · ถอนทัพไม่ได้ · ผู้ชนะบุกเป้าเดิมต่อ ผู้แพ้ถอยกลับ</div>`
       : `<div class="bt-place">${T.icon} ${esc(node.name)} · ${T.name}: ${T.desc}</div>`;
     h += `<div class="bt-sides">${sideCardHtml(ctx.atk, ctx.clash ? 'บุกสวน' : 'ฝ่ายบุก')}<div class="vs">VS</div>${sideCardHtml(ctx.def, ctx.clash ? 'บุกสวน' : 'ฝ่ายรับ')}</div>`;
@@ -4516,6 +4643,7 @@ function uiAskStrategy(ctx, role) {
       h += `<div class="reveal" style="border-color:#a83232;background:#fbe9e4;font-size:16px">⛓️ สปาร์ตาคัส: “${SPARTACUS_LINE}”</div>`;
     }
     if (isBoss() && role === 'atk' && isAres(ctx.def.fac) && ctx.atk.gen && historical(ctx.atk.gen, 0)) h += `<div class="reveal">⚔️ บาดเจ็บจากมนุษย์: ${esc(ctx.atk.gen.name)} เป็นบุคคลในประวัติศาสตร์จริง สู้กับ Ares +10%</div>`;
+    if (aresFrenzy() && isAres(role === 'atk' ? ctx.def.fac : ctx.atk.fac)) h += `<div class="reveal" style="border-color:#9b1c1c;background:#fbe9e4">💢 บัลลังก์แตก — Ares คลั่ง: ทุกทัพของ Ares พลังรบ +40%${S.boss.jar ? ' · 🏺 ไหทองแดง -30%' : ''}</div>`;
     if (isBoss() && isAres(role === 'atk' ? ctx.def.fac : ctx.atk.fac)) h += `<div class="reveal" style="border-color:#6b5aa8;background:#eeeaf8">🦉 แพ้อาเธน่า: Ares มักเลือก “บุกตรง” — “ซุ่มโจมตี” แก้ทางได้</div>`;
     if (ctx.breakout && role === 'atk') h += `<div class="reveal" style="border-color:#b5452b;background:#fbe9e4">🏃 ทัพล้า: พลังรบ -20% · ถอยไม่ได้แล้ว แพ้ = ทัพแตกทั้งหมด</div>`;
     if (ctx.reveal) h += `<div class="reveal">🪶 หยั่งรู้ฟ้าดิน: ศัตรูจะเลือก ${stratTag(ctx.reveal)}<br><span class="muted">ใช้ ${stratTag(counterOf(ctx.reveal))} เพื่อแก้ทาง</span></div>`;
@@ -4624,7 +4752,7 @@ function uiShowBattle(ctx, human) {
     $('battle').classList.remove('hidden');
     if (UI.tut === 'strat') coachHide();
     const aIco = A.gen ? A.gen.icon : facIcon(A.fac), dIco = D.gen ? D.gen.icon : facIcon(D.fac);
-    card.innerHTML = `<h2>⚔️ ${ctx.clash ? 'ปะทะกลางทาง' : 'ปะทะ'}!</h2><div class="strat-line">${stratTag(A.strat)} <span class="vs">vs</span> ${stratTag(D.strat)}</div>
+    card.innerHTML = `<h2>⚔️ ${ctx.final ? 'ศึกสุดท้ายของเทพสงคราม' : ctx.clash ? 'ปะทะกลางทาง' : 'ปะทะ'}!</h2><div class="strat-line">${stratTag(A.strat)} <span class="vs">vs</span> ${stratTag(D.strat)}</div>
       <div class="arena"><span class="fx fa">${aIco}</span><span class="boom">💥</span><span class="fx fb">${dIco}</span></div>`;
     setTimeout(() => {
       const win = (human === 'atk') === ctx.atkWin;
@@ -4749,8 +4877,12 @@ function helpHtml() {
     <li>ยึดเมืองหลวงหุ่นเชิด = ปลดปล่อย: จอมทัพนั้นมาเป็นแม่ทัพของเรา (ใช้สกิลจอมทัพของเขากับทัพนั้น) ดินแดนทั้งหมดเป็นของเรา</li>
     <li>เกจโลหิต: ทุกการรบเติม 1 ช่อง ครบ ${BLOOD_MAX} ช่อง Ares ปล่อยพลัง 🔥 โลหิตเดือด (ทัพ Ares/หุ่นเชิด +25% 2 เทิร์น) หรือ 👻 เชิดวิญญาณ (ดึงตำนานพเนจร หรือตำนานที่ยังไม่ภักดีของเรา) · ทุก 5 เทิร์นภูมิประเทศ 3 แห่งเปลี่ยน</li>
     <li>จุดอ่อน: แพ้อาเธน่า (บุกตรงบ่อย) · ตาข่ายของเฮไฟสตัส (ยึดทุกช่องรอบบัลลังก์ = เกจหยุด) · ไหทองแดง (ล้อมครบ 3 เทิร์น = Ares -30% ไม่มีกำแพง) · บาดเจ็บจากมนุษย์ (ทัพที่บุคคลจริงนำ +10% เมื่อสู้ Ares)</li>
-    <li>ยึดบัลลังก์ → Ares ไร้แผ่นดิน (3 เทิร์น) · ชนะเมื่อทัพของ Ares แตกตอนไร้แผ่นดิน หรือ Ares หาเมืองหลวงใหม่ไม่ได้ · ครบเทิร์นแล้ว Ares ยังอยู่ = แพ้</li></ul>
+    <li>ยึดบัลลังก์ → <b>บัลลังก์แตก — Ares คลั่ง</b>: ไม่นับถอยหลัง ไม่หาเมืองหลวงใหม่ ทุกทัพของ Ares +40% บุกหาทัพ/ดินแดนของเราที่ใกล้ที่สุด ไม่ถอยทัพ จนกว่าจะยึดบัลลังก์คืน (ยึดคืนได้ = ความคลั่งหาย) · หลังเสียบัลลังก์ ตาข่าย/ไหทองแดงล้อม <b>ทัพจอมทัพของ Ares</b> แทนบัลลังก์ (ไหทองแดง = ทุกทัพ Ares -30% ใช้ร่วมกับ +40%)</li>
+    <li>⚔️ ศึกสุดท้ายของเทพสงคราม: ตาของ Ares หลังเสียบัลลังก์ ถ้าทัพจอมทัพจนมุม (ไม่มีดินแดนของ Ares ข้างเคียงให้เดินไป) Ares บุกทัพของเราที่ติดกันและแข็งที่สุดก่อนทำอย่างอื่น (ไม่มีทัพติด = ดินแดนของเราที่ติดกันและมีทหารป้องกันมากที่สุด) — เราถอนทัพไม่ได้ เลือกกลยุทธ์ได้ · ตีกลับได้ = ชนะ · Ares ชนะ = ยึดดินแดนนั้น เกมดำเนินต่อ</li>
+    <li>ชนะ: ตีทัพจอมทัพของ Ares แตกตอนไม่มีบัลลังก์ หรือชนะศึกสุดท้าย (หุ่นเชิดที่เหลือหลุดพ้นพร้อมกัน) · แพ้: ครบเทิร์นแล้ว Ares ยังอยู่ หรือแพ้ตามกติกาปกติ</li></ul>
     <h3>👑 บทที่ 2: ศึกชิงทายาท (ปลดล็อกหลังชนะบทที่ 1)</h3><ul><li>Ares ประกาศเลือก “ทายาทเทพแห่งสงคราม” แต่จริง ๆ แค่อยากดูลูก ๆ กับวีรบุรุษฆ่ากันเอง · เลือกจอมทัพได้ทุกตัวที่ปลดล็อก · แผนที่ใหญ่ AI ระดับตำนาน 5 ฝ่าย · ไม่นับยศ</li>
+    <li>⏱️ <b>เล่นแบบศึกพร้อมกันเท่านั้น</b> (เดินพร้อมกัน แล้วเลือกกลยุทธ์ตอนปะทะ) — เวลาวางแผนใช้ค่าเดียวกับโหมดศึกพร้อมกัน เปลี่ยนได้ในหน้าบทนำ · เซฟบทที่ 2 แบบผลัดตาเดิมยังเล่นต่อแบบเดิมได้</li>
+    <li>จังหวะในศึกพร้อมกัน: โฟบอสคิดตอนเกิดการรบ (ตำแหน่ง ณ ตอนรบ) · ไดมอสทำให้กองรักษาการณ์หนีตอนเริ่มช่วงคำนวณผล ก่อนทัพเคลื่อน · ความคลั่งของเฮราคลีสเปลี่ยนคำสั่งของทัพหนึ่งตอนวางแผน (การบุกนั้น +30%) · ลิโป้แปรพักตร์ตัดสินตอนรบจบ · แฝดไม่สั่งบุกกัน ถ้าบุกสวนกันโดยบังเอิญไม่เกิดการรบ ทั้งคู่กลับที่เดิม · ความโปรดปรานนับระหว่างคำนวณผล ("ตั้งรับอยู่กับที่" = ไม่มีคำสั่งบุก) · พรของ Ares มอบตอนเริ่มช่วงวางแผน ทุกฝ่ายเห็นก่อนสั่งการ · บทพูดของ Ares แสดงในสรุปผลเทิร์นด้วย</li>
     ${['phobos', 'deimos', 'heracles'].map(id => `<li>${heirSkillLine(CHALLENGERS[id])}</li>`).join('')}
     <li>${heirSkillLine(LEG('lubu'))} — ถ้าเราเลือกลิโป้เอง ฝ่ายนี้เปลี่ยนเป็น ${heirSkillLine(CHALLENGERS.enyo)}</li>
     <li>👥 กติกาแฝด: โฟบอสกับไดมอสไม่ตีกันเองขณะยังมีฝ่ายอื่นเหลือ · คนหนึ่งพ่าย อีกคน +20% ถาวรและเล็งฝ่ายที่ล้มแฝด · เหลือแค่สองคน (เราพ่ายแล้ว ดูต่อในโหมดผู้ชม) = สู้กันเอง</li>
@@ -4964,7 +5096,7 @@ function bindUI() {
     if (w) {
       if (w.dataset.wlvl != null) { UI.wegoLevel = +w.dataset.wlvl; try { localStorage.setItem(WEGO_LEVEL_KEY, UI.wegoLevel); } catch (err) { /* ignore */ } }
       else { UI.wegoTime = parseWegoTime(w.dataset.wtime); try { localStorage.setItem(WEGO_TIME_KEY, UI.wegoTime); } catch (err) { /* ignore */ } }
-      openDialog(wegoSetupHtml());
+      openDialog($('dialogCard').querySelector('.heir-setup') ? heirSetupHtml() : wegoSetupHtml());
       return;
     }
     const b = e.target.closest('[data-act]');
@@ -4981,6 +5113,7 @@ function bindUI() {
     if (b.dataset.act === 'endturn') { closeDialog(); endPlayerTurn(); }
     if (b.dataset.act === 'wegoconfirm') { const nw = $('optNoEndWarn'); if (nw && nw.checked) setEndWarnOff(true); closeDialog(); uiWegoConfirm(); }
     if (b.dataset.act === 'wegostart') startWegoFromSetup();
+    if (b.dataset.act === 'heirstart') startHeirGame();
     if (b.dataset.act === 'wegocontinue') continueWego();
     if (b.dataset.act === 'autoendtoggle') { setAutoEndOn(!autoEndOn()); openDialog(menuHtml()); }
     if (b.dataset.act === 'back' && S && isWego()) { closeDialog(); render(); return; }
@@ -5002,8 +5135,9 @@ function bindUI() {
 async function playAutoGame(legendId, numAI, seed, report, opt = {}) {
   if (report.mode === 'sim') ECON = { left: [], broke: [], river: 0, other: 0, capBonus: 0, full: null };
   FX.last = null; FX.steps = []; UI.ghost = false; UI.view = null; // ภาพรอบที่แล้วของเกมก่อนหน้า (แผนที่คนละชุด)
-  newGame(legendId, numAI, seed, opt.level == null ? 1 : opt.level, opt.size || 's', { boss: !!opt.boss, heir: !!opt.heir, troy: !!opt.troy || !!opt.heir, heirs: !!opt.heirs, wego: !!opt.wego, time: 0 });
-  if (opt.wego) {
+  const wego = !!opt.wego || (!!opt.heir && !opt.turnbased);
+  newGame(legendId, numAI, seed, opt.level == null ? 1 : opt.level, opt.size || 's', { boss: !!opt.boss, heir: !!opt.heir, troy: !!opt.troy || !!opt.heir, heirs: !!opt.heirs, wego, time: 0 });
+  if (wego) {
     // ศึกพร้อมกัน: ที่นั่งผู้เล่นวางแผนด้วยบอท (ระดับของเกม) · ตอนรบตอบผ่าน Ctrl.answer → นิสัยแบบคนของ ?sim ด้านล่าง
     let st = 0;
     S.lead8 = undefined;
@@ -5081,6 +5215,10 @@ async function runTests(mode, n, opt = {}) {
       if (S.boss) {
         const bs = report.boss = report.boss || { rage: 0, puppet: 0, athena: 0, net: 0, jar: 0, mortal: 0, freed: 0, throneTaken: 0, aresDead: 0 };
         bs.rage += S.boss.power.rage; bs.puppet += S.boss.power.puppet; bs.freed += S.boss.freed; bs.throneTaken += S.boss.throneTaken ? 1 : 0;
+        // เทิร์นที่เรายึดบัลลังก์ได้ครั้งแรก / ศึกสุดท้าย
+        if (S.boss.throneTurn != null) { bs.throneGames = (bs.throneGames || 0) + 1; bs.throneTurnSum = (bs.throneTurnSum || 0) + S.boss.throneTurn; }
+        bs.finals = (bs.finals || 0) + (S.boss.finals || 0); bs.finalWin = (bs.finalWin || 0) + (S.boss.finalWin || 0);
+        if (S.over && S.over.win) bs['win_' + (S.over.why || 'other')] = (bs['win_' + (S.over.why || 'other')] || 0) + 1;
         for (const k of ['athena', 'net', 'jar', 'mortal']) bs[k] += S.boss.weak[k];
         if (!fac(S.boss.ares).alive) bs.aresDead++;
       }
@@ -5309,10 +5447,10 @@ async function bossLegendChecks(check, nextSeed) {
   const freedArmy = S.armies.find(a => a.gen.lid === PL.id);
   check('boss: capture puppet capital → liberated', !P.alive && P.freed && pcap.owner === 0 && !S.nodes.some(n => n.owner === P.id) && !!freedArmy && freedArmy.fac === 0, `nodes=${pNodes} ${checkInvariants().join(';')}`);
   check('boss: liberated leader keeps his own skill', !!freedArmy && Object.keys(PL.skill).every(k => askill(0, freedArmy.gen, k) === !!PL.skill[k]));
-  // ยึดบัลลังก์ → Ares ไร้แผ่นดิน; ทัพ Ares แตกตอนไร้แผ่นดิน = ชนะ
+  // ยึดบัลลังก์ → บัลลังก์แตก Ares คลั่ง (ไม่นับถอยหลัง ไม่หาเมืองหลวงใหม่) · ทัพจอมทัพ Ares แตกตอนไม่มีบัลลังก์ = ชนะ
   for (const f of S.factions) if (f.id !== 0 && f.id !== ares) { f.alive = false; f.capital = null; for (const n of S.nodes) if (n.owner === f.id) n.owner = 0; S.armies = S.armies.filter(a => a.fac !== f.id); }
   const al = leaderArmy(ares);
-  al.node = S.nodes.find(n => n.owner !== 0 && !armyAt(n.id) && n.capitalOf === null && n.id !== B.throne).id; S.nodes[al.node].owner = ares;
+  al.node = S.nodes.find(n => n.owner !== 0 && !armyAt(n.id) && n.capitalOf === null && n.id !== B.throne && !adjacent(n.id, B.throne)).id; S.nodes[al.node].owner = ares;
   for (const n of S.nodes) if (n.capitalOf !== null && n.id !== B.throne && n.owner === ares) n.owner = 0;
   me.used = 0;
   const st2 = neighbors(B.throne).map(x => x.id).find(id => !neighbors(B.throne).find(x => x.id === id).mountain);
@@ -5320,9 +5458,88 @@ async function bossLegendChecks(check, nextSeed) {
   S.nodes[st2].owner = 0; me.node = st2;
   S.nodes[B.throne].garrison = U(1);
   await moveArmy(me, B.throne);
-  check('boss: throne taken → Ares homeless 3 turns', S.nodes[B.throne].owner === 0 && fac(ares).capital == null && fac(ares).homeless && fac(ares).homeless.left === HOMELESS_TURNS && !S.over);
+  check('boss: throne taken → Ares frenzy, no countdown, no new capital', S.nodes[B.throne].owner === 0 && fac(ares).capital == null && fac(ares).homeless && fac(ares).homeless.left == null && B.frenzy && !S.over && B.throneTurn === S.turn);
+  for (let i = 0; i < 5; i++) homelessTick(ares);
+  check('boss: no landless defeat for Ares after 3+ turns', fac(ares).alive && !S.over);
+  const frSide = { fac: ares, units: U(10), gen: al.gen, pos: al.node };
+  check('boss: frenzy — every Ares army +40%', has(mods(frSide, kSide, al.node, 'atk'), /Ares คลั่ง/, ARES_FRENZY) && has(mods({ ...frSide, gen: { name: 'x', icon: '🎖️', leader: false } }, kSide, al.node, 'def'), /Ares คลั่ง/, ARES_FRENZY)
+    && !has(mods(kSide, frSide, al.node, 'atk'), /Ares คลั่ง/));
+  showScreen('game'); render();
+  check('boss: frenzy shown on map, Ares card, top chip', !!document.querySelector('#map .frenzy') && /Ares คลั่ง/.test($('bossCard').textContent) && /💢/.test($('chips').textContent) && /ช่วงหลังเสียบัลลังก์/.test($('bossCard').textContent));
+  const rctx = { node: al.node, atk: { fac: 0, units: U(200), gen: leaderArmy(0).gen, pos: me.node }, def: { fac: ares, units: U(5), gen: al.gen, pos: al.node }, retreatOpts: [{ to: B.throne, kind: 'safe', lossFrac: 0.1, after: 4 }] };
+  check('boss: frenzied Ares never retreats', aiRetreatChoice(rctx, 3) === null);
+  check('boss: frenzied Ares AI uses the hunt logic (no careful-landless logic)', aiChooseMove(al) === aresFrenzyMove(al));
+  // ตาข่าย/ไหทองแดงรอบทัพจอมทัพของ Ares
+  for (const nb of neighbors(al.node)) { S.nodes[nb.id].owner = 0; S.nodes[nb.id].garrison = Z(); const x = armyAt(nb.id); if (x && x.fac !== 0) S.armies = S.armies.filter(y => y !== x); }
+  const g1 = B.gauge; bloodTick();
+  check("boss: after throne — Hephaestus' net around Ares' leader army stops the gauge", aresCore() === al.node && throneNet() && B.gauge === g1);
+  B.jar = false; B.siege = 0; bossRound(); bossRound();
+  const jar3 = B.jar; bossRound();
+  check('boss: after throne — bronze jar around leader 3 turns → all Ares armies -30% (stacks with +40%)', !jar3 && B.jar && has(mods(frSide, kSide, al.node, 'atk'), /ไหทองแดง/, 0.7) && has(mods(frSide, kSide, al.node, 'atk'), /Ares คลั่ง/, ARES_FRENZY));
+  // Ares ยึดบัลลังก์คืน = ความคลั่งหาย
+  {
+    const tnb = neighbors(B.throne).map(x => x.id).find(id => !mountainEdge(id, B.throne) && id !== me.node);
+    me.node = S.nodes.find(n => n.owner === 0 && !armyAt(n.id) && n.id !== B.throne && n.id !== tnb).id;
+    if (armyAt(tnb)) S.armies = S.armies.filter(y => y !== armyAt(tnb));
+    S.nodes[tnb].owner = ares;
+    const back = newArmy(ares, tnb, { name: 'กองหน้า Ares', icon: '🎖️', leader: false }, U(60));
+    S.nodes[B.throne].garrison = Z();
+    await moveArmy(back, B.throne);
+    check('boss: Ares retakes the throne → frenzy ends', S.nodes[B.throne].owner === ares && fac(ares).capital === B.throne && !B.frenzy && !fac(ares).homeless && !has(mods(frSide, kSide, B.throne, 'atk'), /Ares คลั่ง/));
+    S.nodes[B.throne].owner = 0; S.armies = S.armies.filter(y => y !== back); aresLoseThrone(0);
+  }
   destroyArmy(al, { by: 0 });
-  check('boss: Ares army broken while homeless → win', S.over && S.over.win && S.over.reason === 'boss');
+  check('boss: Ares leader army broken without throne → win', S.over && S.over.win && S.over.reason === 'boss' && S.over.why === 'leader');
+
+  // --- ศึกสุดท้ายของเทพสงคราม ---
+  const keepCtl = [Ctrl.askStrategy, Ctrl.showBattle, Ctrl.showRetreat, Ctrl.showJoin];
+  let seenCtx = null;
+  Ctrl.askStrategy = async (ctx, role) => { seenCtx = { final: ctx.final, ret: ctx.retreatOpts.length, role }; return role === 'def' ? 'defend' : 'charge'; };
+  Ctrl.showBattle = Ctrl.showRetreat = Ctrl.showJoin = async () => {};
+  const lastStand = (aresU, strongU, weakU) => {
+    newGame('kongming', 2, 33000, 1, 's', { boss: true });
+    S.wild = []; S.wInGame = [];
+    const A = S.boss.ares, L = leaderArmy(A);
+    const X = S.nodes.find(n => n.capitalOf === null && S.factions.every(f => f.capital == null || (f.capital !== n.id && !adjacent(n.id, f.capital)))
+      && neighbors(n.id).filter(nb => !nb.mountain && S.nodes[nb.id].capitalOf === null).length >= 3);
+    const nbs = neighbors(X.id).filter(nb => !nb.mountain && S.nodes[nb.id].capitalOf === null).map(nb => nb.id);
+    for (const id of [X.id, ...neighbors(X.id).map(nb => nb.id)]) { const x = armyAt(id); if (x && x !== L && !x.gen.leader) S.armies = S.armies.filter(y => y !== x); }
+    for (const nb of neighbors(X.id)) if (S.nodes[nb.id].owner === A) S.nodes[nb.id].owner = NEUTRAL;
+    S.nodes[S.boss.throne].owner = 0; X.owner = A; L.node = X.id; L.units = { ...aresU }; L.used = 0;
+    aresLoseThrone(0);
+    const [ns, nw, nf] = nbs;
+    for (const id of nbs) { S.nodes[id].owner = 0; S.nodes[id].garrison = Z(); S.nodes[id].terrain = 'mountain'; }
+    const strong = newArmy(0, ns, { name: 'แข็ง', icon: '🎖️', leader: false }, { ...strongU }), weak = weakU ? newArmy(0, nw, { name: 'อ่อน', icon: '🎖️', leader: false }, { ...weakU }) : null;
+    // ทางถอยที่ปลอดภัยของทัพแข็ง (ดินแดนเราว่าง) มีอยู่ แต่ศึกนี้ต้องถอนไม่ได้
+    const safe = neighbors(ns).map(nb => nb.id).find(id => id !== X.id && !armyAt(id) && S.nodes[id].capitalOf === null);
+    if (safe != null) S.nodes[safe].owner = 0;
+    return { A, L, X: X.id, ns, nw, nf, strong, weak, safe };
+  };
+  let LS = lastStand(U(40), U(100), U(10));
+  check('last stand: not triggered while Ares has own land next door', (() => { S.nodes[LS.nf].owner = LS.A; const t = aresLastStandTarget(LS.L); S.nodes[LS.nf].owner = 0; return t == null; })());
+  check('last stand: cornered → targets our strongest adjacent army', aresLastStandTarget(LS.L) === LS.ns);
+  seenCtx = null;
+  await aiTakeActions(LS.A);
+  check('last stand: player cannot retreat (safe land exists)', !!seenCtx && seenCtx.final && seenCtx.ret === 0 && seenCtx.role === 'def' && LS.safe != null);
+  check('last stand: Ares beaten back (army survives) → player wins, puppets freed', S.over && S.over.win && S.over.reason === 'boss' && S.over.why === 'final' && S.armies.includes(LS.L)
+    && S.factions.filter(f => f.id > 0 && !isAres(f.id)).every(f => f.freed && !f.alive) && /ใครแข็งแกร่งที่สุด/.test(S.log.map(l => l.text).join()), `over=${JSON.stringify(S.over)} ares=${sumU(LS.L.units)}`);
+  LS = lastStand(U(300), U(20), null);
+  await aiTakeActions(LS.A);
+  check('last stand: Ares wins → takes the land, game goes on', !S.over && S.nodes[LS.ns].owner === LS.A && LS.L.node === LS.ns);
+  LS = lastStand(U(40), U(0), null);
+  S.armies = S.armies.filter(a => a !== LS.strong);
+  S.nodes[LS.ns].garrison = U(3); S.nodes[LS.nw].garrison = U(9);
+  check('last stand: no adjacent army → our adjacent land with most defenders', aresLastStandTarget(LS.L) === LS.nw);
+  [Ctrl.askStrategy, Ctrl.showBattle, Ctrl.showRetreat, Ctrl.showJoin] = keepCtl;
+  // หน้าต่างรบของศึกสุดท้าย
+  LS = lastStand(U(40), U(100), null);
+  {
+    const fctx = { node: LS.ns, final: true, atk: { fac: LS.A, units: U(40), gen: LS.L.gen, pos: LS.X }, def: { fac: 0, units: U(100), gen: LS.strong.gen, pos: LS.ns }, retreatOpts: [], outcome: [] };
+    const pr = uiAskStrategy(fctx, 'def'), card = $('battleCard').textContent;
+    check('last stand window: special title + Ares line, no retreat button', /ศึกสุดท้ายของเทพสงคราม/.test(card) && card.includes(ARES_LAST_LINE) && !document.querySelector('#battleCard [data-retreat-open]') && /Ares คลั่ง/.test(card));
+    document.querySelector('#battleCard .btn.strat').click(); await pr;
+    $('battle').classList.add('hidden');
+  }
   // ครบเทิร์นแล้ว Ares ยังอยู่ = แพ้
   newGame('napoleon', 2, nextSeed(), 1, 's', { boss: true });
   endByTurns();
@@ -6622,7 +6839,9 @@ async function runHeirTest() {
   Ctrl.showBattle = Ctrl.showRetreat = Ctrl.showJoin = async () => {};
   Ctrl.askDismiss = async (j, g, c) => c[0];
   let sd = 7100;
-  const heir = (legend = 'napoleon') => { newGame(legend, 4, sd++, 3, 'l', { heir: true, troy: true }); S.wild = []; S.wInGame = []; return S.heir; };
+  // บทที่ 2 = ศึกพร้อมกัน · noOrders = คำสั่งว่างทุกฝ่าย (พร้อมคำนวณผล)
+  const noOrders = () => { S.wego.orders = {}; for (const x of S.factions) if (x.alive) S.wego.orders[x.id] = { ...emptyOrders(), ready: true }; return S.wego.orders; };
+  const heir = (legend = 'napoleon') => { newGame(legend, 4, sd++, 3, 'l', { heir: true, wego: true, time: 0, troy: true }); S.wild = []; S.wInGame = []; noOrders(); return S.heir; };
   const F = id => S.factions.find(x => x.legend === id).id;
   // ดินแดนว่างสองแห่งที่ติดกัน (ไม่ใช่เมืองหลวง ไม่มีเทือกเขา)
   const pair = (k = 2) => {
@@ -6643,11 +6862,17 @@ async function runHeirTest() {
     recordBossWin(); renderTitle();
     check('chapter 1 win → chapter 2 unlocked, rewards still hidden', !$('btnHeir').disabled && /ศึกชิงทายาทกับ นโปเลียน/.test($('btnHeir').textContent) && !document.querySelector('[data-legend="lubu"]') && !!document.querySelector('[data-legend="agamemnon"]'));
     UI.setupLegend = 'agamemnon'; renderTitle();
+    const keepT = UI.wegoTime;
     $('btnHeir').click();
-    check('start chapter 2: 5 sides, large map, legend AI, intro', isHeir() && S.factions.length === 5 && S.size === 'l' && S.level === LEVELS.length - 1
-      && ['phobos', 'deimos', 'heracles', 'lubu'].every(id => S.factions.some(x => x.legend === id)) && legendOf(0).id === 'agamemnon'
-      && !$('dialog').classList.contains('hidden') && /ศึกชิงทายาท/.test($('dialogCard').textContent));
-    closeDialog();
+    check('chapter 2 intro: says it is simultaneous play, explains 2 phases, time options', !S && !$('dialog').classList.contains('hidden') && /บทนี้เป็นศึกพร้อมกัน/.test($('dialogCard').textContent)
+      && /วางแผน/.test($('dialogCard').textContent) && /คำนวณผล/.test($('dialogCard').textContent) && document.querySelectorAll('#heirTimeSeg [data-wtime]').length === WEGO_TIMES.length);
+    document.querySelector('#heirTimeSeg [data-wtime="90"]').click();
+    check('chapter 2 intro: change time (shared with simultaneous mode)', UI.wegoTime === 90 && !!document.querySelector('#heirTimeSeg .on[data-wtime="90"]') && !!document.querySelector('.heir-setup'));
+    document.querySelector('#dialogCard [data-act="heirstart"]').click();
+    check('start chapter 2: simultaneous play, 5 sides, large map, legend AI', isHeir() && isWego() && S.wego.time === 90 && S.wego.phase === 'plan' && S.factions.length === 5 && S.size === 'l' && S.level === LEVELS.length - 1
+      && ['phobos', 'deimos', 'heracles', 'lubu'].every(id => S.factions.some(x => x.legend === id)) && legendOf(0).id === 'agamemnon' && $('dialog').classList.contains('hidden'));
+    UI.wegoTime = keepT;
+    check('chapter 2 planning card works (quick recruit / +30 s / army list)', !$('wegoCard').classList.contains('hidden') && !!document.querySelector('#wegoCard [data-wact="extra"]') && !!document.querySelector('#wegoCard [data-wsel]'));
     check('chapter 2 UI: favor gauge on every chip + Ares card', S.factions.every(x => $('chips').textContent.includes('🩸')) && /👑 บทที่ 2/.test($('chips').textContent)
       && !$('bossCard').classList.contains('hidden') && /ความโปรดปรานของ Ares/.test($('bossCard').textContent) && $('bossCard').querySelectorAll('.fav-row').length === 5);
     // จอมทัพรางวัลไม่เข้ากองสุ่มก่อนปลดล็อก
@@ -6683,16 +6908,19 @@ async function runHeirTest() {
     const seat0 = fac(0).capital, seatNb = neighbors(seat0).map(x => x.id).find(id => !armyAt(id) && S.nodes[id].capitalOf === null && id !== v);
     own(seatNb, D); newArmy(D, seatNb, plain('D2'), U(5));
     const g0 = sumU(S.nodes[seat0].garrison);
+    const vBefore = sumU(S.nodes[v].garrison);
+    startFactionTurn(D);
+    check('Deimos (simultaneous): nothing at turn start', sumU(S.nodes[v].garrison) === vBefore);
     const nN = neighbors(u).map(x => x.id).find(id => id !== v && !armyAt(id) && S.nodes[id].capitalOf === null && id !== seatNb);
     if (nN != null) own(nN, NEUTRAL, U(5));
     const [u2] = pair(), wN = neighbors(u2).map(x => x.id).find(id => !armyAt(id) && S.nodes[id].capitalOf === null && id !== v && id !== nN && !adjacent(id, u) && !adjacent(id, seatNb));
     own(u2, D); newArmy(D, u2, plain('D3'), U(5));
     if (wN != null) { own(wN, NEUTRAL, U(6)); S.wild = [{ wid: 'robin', node: wN }]; }
-    startFactionTurn(D);
+    await resolveWego(noOrders());
     check('Deimos: adjacent neutral local forces flee 1', nN == null || sumU(S.nodes[nN].garrison) === 4, `n=${nN} g=${nN != null && sumU(S.nodes[nN].garrison)}`);
     check('Deimos: land with a wandering legend unaffected', wN == null || sumU(S.nodes[wN].garrison) === 6, `w=${wN}`);
     S.wild = [];
-    check('Deimos: adjacent enemy garrison loses 2 at his turn start', sumU(S.nodes[v].garrison) === 3 && /ความสยดสยอง/.test(logs()), `g=${sumU(S.nodes[v].garrison)}`);
+    check('Deimos: adjacent enemy garrison loses 2 at the start of resolution', sumU(S.nodes[v].garrison) === 3 && /ความสยดสยอง/.test(logs()), `g=${sumU(S.nodes[v].garrison)}`);
     check('Deimos: capitals unaffected', sumU(S.nodes[seat0].garrison) === g0);
     // เฮราคลีส: ปราบอสูร / ความคลั่งจากเฮรา
     H = heir(); const HR = F('heracles'); P = F('phobos');
@@ -6702,9 +6930,14 @@ async function runHeirTest() {
     HEIR_CFG.madness = 1;
     for (const x of S.factions) x.human = false;
     for (const a of S.armies.filter(a => a.fac === HR)) for (const nb of neighbors(a.node)) if (S.nodes[nb.id].owner !== HR && !armyAt(nb.id) && S.nodes[nb.id].capitalOf === null) S.nodes[nb.id].garrison = U(3);
+    const madPlan = wegoPlanBot(HR);
+    HEIR_CFG.madness = keepMad;
+    const mm = madPlan.moves.find(m => m.mad);
+    check("Heracles' madness rewrites one bot order into a random adjacent attack", !!mm && mm.path.length === 1 && S.nodes[mm.path[0]].owner !== HR && madPlan.moves.filter(m => m.mad).length === 1, JSON.stringify(madPlan.moves));
+    noOrders(); S.wego.orders[HR] = madPlan;
     powerOf = (side, other, node, role, opts) => { const r = realPower(side, other, node, role, opts); if (side.fac === HR && role === 'atk' && opts && opts.luck) madMods.push(r.mods.map(m => m.label).join()); return r; };
-    try { await aiTakeActions(HR); } finally { powerOf = realPower; HEIR_CFG.madness = keepMad; }
-    check("Heracles: mad attack is a double-edged sword (+30% in that battle only)", /ความคลั่งจากเฮรา/.test(madMods[0] || '') && !MAD.gen, JSON.stringify(madMods.slice(0, 2)));
+    try { await resolveWego(S.wego.orders); } finally { powerOf = realPower; }
+    check("Heracles: mad attack is a double-edged sword (+30% in that battle only)", madMods.some(t => /ความคลั่งจากเฮรา/.test(t)) && !MAD.gen && H.stats.madness === 1 && /ความคลั่งจากเฮรา/.test(logs()), JSON.stringify(madMods.slice(0, 2)));
     check('Heracles: +30% only while mad', !has(mods({ fac: HR, units: U(10), gen: leaderArmy(HR).gen, pos: null }, { fac: 0, units: U(10), gen: null }, 0, 'atk'), /ความคลั่ง/));
     check("Heracles: Hera's madness sends an army at a random neighbour", H.stats.madness === 1 && /ความคลั่งจากเฮรา/.test(logs()), logs().slice(0, 200));
     // ลิโป้
@@ -6722,7 +6955,7 @@ async function runHeirTest() {
     await moveArmy(traitor, v);
     const gv = sumU(S.nodes[v].garrison);
     check('Lu Bu: beaten general → survivors defect to the winner (attacker lost)', !S.armies.includes(traitor) && /แปรพักตร์/.test(logs()) && gv > 0, `garrison=${gv}`);
-    check('Ares line on first Lu Bu defection', /นั่นแหละ ลูกข้า/.test(logs()) && S.tag && /นั่นแหละ/.test(S.tag.text));
+    check('Ares line on first Lu Bu defection (log, map tag, turn summary)', /นั่นแหละ ลูกข้า/.test(logs()) && S.tag && /นั่นแหละ/.test(S.tag.text) && UI.notices.some(t => /นั่นแหละ ลูกข้า/.test(t)));
     [u, v] = pair();
     own(u, 0); own(v, LB);
     S.noRetreat = [LB];
@@ -6783,8 +7016,17 @@ async function runHeirTest() {
     check('twins: allied while others remain (no attacks)', allied(P, D) && !hostile(P, D) && hostile(P, 0) && hostile(P, F('heracles')));
     [u, v] = pair();
     own(u, P); own(v, D);
-    const pt = newArmy(P, u, plain('PT'), U(30));
+    const pt = newArmy(P, u, plain('PT'), U(30)); // eslint-disable-line
     check('twins: twin land not a move target', !moveTargets(pt).includes(v));
+    // แฝดบุกสวนกัน (คำสั่งที่หลุดมา) = ไม่เกิดการรบ ทั้งคู่กลับที่เดิม
+    const dt = newArmy(D, v, plain('DT'), U(30));
+    noOrders(); S.wego.orders[P].moves.push({ army: pt.id, path: [v] }); S.wego.orders[D].moves.push({ army: dt.id, path: [u] });
+    FX.rec = true; FX.steps = []; FX.cur = null;
+    await resolveWego(S.wego.orders);
+    FX.rec = false;
+    check('twins: head-on orders → no battle, both back home', pt.node === u && dt.node === v && sumU(pt.units) === 30 && sumU(dt.units) === 30 && !FX.steps.flatMap(st => st.ev).some(e => e.t === 'battle') && S.nodes[u].owner === P && S.nodes[v].owner === D);
+    check('twins: bots never plan attacks on each other', [P, D].every(t => wegoPlanBot(t).moves.every(m => m.path.every(n => !H.twins.includes(S.nodes[n].owner) || S.nodes[n].owner === t))));
+    S.armies = S.armies.filter(a => a !== pt && a !== dt);
     // แฝดคนหนึ่งพ่ายด้วยมือผู้เล่น
     eliminate(P, 0, 'leader');
     check('twin falls → other +20% for good', has(mods({ fac: D, units: U(10), gen: plain('d') }, { fac: 0, units: U(10), gen: null }, 0, 'atk'), /แค้นแทนแฝด/, HEIR_CFG.twinRage));
@@ -6831,6 +7073,15 @@ async function runHeirTest() {
     H.favor[LB3] = 4; H.lastAtk[LB3] = S.turn; S.turn += HEIR_CFG.idleTurns;
     heirRound();
     check('favor: idle 3+ turns → -1 per turn', H.favor[LB3] === 3, `fav=${H.favor[LB3]}`);
+    // ศึกพร้อมกัน: "ตั้งรับอยู่กับที่" = ไม่มีคำสั่งบุก
+    H.lastAtk[LB3] = 1; H.lastAtk[P] = 1;
+    noOrders();
+    for (const a of S.armies) a.used = 0;
+    const lbA = S.armies.find(a => a.fac === LB3 && moveTargets(a).some(id => S.nodes[id].owner !== LB3));
+    if (lbA) S.wego.orders[LB3].moves.push({ army: lbA.id, path: [moveTargets(lbA).find(id => S.nodes[id].owner !== LB3)] });
+    const turnNow = S.turn;
+    await resolveWego(S.wego.orders);
+    check('favor: an attack order counts as attacking, no order = idle', !lbA || (H.lastAtk[LB3] === turnNow && H.lastAtk[P] === 1));
     // พรของ Ares ทุก 5 เทิร์น
     S.turn = 6;
     for (const x of S.factions) H.favor[x.id] = x.id === LB3 ? 9 : 2;
@@ -6848,15 +7099,26 @@ async function runHeirTest() {
     S.turn = 16; for (const x of S.factions) { H.favor[x.id] = 0; H.lastAtk[x.id] = S.turn; }
     heirRound();
     check('bless: nobody favoured → no blessing', !H.bless || H.bless.fac === 0 && H.bless.left < 2);
+    // พรมอบตอนเริ่มช่วงวางแผน (ก่อนทุกฝ่ายสั่งการ)
+    S.turn = 15; H.bless = null; S.wego.ticked = false; S.wego.phase = 'resolve';
+    for (const x of S.factions) { H.favor[x.id] = x.id === LB3 ? 7 : 1; H.lastAtk[x.id] = 16; }
+    const r16 = await wegoNextTurn();
+    check('bless: granted at the start of the planning phase, visible to all before orders', r16 === 'next' && S.turn === 16 && S.wego.phase === 'plan' && H.bless && H.bless.fac === LB3 && H.blessAt === 16
+      && S.factions.every(x => !x.alive || x.human || S.wego.orders[x.id].ready));
     showScreen('game'); render();
+    check('bless shown on chips + card for everyone', /✨/.test($('chips').textContent) && /พรของ Ares/.test($('bossCard').textContent));
     check('favor card explains gains/losses', /ยึดเมืองหลวง/.test($('bossCard').textContent) && /ถอนทัพ/.test($('bossCard').textContent) && /พรครั้งถัดไป/.test($('bossCard').textContent));
 
     // ---------- 6. ฉากจบ + ปลดล็อก 3 จอมทัพ (ไม่นับยศ) ----------
     saveDisabled = false;
     const prog0 = loadProgress();
-    heir('napoleon'); showScreen('game'); render();
-    S.over = { win: true, reason: 'conquest' }; uiGameOver();
+    heir('napoleon'); enterWego();
+    S.turn = maxTurns();
+    for (const n of S.nodes) if (n.owner === NEUTRAL) n.owner = 0;
+    noOrders();
+    await uiWegoResolve();
     const endT = $('dialogCard').textContent;
+    check('ending after resolving the last turn (simultaneous)', S.over && S.over.win && S.over.reason === 'turns' && /ชนะศึกชิงทายาท/.test(endT));
     check('ending lines (Lu Bu alive)', /ร่างทรงคนต่อไป/.test(endT) && /ไอ้โง่/.test(endT) && /อากาเม็มนอนตะโกนเตือน/.test(endT) && /ยังไม่ใช่ตอนนี้/.test(endT) && /ข้าจะรอ จนกว่าเจ้าจะอยากเป็นเทพเอง/.test(endT) && /ปลดล็อกจอมทัพรางวัล/.test(endT));
     const p1 = loadProgress();
     check('win unlocks Lu Bu, Cao Cao, Sun Quan — rank untouched', p1.heirWon && p1.unlocked === prog0.unlocked && p1.best === prog0.best);
@@ -6869,14 +7131,25 @@ async function runHeirTest() {
     check('title: reward legends selectable after unlock', ['lubu', 'caocao', 'sunquan'].every(id => !!document.querySelector(`[data-legend="${id}"]`)));
     check('recordHeirWin first only once', recordHeirWin() === false);
 
+    // ---------- เซฟบทที่ 2 แบบผลัดตาเดิม เล่นต่อแบบเดิมได้ ----------
+    saveDisabled = false;
+    try { localStorage.removeItem(SAVE_KEY); localStorage.removeItem(WEGO_SAVE_KEY); } catch (e) { /* ignore */ }
+    newGame('napoleon', 4, sd++, 3, 'l', { heir: true, troy: true });
+    saveGame(); S = null;
+    showScreen('title'); renderTitle();
+    check('old turn-based chapter 2 save: continue button', !$('btnContinue').classList.contains('hidden') && /บทที่ 2/.test($('btnContinue').textContent));
+    $('btnContinue').click();
+    check('old turn-based chapter 2 save continues turn-based', isHeir() && !isWego() && S.phase === 'player' && /จบเทิร์น/.test($('btnEnd').textContent));
+    clearSave(); saveDisabled = true;
+
     // ---------- 7. แพ้ → โหมดผู้ชมในบทนี้ ----------
     saveDisabled = true;
-    heir('napoleon'); showScreen('game'); render();
+    heir('napoleon'); enterWego();
     eliminate(0, F('heracles'), 'leader'); render(); uiGameOver();
     const sb = document.querySelector('#dialogCard [data-act="spectate"]');
     check('chapter 2: lost early → watch bots', !!sb && !$('overBar').classList.contains('hidden'));
     if (sb) { sb.click(); await UI.specTask; }
-    check('chapter 2 spectate plays to the end', !!S.specResult && !S.spectate && checkInvariants().length === 0 && window.__errs.length === 0, `turn=${S.turn} ${S.specResult && S.specResult.reason} ${checkInvariants().join(';')}`);
+    check('chapter 2 spectate (simultaneous) plays to the end', isWego() && !!S.specResult && !S.spectate && checkInvariants().length === 0 && window.__errs.length === 0, `turn=${S.turn} ${S.specResult && S.specResult.reason} ${checkInvariants().join(';')}`);
     closeDialog();
   } catch (e) { res.push('EXC ' + (e && e.stack || e)); }
   $('testOut').textContent = 'TESTDONE ' + JSON.stringify({ heir: res, errs: window.__errs });
@@ -7488,6 +7761,7 @@ function boot() {
   if (q.has('troy')) topt.troy = true;
   if (q.has('heir')) topt.heir = true;
   if (q.has('heirs')) topt.heirs = true;
+  if (q.has('turnbased')) topt.turnbased = true; // บทที่ 2 แบบผลัดตาเดิม (ไว้เทียบใน ?sim)
   // บทที่ 2: ปรับตัวเลขของผู้ท้าชิง/ความโปรดปรานใน ?sim — &hc=fear:0.85,madness:0.1
   for (const kv of (q.get('hc') || '').split(',')) { const [k, v] = kv.split(':'); if (k in HEIR_CFG && Number.isFinite(+v)) HEIR_CFG[k] = +v; }
   if (q.get('from')) topt.from = +q.get('from');
